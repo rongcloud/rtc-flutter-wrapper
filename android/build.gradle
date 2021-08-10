@@ -1,0 +1,52 @@
+package android
+
+group 'cn.rongcloud.rongcloud_rtc_wrapper_plugin'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 19
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+
+    def configFile = file('../version.config')
+    def configProperties = new Properties()
+    assert configFile.exists()
+    configFile.withReader("UTF-8") { reader -> configProperties.load(reader) }
+    def rtc_sdk_version = configProperties.getProperty("android_rtc_sdk_version")
+    assert rtc_sdk_version != null, "You need to config android_rtc_sdk_version in version.config!!"
+
+    implementation 'cn.rongcloud.sdk:im_lib:5.1.3.1'
+    implementation 'cn.rongcloud.sdk:rtc_lib:' + rtc_sdk_version
+}

@@ -1,0 +1,6 @@
+framework module RongRTCLibWrapper {
+  umbrella header "RongRTCLibWrapper.h"
+
+  export *
+  module * { export * }
+}

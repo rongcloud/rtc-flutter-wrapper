@@ -1,0 +1,76 @@
+PODS:
+  - Flutter (1.0.0)
+  - "permission_handler (5.1.0+2)":
+    - Flutter
+  - rongcloud_im_plugin (0.0.1):
+    - Flutter
+    - RongCloudIM/IMLib (= 5.1.3.1)
+  - rongcloud_rtc_wrapper_plugin (0.0.1):
+    - Flutter
+    - RongCloudIM/IMLib (= 5.1.3.1)
+    - RongCloudRTC/RongRTCLib (= 5.1.6)
+  - RongCloudIM/ChatRoom (5.1.3.1):
+    - RongCloudIM/IMLibCore
+  - RongCloudIM/CustomerService (5.1.3.1):
+    - RongCloudIM/IMLibCore
+  - RongCloudIM/Discussion (5.1.3.1):
+    - RongCloudIM/IMLibCore
+  - RongCloudIM/IMLib (5.1.3.1):
+    - RongCloudIM/ChatRoom
+    - RongCloudIM/CustomerService
+    - RongCloudIM/Discussion
+    - RongCloudIM/IMLibCore
+    - RongCloudIM/Location
+    - RongCloudIM/PublicService
+  - RongCloudIM/IMLibCore (5.1.3.1)
+  - RongCloudIM/Location (5.1.3.1):
+    - RongCloudIM/IMLibCore
+  - RongCloudIM/PublicService (5.1.3.1):
+    - RongCloudIM/IMLibCore
+  - RongCloudRTC/RongRTCLib (5.1.6):
+    - RongCloudIM/IMLibCore (>= 5.1.3)
+  - shared_preferences (0.0.1):
+    - Flutter
+  - wakelock (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - rongcloud_im_plugin (from `.symlinks/plugins/rongcloud_im_plugin/ios`)
+  - rongcloud_rtc_wrapper_plugin (from `.symlinks/plugins/rongcloud_rtc_wrapper_plugin/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+
+SPEC REPOS:
+  trunk:
+    - RongCloudIM
+    - RongCloudRTC
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
+  rongcloud_im_plugin:
+    :path: ".symlinks/plugins/rongcloud_im_plugin/ios"
+  rongcloud_rtc_wrapper_plugin:
+    :path: ".symlinks/plugins/rongcloud_rtc_wrapper_plugin/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
+  wakelock:
+    :path: ".symlinks/plugins/wakelock/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
+  rongcloud_im_plugin: 974b9332fa8328825a63d995b939bca269d5df46
+  rongcloud_rtc_wrapper_plugin: 28ecefdc8be3231f3e4fc650fd845bdd3aaf5747
+  RongCloudIM: 68186cbc17e695d49dc953612ccf80a6cc160ebf
+  RongCloudRTC: 350f40a92cd4e658a9e581e529e835a6b64636cd
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  wakelock: b0843b2479edbf6504d8d262c2959446f35373aa
+
+PODFILE CHECKSUM: 3114a78088f706d6db7780fa052eeb71960ff573
+
+COCOAPODS: 1.10.1
