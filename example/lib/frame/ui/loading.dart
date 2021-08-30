@@ -8,9 +8,9 @@ class Loading {
     Loading? loading = _cache[context];
     if (loading == null) {
       loading = Loading(0, _buildLoading(context));
+      _cache[context] = loading;
     }
     loading._retain++;
-    _cache[context] = loading;
   }
 
   static OverlayEntry _buildLoading(BuildContext context) {
@@ -57,8 +57,8 @@ class Loading {
     if (loading != null) {
       loading._retain--;
       if (loading._retain <= 0) {
+        _cache.remove(context);
         loading._entry.remove();
-        _cache[context] = null;
       }
     }
   }

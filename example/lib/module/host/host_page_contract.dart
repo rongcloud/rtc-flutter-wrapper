@@ -9,6 +9,7 @@ abstract class View implements IView {
   void onUserLeft(String id);
 
   void onUserAudioStateChanged(String id, bool published);
+
   void onUserVideoStateChanged(String id, bool published);
 
   void onExit();

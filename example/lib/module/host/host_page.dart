@@ -44,7 +44,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
 
   @override
   void dispose() {
-    Utils.engine?.setStatsListener(null);
+    _remotes.clear();
 
     _networkStats = null;
     _localAudioStats = null;
@@ -490,7 +490,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
           ),
         ),
       ),
-      onWillPop: () => _exit(),
+      onWillPop: _exit,
     );
   }
 
@@ -688,8 +688,9 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Loading.dismiss(context);
   }
 
-  Future<bool> _exit() {
+  Future<bool> _exit() async {
     Loading.show(context);
+    await Utils.engine?.setStatsListener(null);
     presenter.exit();
     return Future.value(false);
   }
@@ -710,17 +711,21 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Completer<void> completer = Completer();
     _remotes.clear();
     int count = Utils.users.length;
-    Utils.users.forEach((user) async {
-      if (user.videoSubscribed) {
-        RCRTCView view = await RCRTCView.create(mirror: false);
-        Utils.engine?.setRemoteView(user.id, view);
-        _remotes[user.id] = view;
-      }
-      count--;
-      if (count <= 0) {
-        completer.complete();
-      }
-    });
+    if (count > 0) {
+      Utils.users.forEach((user) async {
+        if (user.videoSubscribed) {
+          RCRTCView view = await RCRTCView.create(mirror: false);
+          Utils.engine?.setRemoteView(user.id, view);
+          _remotes[user.id] = view;
+        }
+        count--;
+        if (count <= 0) {
+          completer.complete();
+        }
+      });
+    } else {
+      completer.complete();
+    }
     return completer.future;
   }
 

@@ -1,6 +1,4 @@
-package android
-
-group 'cn.rongcloud.rongcloud_rtc_wrapper_plugin'
+group 'cn.rongcloud.rtc.wrapper.flutter'
 version '1.0'
 
 buildscript {

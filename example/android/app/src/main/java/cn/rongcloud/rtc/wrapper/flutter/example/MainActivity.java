@@ -1,10 +1,10 @@
-package cn.rongcloud.rongcloud_rtc_wrapper_plugin_example;
+package cn.rongcloud.rtc.wrapper.flutter.example;
 
 import androidx.annotation.NonNull;
 
-import cn.rongcloud.rongcloud_rtc_wrapper_plugin.RCRTCEngineWrapper;
-import cn.rongcloud.rongcloud_rtc_wrapper_plugin_example.beauty.VideoOutputFrameListener;
-import cn.rongcloud.rongcloud_rtc_wrapper_plugin_example.utils.UIThreadHandler;
+import cn.rongcloud.rtc.wrapper.flutter.RCRTCEngineWrapper;
+import cn.rongcloud.rtc.wrapper.flutter.example.beauty.VideoOutputFrameListener;
+import cn.rongcloud.rtc.wrapper.flutter.example.utils.UIThreadHandler;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.BinaryMessenger;

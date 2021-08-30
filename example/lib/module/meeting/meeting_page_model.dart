@@ -214,12 +214,14 @@ class MeetingPageModel extends AbstractModel implements Model {
   Future<int> exit() async {
     Completer<int> completer = Completer();
     Utils.engine?.onRoomLeft = (int code, String? message) async {
+      Utils.engine?.onRoomLeft = null;
       await Utils.engine?.destroy();
       Utils.engine = null;
       completer.complete(code);
     };
     int code = await Utils.engine?.leaveRoom() ?? -1;
     if (code != 0) {
+      Utils.engine?.onRoomLeft = null;
       await Utils.engine?.destroy();
       Utils.engine = null;
       return code;

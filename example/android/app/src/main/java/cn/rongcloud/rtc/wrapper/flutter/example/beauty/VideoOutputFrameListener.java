@@ -1,4 +1,4 @@
-package cn.rongcloud.rongcloud_rtc_wrapper_plugin_example.beauty;
+package cn.rongcloud.rtc.wrapper.flutter.example.beauty;
 
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWVideoFrame;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnVideoFrameListener;

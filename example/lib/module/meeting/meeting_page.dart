@@ -55,7 +55,7 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
 
   @override
   void dispose() {
-    Utils.engine?.setStatsListener(null);
+    _remotes.clear();
 
     _networkStats = null;
     _localAudioStats = null;
@@ -503,7 +503,7 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
           ),
         ),
       ),
-      onWillPop: () => _exit(),
+      onWillPop: _exit,
     );
   }
 
@@ -514,10 +514,10 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     } else {
       await Main.getInstance().closeBeauty();
     }
-    Loading.dismiss(context);
     setState(() {
       _beauty = !_beauty;
     });
+    Loading.dismiss(context);
   }
 
   void _showAudioEffectPanel(BuildContext context) {
@@ -692,8 +692,9 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     Loading.dismiss(context);
   }
 
-  Future<bool> _exit() {
+  Future<bool> _exit() async {
     Loading.show(context);
+    await Utils.engine?.setStatsListener(null);
     presenter.exit();
     return Future.value(false);
   }
@@ -714,17 +715,21 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     Completer<void> completer = Completer();
     _remotes.clear();
     int count = Utils.users.length;
-    Utils.users.forEach((user) async {
-      if (user.videoSubscribed) {
-        RCRTCView view = await RCRTCView.create(mirror: false);
-        Utils.engine?.setRemoteView(user.id, view);
-        _remotes[user.id] = view;
-      }
-      count--;
-      if (count <= 0) {
-        completer.complete();
-      }
-    });
+    if (count > 0) {
+      Utils.users.forEach((user) async {
+        if (user.videoSubscribed) {
+          RCRTCView view = await RCRTCView.create(mirror: false);
+          Utils.engine?.setRemoteView(user.id, view);
+          _remotes[user.id] = view;
+        }
+        count--;
+        if (count <= 0) {
+          completer.complete();
+        }
+      });
+    } else {
+      completer.complete();
+    }
     return completer.future;
   }
 

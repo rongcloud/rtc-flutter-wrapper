@@ -1,3 +1,4 @@
+// import 'package:leak_detector/leak_detector.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/local_storage.dart';
 import 'package:context_holder/context_holder.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,11 @@ import 'router/router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // LeakDetector().init(maxRetainingPath: 300);
+  // LeakDetector().onLeakedStream.listen((event) {
+  //   event.retainingPath.forEach((node) => print(node));
+  //   showLeakedInfoPage(ContextHolder.currentContext, event);
+  // });
   LocalStorage.init().then((value) => runApp(RCRTCFlutter()));
 }
 
@@ -36,6 +42,9 @@ class RCRTCFlutter extends StatelessWidget {
       ),
       initialRoute: RouterManager.CONNECT,
       routes: RouterManager.initRouters(),
+      // navigatorObservers: [
+      //   LeakNavigatorObserver(),
+      // ],
     );
   }
 }

@@ -10,6 +10,7 @@
 #import <RongRTCLib/RongRTCLib.h>
 
 #import "MainThreadPoster.h"
+#import "RCRTCLogUtility.h"
 
 @interface RCRTCIWFlutterView
 
@@ -31,6 +32,9 @@
     int rotation;
     int width;
     int height;
+    
+    BOOL pixelCopyed;
+    BOOL viewRendered;
 }
 
 @end
@@ -53,6 +57,9 @@
         rotation = -1;
         width = 0;
         height = 0;
+        
+        pixelCopyed = false;
+        viewRendered = false;
     }
     return self;
 }
@@ -66,19 +73,32 @@
 }
 
 - (void)destroy {
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewDestroy", RongRTCLogTaskBegin, @"self:%@", [self description]);
     RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self->view;
     view.delegate = nil;
     [self->view destroy];
     [channel setStreamHandler:nil];
     [registry unregisterTexture:tid];
     registry = nil;
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewDestroy", RongRTCLogTaskResponse, @"self:%@", [self description]);
 }
 
 - (CVPixelBufferRef)copyPixelBuffer {
+    if (!pixelCopyed) {
+        RongRTCLogI(RongRTCLogFromLib, @"FlutterViewCopyPixelBuffer", RongRTCLogTaskBegin, @"self:%@ start copy pixel buffer.", [self description]);
+    }
     RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
     CVPixelBufferRef pixelBufferRef = [view pixelBufferRef];
     if (pixelBufferRef != nil) {
         CVBufferRetain(pixelBufferRef);
+        if (!pixelCopyed) {
+            RongRTCLogI(RongRTCLogFromLib, @"FlutterViewCopyPixelBuffer", RongRTCLogTaskResponse, @"self:%@ copy pixel buffer over.", [self description]);
+            pixelCopyed = true;
+        }
+    } else {
+        if (!pixelCopyed) {
+            RongRTCLogI(RongRTCLogFromLib, @"RongRTCLogTaskError", RongRTCLogTaskResponse, @"self:%@ start copy pixel buffer.", [self description]);
+        }
     }
     return pixelBufferRef;
 }
@@ -102,6 +122,7 @@
             typeof (weak) strong = weak;
             if (strong != nil) {
                 strong(arguments);
+                RongRTCLogI(RongRTCLogFromLib, @"FlutterViewVideoFristFrameRendered", RongRTCLogTaskStatus, @"self:%@ video first frame has rendered.", [self description]);
             }
         });
     }
@@ -118,6 +139,7 @@
             typeof (weak) strong = weak;
             if (strong != nil) {
                 strong(arguments);
+                RongRTCLogI(RongRTCLogFromLib, @"FlutterViewFrameRotationChanged", RongRTCLogTaskStatus, @"self:%@ has changed frame rotation, rotation:%@.", [self description], @(rotation));
             }
         });
     }
@@ -130,13 +152,14 @@
         [arguments setObject:@"onSizeChanged" forKey:@"event"];
         [arguments setObject:@(width) forKey:@"width"];
         [arguments setObject:@(height) forKey:@"height"];
-        [arguments setObject:@(rotation) forKey:@"rotation"];
+        [arguments setObject:@(self->rotation) forKey:@"rotation"];
         self->width = width;
         self->height = height;
         dispatch_to_main_queue(^{
             typeof (weak) strong = weak;
             if (strong != nil) {
                 strong(arguments);
+                RongRTCLogI(RongRTCLogFromLib, @"FlutterViewFrameSizeChanged", RongRTCLogTaskStatus, @"self:%@ has changed frame size, width:%@, height:%@, rotation:%@.", [self description], @(width), @(height), @(self->rotation));
             }
         });
     }
@@ -144,6 +167,14 @@
 
 - (void)frameRendered {
     [registry textureFrameAvailable:tid];
+    if (!viewRendered) {
+        viewRendered = true;
+        RongRTCLogI(RongRTCLogFromLib, @"FlutterViewRendered", RongRTCLogTaskStatus, @"self:%@ view has rendered.", [self description]);
+    }
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p, id: %@>", NSStringFromClass([self class]), self, @(tid)];
 }
 
 @end
@@ -183,6 +214,7 @@ SingleInstanceM(Instance);
     channel = [FlutterMethodChannel methodChannelWithName:@"cn.rongcloud.rtc.flutter/view"
                                           binaryMessenger:messenger];
     [registrar addMethodCallDelegate:instance channel:channel];
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerInit", RongRTCLogTaskStatus, @"");
 }
 
 - (void)unInit {
@@ -193,44 +225,54 @@ SingleInstanceM(Instance);
         [view destroy];
     }
     [views removeAllObjects];
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerUnInit", RongRTCLogTaskStatus, @"");
 }
 
 #pragma mark *************** [D] ***************
 
 - (void)create:(FlutterResult)result {
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskBegin, @"");
     NSInteger code = -1;
     RCRTCView *view = [[RCRTCView alloc] initWithTextureRegistry:registry
                                                        messenger:messenger];
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskStatus, @"view:%@", [view description]);
     code = [view textureId];
     [views setObject:view forKey:[NSNumber numberWithInteger:code]];
     dispatch_to_main_queue(^{
         result(@(code));
+        RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskResponse, @"view id:%@", @(code));
     });
 }
 
 - (void)destroy:(FlutterMethodCall *)call result:(FlutterResult)result {
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodDestroy", RongRTCLogTaskBegin, @"arguments:%@", call.arguments);
     RCRTCView *view = [views objectForKey:call.arguments];
     if (view != nil) {
+        RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodDestroy", RongRTCLogTaskStatus, @"view:%@", [view description]);
         [view destroy];
         [views removeObjectForKey:call.arguments];
     }
     dispatch_to_main_queue(^{
         result(nil);
+        RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodDestroy", RongRTCLogTaskResponse, @"");
     });
 }
 
 #pragma mark *************** [F] ***************
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerRegister", RongRTCLogTaskStatus, @"");
     [[RCRTCViewWrapper sharedInstance] initWithRegistrar:registrar];
 }
 
 - (void)detachFromEngineForRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerUnregister", RongRTCLogTaskStatus, @"");
     [self unInit];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSString* method = [call method];
+    RongRTCLogI(RongRTCLogFromAPP, @"FlutterViewManagerCallMethod", RongRTCLogTaskStatus, @"method:%@", method);
     if ([method isEqualToString:@"create"]) {
         [self create:result];
     } else if ([method isEqualToString:@"destroy"]) {

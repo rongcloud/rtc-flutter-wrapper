@@ -1,4 +1,4 @@
-package cn.rongcloud.rongcloud_rtc_wrapper_plugin_example.beauty;
+package cn.rongcloud.rtc.wrapper.flutter.example.beauty;
 
 import android.graphics.PointF;
 import android.opengl.GLES20;

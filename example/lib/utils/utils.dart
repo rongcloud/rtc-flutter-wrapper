@@ -81,6 +81,8 @@ class Utils {
       _engine?.onUserJoined = null;
       _engine?.onUserOffline = null;
       _engine?.onUserLeft = null;
+      _engine?.onRemotePublished = null;
+      _engine?.onRemoteUnpublished = null;
       _users.clear();
     }
   }

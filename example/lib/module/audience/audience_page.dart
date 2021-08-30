@@ -33,10 +33,10 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
 
   @override
   void dispose() {
-    Utils.engine?.setStatsListener(null);
-
     _remoteAudioStatsStateSetter = null;
     _remoteVideoStatsStateSetter = null;
+    _remoteAudioStats = null;
+    _remoteVideoStats = null;
     super.dispose();
   }
 
@@ -194,7 +194,7 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
           ],
         ),
       ),
-      onWillPop: () => _exit(),
+      onWillPop: _exit,
     );
   }
 
@@ -234,11 +234,13 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
     });
   }
 
-  Future<bool> _exit() {
+  Future<bool> _exit() async {
     Loading.show(context);
-    presenter.exit();
+    await Utils.engine?.setStatsListener(null);
+    await presenter.exit();
     Loading.dismiss(context);
-    return Future.value(true);
+    Navigator.pop(context);
+    return Future.value(false);
   }
 
   @override

@@ -149,6 +149,7 @@ class ConnectPageModel extends AbstractModel implements Model {
     };
     int ret = await Utils.engine?.joinRoom(id, setup) ?? -1;
     if (ret != 0) {
+      Utils.engine?.onRoomJoined = null;
       callback(ret, 'Join room error $ret');
     }
   }

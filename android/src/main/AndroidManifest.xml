@@ -1,3 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="cn.rongcloud.rongcloud_rtc_wrapper_plugin">
+    package="cn.rongcloud.rtc.wrapper.flutter">
+
+    <application>
+        <meta-data
+            android:name="rc.rtcwrapperflutter"
+            android:value="5.1.0" />
+    </application>
+
 </manifest>

@@ -1,4 +1,4 @@
-package cn.rongcloud.rongcloud_rtc_wrapper_plugin;
+package cn.rongcloud.rtc.wrapper.flutter;
 
 import android.os.Handler;
 import android.os.Looper;

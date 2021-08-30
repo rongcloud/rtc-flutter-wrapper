@@ -4,9 +4,10 @@
     <type id="android" />
   </component>
   <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/android/build.gradle" />
+    <file url="file://$PROJECT_DIR$/example/android/app/build.gradle" />
+    <file url="file://$PROJECT_DIR$/example/android/settings.gradle" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_14" default="false" project-jdk-name="Android API 30 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android API 30 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

@@ -1,4 +1,4 @@
-package cn.rongcloud.rongcloud_rtc_wrapper_plugin;
+package cn.rongcloud.rtc.wrapper.flutter;
 
 import androidx.annotation.NonNull;
 
@@ -8,8 +8,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin;
  * RongcloudRtcWrapperPlugin
  */
 public class RCRTCWrapperPlugin implements FlutterPlugin {
-
-    private static final String VER = "5.0.0";
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
