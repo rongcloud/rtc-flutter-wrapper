@@ -265,18 +265,36 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
   void onLocalVideoStats(RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteAudioStats(RCRTCRemoteAudioStats stats) {
+  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
     _remoteAudioStatsStateSetter?.call(() {
       _remoteAudioStats = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(RCRTCRemoteVideoStats stats) {
+  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
     _remoteVideoStatsStateSetter?.call(() {
       _remoteVideoStats = stats;
     });
   }
+
+  @override
+  void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
+
+  @override
+  void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
+
+  @override
+  void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
+
+  @override
+  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {}
 
   late String _roomId;
   RCRTCView? _host;

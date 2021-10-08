@@ -153,11 +153,25 @@ typedef NS_ENUM(NSInteger, RCRTCIWAudioMixingMode) {
     RCRTCIWAudioMixingModeReplace      // 对端只能听到音频文件的声音
 };
 
-
+/*!
+ 网络类型
+ */
 typedef NS_ENUM(NSInteger, RCRTCIWNetworkType) {
     RCRTCIWNetworkTypeUnknown,
     RCRTCIWNetworkTypeWiFi,
     RCRTCIWNetworkTypeMobile
+};
+
+/*!
+ 流类型
+ */
+typedef NS_ENUM(NSInteger, RCRTCIWStreamType) {
+    RCRTCIWStreamTypeNotNormal = -1,
+    RCRTCIWStreamTypeNormal = 0,
+    RCRTCIWStreamTypeLive,
+    RCRTCIWStreamTypeFile,
+    RCRTCIWStreamTypeScreen,
+    RCRTCIWStreamTypeCDN
 };
 
 #endif /* RCRTCIWDefine_h */

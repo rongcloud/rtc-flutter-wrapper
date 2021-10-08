@@ -248,63 +248,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  设置默认视频合流码率操作回调, 仅供直播主播用户使用
+ @param tiny 是否小流
  @param code 返回码
  @param errMsg 返回消息
  @discussion
  设置默认视频合流码率操作回调, 仅供直播主播用户使用
  */
-- (void)onLiveMixVideoBitrateSet:(NSInteger)code
+- (void)onLiveMixVideoBitrateSet:(BOOL)tiny
+                            code:(NSInteger)code
                          message:(NSString *)errMsg;
 
 /*!
- 设置小流视频合流码率操作回调, 仅供直播主播用户使用
- @param code 返回码
- @param errMsg 返回消息
- @discussion
- 设置小流视频合流码率操作回调, 仅供直播主播用户使用
- */
-- (void)onLiveMixTinyVideoBitrateSet:(NSInteger)code
-                             message:(NSString *)errMsg;
-
-/*!
  设置默认视频分辨率操作回调, 仅供直播主播用户使用
+ @param tiny 是否小流
  @param code 返回码
  @param errMsg 返回消息
  @discussion
  设置默认视频分辨率操作回调, 仅供直播主播用户使用
  */
-- (void)onLiveMixVideoResolutionSet:(NSInteger)code
+- (void)onLiveMixVideoResolutionSet:(BOOL)tiny
+                               code:(NSInteger)code
                             message:(NSString *)errMsg;
 
 /*!
- 设置小流视频分辨率操作回调, 仅供直播主播用户使用
- @param code 返回码
- @param errMsg 返回消息
- @discussion
- 设置小流视频分辨率操作回调, 仅供直播主播用户使用
- */
-- (void)onLiveMixTinyVideoResolutionSet:(NSInteger)code
-                                message:(NSString *)errMsg;
-
-/*!
  设置默认视频帧率操作回调, 仅供直播主播用户使用
+ @param tiny 是否小流
  @param code 返回码
  @param errMsg 返回消息
  @discussion
  设置默认视频帧率操作回调, 仅供直播主播用户使用
  */
-- (void)onLiveMixVideoFpsSet:(NSInteger)code
+- (void)onLiveMixVideoFpsSet:(BOOL)tiny
+                        code:(NSInteger)code
                      message:(NSString *)errMsg;
-
-/*!
- 设置小流视频帧率操作回调, 仅供直播主播用户使用
- @param code 返回码
- @param errMsg 返回消息
- @discussion
- 设置小流视频帧率操作回调, 仅供直播主播用户使用
- */
-- (void)onLiveMixTinyVideoFpsSet:(NSInteger)code
-                         message:(NSString *)errMsg;
 
 #pragma mark - 本地会议用户或直播主播用户设置音效操作回调
 /*!
@@ -441,11 +417,122 @@ NS_ASSUME_NONNULL_BEGIN
  @param type 媒体类型
  @param disabled 是否关闭, YES: 关闭, NO: 打开
  @discussion
- 远端用户开关麦克风操作回调
+ 远端用户开关麦克风或摄像头操作回调
  */
 - (void)onRemoteStateChanged:(NSString *)userId
                         type:(RCRTCIWMediaType)type
                     disabled:(BOOL)disabled;
+
+#pragma mark - 本地用户发布本地自定义流操作回调
+/*!
+ 本地用户发布本地自定义流操作回调
+ @param tag 本地自定义流标签
+ @param code 返回码
+ @param errMsg 返回信息
+ @discussion
+ 本地用户发布本地自定义流操作回调
+ */
+- (void)onCustomStreamPublished:(NSString *)tag
+                           code:(int)code
+                        message:(NSString *)errMsg;
+
+#pragma mark - 本地用户取消发布本地自定义流操作回调
+/*!
+ 本地用户取消发布本地自定义流操作回调
+ @param tag 本地自定义流标签
+ @param code 返回码
+ @param errMsg 返回信息
+ @discussion
+ 本地用户取消发布本地自定义流操作回调
+ */
+- (void)onCustomStreamUnpublished:(NSString *)tag
+                             code:(int)code
+                          message:(NSString *)errMsg;
+
+#pragma mark - 本地自定义流发布结束回调
+/*!
+ 本地自定义流发布结束回调
+ @param tag 本地自定义流标签
+ @discussion
+ 本地自定义流发布结束回调
+ */
+- (void)onCustomStreamPublishFinished:(NSString *)tag;
+
+#pragma mark - 远端用户发布自定义流操作回调
+/*!
+ 远端用户发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @discussion
+ 远端用户发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onRemoteCustomStreamPublished:(NSString *)userId
+                                  tag:(NSString *)tag;
+
+#pragma mark - 远端用户取消发布自定义流操作回调
+/*!
+ 远端用户取消发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @discussion
+ 远端用户取消发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onRemoteCustomStreamUnpublished:(NSString *)userId
+                                    tag:(NSString *)tag;
+
+#pragma mark - 远端用户开关自定义流操作回调
+/*!
+ 远端用户开关自定义流操作回调
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @param disabled 是否关闭, YES: 关闭, NO: 打开
+ @discussion
+ 远端用户开关自定义流操作回调
+ */
+- (void)onRemoteCustomStreamStateChanged:(NSString *)userId
+                                     tag:(NSString *)tag
+                                disabled:(BOOL)disabled;
+
+#pragma mark - 本地会议用户或直播主播用户收到远端用户自定义流第一帧回调
+/*!
+ 收到远端用户自定义流第一个关键帧回调, 仅供会议用户或直播主播用户使用
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @discussion
+ 收到远端用户自定义流第一个关键帧回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onRemoteCustomStreamFirstFrame:(NSString *)userId
+                                   tag:(NSString *)tag;
+
+#pragma mark - 本地会议用户或直播主播用户订阅自定义流操作回调
+/*!
+ 订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onCustomStreamSubscribed:(NSString *)userId
+                             tag:(NSString *)tag
+                            code:(int)code
+                         message:(NSString *)errMsg;
+
+#pragma mark - 本地会议用户或直播主播用户取消订阅自定义流操作回调
+/*!
+ 取消订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param userId 远端用户UserId
+ @param tag 自定义流标签
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 取消订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onCustomStreamUnsubscribed:(NSString *)userId
+                               tag:(NSString *)tag
+                              code:(int)code
+                           message:(NSString *)errMsg;
 
 @end
 

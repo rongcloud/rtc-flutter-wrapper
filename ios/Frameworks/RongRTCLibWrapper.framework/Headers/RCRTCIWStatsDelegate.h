@@ -44,18 +44,82 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  上报远端音频统计信息
  @param stats 音频统计信息
+ @param userId 远端用户ID
  @discussion
  上报远端音频统计信息
  */
-- (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats;
+- (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                    userId:(NSString *)userId;
 
 /*!
  上报远端视频统计信息
  @param stats 视频统计信息
+ @param userId 远端用户ID
  @discussion
  上报远端视频统计信息
  */
-- (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats;
+- (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                    userId:(NSString *)userId;
+
+/*!
+ 上报远端合流音频统计信息
+ @param stats 音频统计信息
+ @discussion
+ 上报远端合流音频统计信息
+ */
+- (void)onLiveMixAudioStats:(RCRTCIWRemoteAudioStats *)stats;
+
+/*!
+ 上报远端合流视频统计信息
+ @param stats 视频统计信息
+ @discussion
+ 上报远端合流视频统计信息
+ */
+- (void)onLiveMixVideoStats:(RCRTCIWRemoteVideoStats *)stats;
+
+/*!
+ 上报本地自定义音频统计信息
+ @param stats 音频统计信息
+ @param tag 自定义音频tag
+ @discussion
+ 上报本地自定义音频统计信息
+ */
+- (void)onLocalCustomAudioStats:(RCRTCIWLocalAudioStats *)stats
+                            tag:(NSString *)tag;
+
+/*!
+ 上报本地自定义视频统计信息
+ @param stats 视频统计信息
+ @param tag 自定义视频tag
+ @discussion
+ 上报本地自定义视频统计信息
+ */
+- (void)onLocalCustomVideoStats:(RCRTCIWLocalVideoStats *)stats
+                            tag:(NSString *)tag;
+
+/*!
+ 上报远端自定义音频统计信息
+ @param stats 音频统计信息
+ @param userId 远端用户ID
+ @param tag 自定义音频tag
+ @discussion
+ 上报远端自定义音频统计信息
+ */
+- (void)onRemoteCustomAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                          userId:(NSString *)userId
+                             tag:(NSString *)tag;
+
+/*!
+ 上报远端自定义视频统计信息
+ @param stats 视频统计信息
+ @param userId 远端用户ID
+ @param tag 自定义视频tag
+ @discussion
+ 上报远端自定义视频统计信息
+ */
+- (void)onRemoteCustomVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                          userId:(NSString *)userId
+                             tag:(NSString *)tag;
 
 @end
 

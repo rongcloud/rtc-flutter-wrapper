@@ -26,22 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, weak) id<RCRTCIWEngineDelegate> engineDelegate;
 
-/*!
- 状态报表代理
- */
-@property (nonatomic, weak) id<RCRTCIWStatsDelegate> statsDelegate;
-
-/*!
- 音频数据上报代理
- */
-@property (nonatomic, weak) id<RCRTCIWAudioFrameDelegate> audioBufferDelegate;
-
-/*!
- 视频数据上报代理
- */
-@property (nonatomic, weak) id<RCRTCIWVideoFrameDelegate> videoBufferDelegate;
-
-
 #pragma mark - 引擎
 
 /*!
@@ -58,6 +42,58 @@ NS_ASSUME_NONNULL_BEGIN
  销毁引擎对象中的资源, 引擎对象除外
  */
 - (void)destroy;
+
+#pragma mark - 监听
+
+/*!
+ 设置状态报表监听
+ */
+- (NSInteger)setStatsDelegate:(id<RCRTCIWStatsDelegate>)delegate;
+
+/*!
+ 设置本地音频前处理回调
+ */
+- (NSInteger)setLocalAudioCapturedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+
+/*!
+ 设置本地音频后处理回调
+ */
+- (NSInteger)setLocalAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+
+/*!
+ 设置远端音频前处理回调
+ */
+- (NSInteger)setRemoteAudioReceivedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate
+                                     userId:(NSString *)userId;
+
+/*!
+ 设置本地音频后处理回调
+ */
+- (NSInteger)setRemoteAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+
+/*!
+ 设置本地视频后处理回调
+ */
+- (NSInteger)setLocalVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate;
+
+/*!
+ 设置远端视频后处理回调
+ */
+- (NSInteger)setRemoteVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+                                      userId:(NSString *)userId;
+
+/*!
+ 设置本地自定义视频后处理回调
+ */
+- (NSInteger)setLocalCustomVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate
+                                              tag:(NSString *)tag;
+
+/*!
+ 设置远端自定义视频后处理回调
+ */
+- (NSInteger)setRemoteCustomVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+                                            userId:(NSString *)userId
+                                               tag:(NSString *)tag;
 
 #pragma mark - 房间
 /*!
@@ -84,20 +120,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)setAudioConfig:(RCRTCIWAudioConfig *)config;
 
 /*!
- 设置默认视频参数, 仅供会议用户或直播主播用户使用
+ 设置默认视频大流参数, 仅供会议用户或直播主播用户使用
  @param config 视频参数
  @discussion
- 设置默认视频参数, 仅供会议用户或直播主播用户使用
+ 设置默认视频大流参数, 仅供会议用户或直播主播用户使用
  */
 - (NSInteger)setVideoConfig:(RCRTCIWVideoConfig *)config;
 
 /*!
- 设置默认视频小流参数, 仅供会议用户或直播主播用户使用
+ 设置默认视频参数, 仅供会议用户或直播主播用户使用
  @param config 视频参数
+ @param tiny 是否小流
  @discussion
- 设置默认视频小流参数, 仅供会议用户或直播主播用户使用
+ 设置默认视频参数, 仅供会议用户或直播主播用户使用
  */
-- (NSInteger)setTinyVideoConfig:(RCRTCIWVideoConfig *)config;
+- (NSInteger)setVideoConfig:(RCRTCIWVideoConfig *)config
+                       tiny:(BOOL)tiny;
 
 #pragma mark - 本地用户发布资源
 /*!
@@ -442,28 +480,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)setLiveMixVideoBitrate:(NSInteger)bitrate;
 
 /*!
- 设置直播合流小流视频码率, 仅供直播主播用户使用
+ 设置直播合流视频码率, 仅供直播主播用户使用
  @param bitrate 视频码率
+ @param tiny 是否小流
  @discussion
- 设置直播合流小流视频码率, 仅供直播主播用户使用
+ 设置直播合流视频码率, 仅供直播主播用户使用
  */
-- (NSInteger)setLiveMixTinyVideoBitrate:(NSInteger)bitrate;
+- (NSInteger)setLiveMixVideoBitrate:(NSInteger)bitrate
+                               tiny:(BOOL)tiny;
 
 /*!
  设置直播合流大流视频分辨率, 仅供直播主播用户使用
- @param resolution 视频分辨率
+ @param width 视频宽度
+ @param height 视频高度
  @discussion
  设置直播合流大流视频分辨率, 仅供直播主播用户使用
  */
-- (NSInteger)setLiveMixVideoResolution:(RCRTCIWVideoResolution)resolution;
+- (NSInteger)setLiveMixVideoResolution:(NSInteger)width
+                                height:(NSInteger)height;
 
 /*!
- 设置直播合流小流视频分辨率, 仅供直播主播用户使用
- @param resolution 视频分辨率
+ 设置直播合流视频分辨率, 仅供直播主播用户使用
+ @param width 视频宽度
+ @param height 视频高度 
+ @param tiny 是否小流
  @discussion
- 设置直播合流小流视频分辨率, 仅供直播主播用户使用
+ 设置直播合流视频分辨率, 仅供直播主播用户使用
  */
-- (NSInteger)setLiveMixTinyVideoResolution:(RCRTCIWVideoResolution)resolution;
+- (NSInteger)setLiveMixVideoResolution:(NSInteger)width
+                                height:(NSInteger)height
+                                  tiny:(BOOL)tiny;
 
 /*!
  设置直播合流大流视频帧率, 仅供直播主播用户使用
@@ -474,12 +520,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)setLiveMixVideoFps:(RCRTCIWVideoFps)fps;
 
 /*!
- 设置直播合流小流视频帧率, 仅供直播主播用户使用
+ 设置直播合流视频帧率, 仅供直播主播用户使用
  @param fps 帧率
+ @param tiny 是否小流
  @discussion
- 设置直播合流小流视频帧率, 仅供直播主播用户使用
+ 设置直播合流视频帧率, 仅供直播主播用户使用
  */
-- (NSInteger)setLiveMixTinyVideoFps:(RCRTCIWVideoFps)fps;
+- (NSInteger)setLiveMixVideoFps:(RCRTCIWVideoFps)fps
+                           tiny:(BOOL)tiny;
 
 #pragma mark - 音效操作
 /*!
@@ -694,6 +742,129 @@ NS_ASSUME_NONNULL_BEGIN
  每次加入房间所得到的 SessionId 均不同
  */
 - (NSString *)getSessionId;
+
+#pragma mark - 自定义视频流
+/*!
+ 从视频文件创建自定义流, 仅供会议用户或直播主播用户使用
+ @param url 本地文件地址
+ @param tag 自定义流全局唯一标签
+ @param replace 是否替换音频流  YES: 替换  NO: 不替换
+ @param playback 是否本地回放音频流  YES: 回放  NO: 不回放
+ @discussion
+ 从视频文件创建自定义流, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)createCustomStreamFromFile:(NSURL *)url
+                                    tag:(NSString *)tag
+                                replace:(BOOL)replace
+                               playback:(BOOL)playback;
+
+/*!
+ 设置自定义流参数, 仅供会议用户或直播主播用户使用
+ @param config 视频参数
+ @param tag 自定义流标签
+ @discussion
+ 设置自定义流参数, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)setCustomStreamVideoConfig:(RCRTCIWVideoConfig *)config
+                                    tag:(NSString *)tag;
+
+/*!
+ 停止自定义流发送, 仅供会议用户或直播主播用户使用
+ @param tag 自定义流标签
+ @param mute YES: 不发送 NO: 发送
+ @discussion
+ 静音自定义流, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)muteLocalCustomStream:(NSString *)tag
+                              mute:(BOOL)mute;
+
+/*!
+ 设置自定义流预览窗口, 仅供会议用户或直播主播用户使用
+ @param view 预览窗口
+ @param tag 自定义流标签
+ @discussion
+ 设置自定义流预览窗口, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)setLocalCustomStreamView:(RCRTCIWView *)view
+                                  tag:(NSString *)tag;
+
+/*!
+ 移除自定义流预览窗口, 仅供会议用户或直播主播用户使用
+ @param tag 自定义流标签
+ @discussion
+ 移除自定义流预览窗口, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)removeLocalCustomStreamView:(NSString *)tag;
+
+/*!
+ 发布自定义流, 仅供会议用户或直播主播用户使用
+ @param tag 自定义流标签
+ @discussion
+ 发布自定义流, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)publishCustomStream:(NSString *)tag;
+
+/*!
+ 取消发布自定义流, 仅供会议用户或直播主播用户使用
+ @param tag 自定义流标签
+ @discussion
+ 取消发布自定义流, 仅供会议用户或直播主播用户使用
+ */
+- (NSInteger)unpublishCustomStream:(NSString *)tag;
+
+/*!
+ 停止远端用户自定义流数据的接收
+ @param userId 远端用户Id
+ @param tag 远端自定义流标签
+ @param mute YES: 不接收 NO: 接收
+ @discussion
+ 停止远端用户自定义流数据的接收
+ */
+- (NSInteger)muteRemoteCustomStream:(NSString *)userId
+                                tag:(NSString *)tag
+                               mute:(BOOL)mute;
+
+/*!
+ 设置远端自定义流View
+ @param view RCRTCIWVideoView对象
+ @param userId 远端用户Id
+ @param tag 远端自定义流标签
+ @discussion
+ 使用 [RCRTCIWVideoView create] 创建的view作为参数
+ */
+- (NSInteger)setRemoteCustomStreamView:(RCRTCIWView *)view
+                                userId:(NSString *)userId
+                                   tag:(NSString *)tag;
+
+/*!
+ 移除远端自定义流View
+ @param userId 远端用户Id
+ @param tag 远端自定义流标签
+ @discussion
+ 移除远端自定义流View
+ */
+- (NSInteger)removeRemoteCustomStreamView:(NSString *)userId
+                                      tag:(NSString *)tag;
+
+/*!
+ 加入房间后, 订阅远端用户发布的自定义流
+ @param userId 远端用户UserId
+ @param tag 远端自定义流标签
+ @discussion
+ 加入房间后, 订阅远端用户发布的自定义流
+ */
+- (NSInteger)subscribeCustomStream:(NSString *)userId
+                               tag:(NSString *)tag;
+
+/*!
+ 加入房间后, 取消订阅远端用户发布的自定义流
+ @param userId 远端用户UserId
+ @param tag 远端自定义流标签
+ @discussion
+ 加入房间后, 取消订阅远端用户发布的自定义流
+ */
+- (NSInteger)unsubscribeCustomStream:(NSString *)userId
+                                 tag:(NSString *)tag;
 
 #pragma mark - Version
 /*!

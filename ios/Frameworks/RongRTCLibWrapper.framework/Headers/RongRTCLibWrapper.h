@@ -15,6 +15,7 @@ FOUNDATION_EXPORT const unsigned char RongRTCLibWrapperVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <RongRTCLibWrapper/PublicHeader.h>
 
+#import <RongRTCLibWrapper/RCRTCIWAudioFrame.h>
 #import <RongRTCLibWrapper/RCRTCIWAudioFrameDelegate.h>
 #import <RongRTCLibWrapper/RCRTCIWAudioConfig.h>
 #import <RongRTCLibWrapper/RCRTCIWAudioSetup.h>

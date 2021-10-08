@@ -14,11 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RCRTCIWRemoteVideoStats : NSObject
 
 /*!
- 用户Id
- */
-@property (nonatomic, strong) NSString *userId;
-
-/*!
  音频编码
  */
 @property (nonatomic, assign) RCRTCIWVideoCodecType codec;

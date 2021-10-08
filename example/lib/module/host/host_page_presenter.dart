@@ -50,6 +50,20 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
     Utils.onUserVideoStateChanged = (id, published) {
       view.onUserVideoStateChanged(id, published);
     };
+
+    Utils.onUserCustomStateChanged = (id, tag, published) {
+      view.onUserCustomStateChanged(id, tag, published);
+    };
+
+    Utils.engine?.onCustomStreamPublishFinished = (tag) {
+      view.onCustomVideoUnpublished();
+    };
+  }
+
+  @override
+  void detachView() {
+    Utils.engine?.onCustomStreamPublishFinished = null;
+    super.detachView();
   }
 
   @override
@@ -110,6 +124,36 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
   @override
   Future<bool> changeRemoteVideoStatus(String id, bool subscribe) {
     return model.changeRemoteVideoStatus(id, subscribe);
+  }
+
+  @override
+  void publishCustomVideo(String id, String path, RCRTCVideoConfig config, bool yuv) async {
+    int code = await model.publishCustomVideo(id, path, config, yuv);
+    if (code != 0) {
+      view.onCustomVideoPublishedError(code);
+    } else {
+      view.onCustomVideoPublished();
+    }
+  }
+
+  @override
+  void unpublishCustomVideo() async {
+    int code = await model.unpublishCustomVideo();
+    if (code != 0) {
+      view.onCustomVideoUnpublishedError(code);
+    } else {
+      view.onCustomVideoUnpublished();
+    }
+  }
+
+  @override
+  Future<bool> changeCustomConfig(RCRTCVideoConfig config) {
+    return model.changeCustomConfig(config);
+  }
+
+  @override
+  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe) {
+    return model.changeRemoteCustomStatus(rid, uid, tag, yuv, subscribe);
   }
 
   @override

@@ -10,6 +10,16 @@ class Result {
   Result(this.code, this.content);
 }
 
+class CustomState {
+  CustomState(this.tag)
+      : subscribed = false,
+        yuv = false;
+
+  String tag;
+  bool subscribed;
+  bool yuv;
+}
+
 class UserState {
   UserState(this.id)
       : audioPublished = false,
@@ -24,6 +34,8 @@ class UserState {
 
   bool audioSubscribed;
   bool videoSubscribed;
+
+  final List<CustomState> customs = [];
 }
 
 class User {

@@ -136,13 +136,19 @@ RCRTCIWVideoConfig *toVideoConfig(NSDictionary *arguments) {
 }
 
 RCRTCIWCustomLayout *toLiveMixCustomLayout(NSDictionary *arguments) {
+    RCRTCIWStreamType type = (RCRTCIWStreamType) [arguments[@"type"] intValue];
     NSString *uid = arguments[@"id"];
+    NSString *tag = arguments[@"tag"];
     int x = [arguments[@"x"] intValue];
     int y = [arguments[@"y"] intValue];
     int width = [arguments[@"width"] intValue];
     int height = [arguments[@"height"] intValue];
-    RCRTCIWCustomLayout *layout = [[RCRTCIWCustomLayout alloc] init];
-    layout.userId = uid;
+    RCRTCIWCustomLayout *layout;
+    if (type != RCRTCIWStreamTypeNormal) {
+        layout = [[RCRTCIWCustomLayout alloc] initWithStreamType:type userId:uid tag:tag];
+    } else {
+        layout = [[RCRTCIWCustomLayout alloc] initWithUserId:uid];
+    }
     layout.x = x;
     layout.y = y;
     layout.width = width;
@@ -202,7 +208,6 @@ NSDictionary *fromLocalVideoStats(RCRTCIWLocalVideoStats *stats) {
 
 NSDictionary *fromRemoteAudioStats(RCRTCIWRemoteAudioStats *stats) {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
-    [dictionary setObject:stats.userId forKey:@"id"];
     [dictionary setObject:@(fromAudioCodecType(stats.codec)) forKey:@"codec"];
     [dictionary setObject:@(stats.bitrate) forKey:@"bitrate"];
     [dictionary setObject:@(stats.volume) forKey:@"volume"];
@@ -213,7 +218,6 @@ NSDictionary *fromRemoteAudioStats(RCRTCIWRemoteAudioStats *stats) {
 
 NSDictionary *fromRemoteVideoStats(RCRTCIWRemoteVideoStats *stats) {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
-    [dictionary setObject:stats.userId forKey:@"id"];
     [dictionary setObject:@((int) stats.codec) forKey:@"codec"];
     [dictionary setObject:@(stats.bitrate) forKey:@"bitrate"];
     [dictionary setObject:@(stats.fps) forKey:@"fps"];

@@ -56,6 +56,27 @@ enum RCRTCVideoFps {
   fps_30,
 }
 
+extension RCRTCVideoFpsExtension on RCRTCVideoFps {
+  int get fps {
+    int result = 0;
+    switch (this) {
+      case RCRTCVideoFps.fps_10:
+        result = 10;
+        break;
+      case RCRTCVideoFps.fps_15:
+        result = 15;
+        break;
+      case RCRTCVideoFps.fps_24:
+        result = 24;
+        break;
+      case RCRTCVideoFps.fps_30:
+        result = 30;
+        break;
+    }
+    return result;
+  }
+}
+
 enum RCRTCVideoResolution {
   resolution_144_176,
   resolution_144_256,
@@ -74,6 +95,124 @@ enum RCRTCVideoResolution {
   resolution_720_960,
   resolution_720_1280,
   resolution_1080_1920,
+}
+
+extension RCRTCVideoResolutionExtension on RCRTCVideoResolution {
+  int get width {
+    int result = 0;
+    switch (this) {
+      case RCRTCVideoResolution.resolution_144_176:
+        result = 144;
+        break;
+      case RCRTCVideoResolution.resolution_144_256:
+        result = 144;
+        break;
+      case RCRTCVideoResolution.resolution_180_180:
+        result = 180;
+        break;
+      case RCRTCVideoResolution.resolution_180_240:
+        result = 180;
+        break;
+      case RCRTCVideoResolution.resolution_180_320:
+        result = 180;
+        break;
+      case RCRTCVideoResolution.resolution_240_240:
+        result = 240;
+        break;
+      case RCRTCVideoResolution.resolution_240_320:
+        result = 240;
+        break;
+      case RCRTCVideoResolution.resolution_360_360:
+        result = 360;
+        break;
+      case RCRTCVideoResolution.resolution_360_480:
+        result = 360;
+        break;
+      case RCRTCVideoResolution.resolution_360_640:
+        result = 360;
+        break;
+      case RCRTCVideoResolution.resolution_480_480:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_480_640:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_480_848:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_480_720:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_720_960:
+        result = 720;
+        break;
+      case RCRTCVideoResolution.resolution_720_1280:
+        result = 720;
+        break;
+      case RCRTCVideoResolution.resolution_1080_1920:
+        result = 1080;
+        break;
+    }
+    return result;
+  }
+
+  int get height {
+    int result = 0;
+    switch (this) {
+      case RCRTCVideoResolution.resolution_144_176:
+        result = 176;
+        break;
+      case RCRTCVideoResolution.resolution_144_256:
+        result = 256;
+        break;
+      case RCRTCVideoResolution.resolution_180_180:
+        result = 180;
+        break;
+      case RCRTCVideoResolution.resolution_180_240:
+        result = 240;
+        break;
+      case RCRTCVideoResolution.resolution_180_320:
+        result = 320;
+        break;
+      case RCRTCVideoResolution.resolution_240_240:
+        result = 240;
+        break;
+      case RCRTCVideoResolution.resolution_240_320:
+        result = 320;
+        break;
+      case RCRTCVideoResolution.resolution_360_360:
+        result = 360;
+        break;
+      case RCRTCVideoResolution.resolution_360_480:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_360_640:
+        result = 640;
+        break;
+      case RCRTCVideoResolution.resolution_480_480:
+        result = 480;
+        break;
+      case RCRTCVideoResolution.resolution_480_640:
+        result = 640;
+        break;
+      case RCRTCVideoResolution.resolution_480_848:
+        result = 848;
+        break;
+      case RCRTCVideoResolution.resolution_480_720:
+        result = 720;
+        break;
+      case RCRTCVideoResolution.resolution_720_960:
+        result = 960;
+        break;
+      case RCRTCVideoResolution.resolution_720_1280:
+        result = 1280;
+        break;
+      case RCRTCVideoResolution.resolution_1080_1920:
+        result = 1920;
+        break;
+    }
+    return result;
+  }
 }
 
 enum RCRTCCamera {

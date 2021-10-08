@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.rongcloud.rtc.wrapper.config.RCRTCIWAudioConfig;
-import cn.rongcloud.rtc.wrapper.config.RCRTCIWCustomLayout;
 import cn.rongcloud.rtc.wrapper.config.RCRTCIWVideoConfig;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioCodecType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioMixingMode;
@@ -24,8 +23,10 @@ import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRole;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWStreamType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWVideoFps;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWVideoResolution;
+import cn.rongcloud.rtc.wrapper.module.RCRTCIWCustomLayout;
 import cn.rongcloud.rtc.wrapper.setup.RCRTCIWAudioSetup;
 import cn.rongcloud.rtc.wrapper.setup.RCRTCIWEngineSetup;
 import cn.rongcloud.rtc.wrapper.setup.RCRTCIWRoomSetup;
@@ -88,6 +89,10 @@ final class ArgumentAdapter {
         return RCRTCIWAudioScenario.values()[scenario];
     }
 
+    static RCRTCIWStreamType toStreamType(@NonNull Integer type) {
+        return RCRTCIWStreamType.values()[type];
+    }
+
     static RCRTCIWAudioSetup toAudioSetup(@NonNull HashMap<String, Object> setup) {
         Integer codec = (Integer) setup.get("codec");
         assert (codec != null);
@@ -131,6 +136,7 @@ final class ArgumentAdapter {
                 .build();
     }
 
+    @SuppressWarnings("unchecked")
     static RCRTCIWEngineSetup toEngineSetup(@NonNull HashMap<String, Object> setup) {
         Boolean reconnectable = (Boolean) setup.get("reconnectable");
         assert (reconnectable != null);
@@ -154,7 +160,6 @@ final class ArgumentAdapter {
         return builder.build();
     }
 
-    @SuppressWarnings("unchecked")
     static RCRTCIWRoomSetup toRoomSetup(@NonNull HashMap<String, Object> setup) {
         Integer type = (Integer) setup.get("type");
         assert (type != null);
@@ -204,8 +209,11 @@ final class ArgumentAdapter {
     }
 
     static RCRTCIWCustomLayout toLiveMixCustomLayout(@NonNull HashMap<String, Object> layout) {
+        Integer type = (Integer) layout.get("type");
+        assert (type != null);
         String id = (String) layout.get("id");
         assert (id != null);
+        Object tag = layout.get("tag");
         Integer x = (Integer) layout.get("x");
         assert (x != null);
         Integer y = (Integer) layout.get("y");
@@ -214,7 +222,7 @@ final class ArgumentAdapter {
         assert (width != null);
         Integer height = (Integer) layout.get("height");
         assert (height != null);
-        return new RCRTCIWCustomLayout(id, x, y, width, height);
+        return new RCRTCIWCustomLayout(toStreamType(type), id, tag != null ? (String) tag : null, x, y, width, height);
     }
 
     static HashMap<String, Object> fromNetworkStats(@NonNull RCRTCIWNetworkStats stats) {
@@ -250,9 +258,9 @@ final class ArgumentAdapter {
         return map;
     }
 
+    // TODO 后续替换成不包装userID的类型
     static HashMap<String, Object> fromRemoteAudioStats(@NonNull RCRTCIWRemoteAudioStats stats) {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("id", stats.getUserId());
         map.put("codec", stats.getCodec().ordinal());
         map.put("bitrate", stats.getBitrate());
         map.put("volume", stats.getVolume());
@@ -261,9 +269,9 @@ final class ArgumentAdapter {
         return map;
     }
 
+    // TODO 后续替换成不包装userID的类型
     static HashMap<String, Object> fromRemoteVideoStats(@NonNull RCRTCIWRemoteVideoStats stats) {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("id", stats.getUserId());
         map.put("codec", stats.getCodec().ordinal());
         map.put("bitrate", stats.getBitrate());
         map.put("fps", stats.getFps());

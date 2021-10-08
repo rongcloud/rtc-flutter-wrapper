@@ -43,6 +43,7 @@ abstract class Model implements IModel {
     RCRTCMediaType type,
     RCRTCRole role,
     bool tiny,
+    bool yuv,
     StateCallback callback,
   );
 }
@@ -71,5 +72,6 @@ abstract class Presenter implements IPresenter {
     RCRTCMediaType type,
     RCRTCRole role,
     bool tiny,
+    bool yuv,
   );
 }

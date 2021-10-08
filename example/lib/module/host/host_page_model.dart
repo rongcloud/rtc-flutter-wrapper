@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/model.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/main.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 
 import 'host_page_contract.dart';
@@ -205,6 +207,84 @@ class HostPageModel extends AbstractModel implements Model {
     if (code != 0) {
       Utils.engine?.onSubscribed = null;
       Utils.engine?.onUnsubscribed = null;
+      return !subscribe;
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<int> publishCustomVideo(String id, String path, RCRTCVideoConfig config, bool yuv) async {
+    Completer<int> completer = Completer();
+    String tag = '${DefaultData.user!.id.replaceAll('_', '')}Custom';
+    int code = await Utils.engine?.createCustomStreamFromFile(path: path, tag: tag) ?? -1;
+    if (code != 0) {
+      completer.complete(code);
+      return completer.future;
+    }
+    code = await Utils.engine?.setCustomStreamVideoConfig(tag, config) ?? -1;
+    if (code != 0) {
+      completer.complete(code);
+      return completer.future;
+    }
+    if (yuv) Main.getInstance().enableLocalCustomYuv(id);
+    Utils.engine?.onCustomStreamPublished = (String tag, int code, String? message) {
+      Utils.engine?.onCustomStreamPublished = null;
+      completer.complete(code);
+    };
+    code = await Utils.engine?.publishCustomStream(tag) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onCustomStreamPublished = null;
+      completer.complete(code);
+      return completer.future;
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<int> unpublishCustomVideo() async {
+    Completer<int> completer = Completer();
+    String tag = '${DefaultData.user!.id.replaceAll('_', '')}Custom';
+    Utils.engine?.onCustomStreamUnpublished = (String tag, int code, String? message) {
+      Utils.engine?.onCustomStreamUnpublished = null;
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.unpublishCustomStream(tag) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onCustomStreamUnpublished = null;
+      completer.complete(code);
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<bool> changeCustomConfig(RCRTCVideoConfig config) async {
+    String tag = '${DefaultData.user!.id.replaceAll('_', '')}Custom';
+    int code = await Utils.engine?.setCustomStreamVideoConfig(tag, config) ?? -1;
+    return code == 0;
+  }
+
+  @override
+  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe) async {
+    Completer<bool> completer = Completer();
+    int code = -1;
+    if (subscribe) {
+      Utils.engine?.onCustomStreamSubscribed = (String id, String tag, int code, String? message) {
+        Utils.engine?.onCustomStreamSubscribed = null;
+        completer.complete(code != 0 ? !subscribe : subscribe);
+      };
+      if (yuv) Main.getInstance().enableRemoteCustomYuv(rid, uid, tag);
+      code = await Utils.engine?.subscribeCustomStream(uid, tag) ?? -1;
+    } else {
+      Utils.engine?.onCustomStreamUnsubscribed = (String id, String tag, int code, String? message) {
+        Utils.engine?.onCustomStreamUnsubscribed = null;
+        completer.complete(code != 0 ? !subscribe : subscribe);
+      };
+      Main.getInstance().disableRemoteCustomYuv(uid, tag);
+      code = await Utils.engine?.unsubscribeCustomStream(uid, tag) ?? -1;
+    }
+    if (code != 0) {
+      Utils.engine?.onCustomStreamSubscribed = null;
+      Utils.engine?.onCustomStreamUnsubscribed = null;
       return !subscribe;
     }
     return completer.future;

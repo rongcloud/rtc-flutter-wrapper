@@ -14,6 +14,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/network/network.dart'
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/extension.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/global_config.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 
 List<DropdownMenuItem<RCRTCVideoResolution>> videoResolutionItems() {
   List<DropdownMenuItem<RCRTCVideoResolution>> items = [];
@@ -348,6 +349,9 @@ extension StringExtension on String {
   }) {
     return Text(
       this,
+      softWrap: true,
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: 15.sp,
         color: color,
@@ -858,15 +862,22 @@ class RemoteVideoStatsTable extends StatelessWidget {
   final RCRTCRemoteVideoStats? stats;
 }
 
+class LiveMixItem {
+  LiveMixItem(this.id, this.tag);
+
+  final String id;
+  final String? tag;
+}
+
 class LiveMixPanel extends StatefulWidget {
-  LiveMixPanel(this.engine, this.config, this.users);
+  LiveMixPanel(this.engine, this.config, this.items);
 
   @override
   State<StatefulWidget> createState() => _LiveMixPanelState();
 
   final RCRTCEngine engine;
   final LiveMix config;
-  final List<String> users;
+  final List<LiveMixItem> items;
 }
 
 class _LiveMixPanelState extends State<LiveMixPanel> {
@@ -1107,7 +1118,11 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                   onPressed: () {
                     widget.engine.setLiveMixVideoBitrate(tiny ? widget.config.tinyVideoBitrate : widget.config.videoBitrate, tiny);
                     widget.engine.setLiveMixVideoFps(tiny ? widget.config.tinyVideoFps : widget.config.videoFps, tiny);
-                    widget.engine.setLiveMixVideoResolution(tiny ? widget.config.tinyVideoResolution : widget.config.videoResolution, tiny);
+                    widget.engine.setLiveMixVideoResolution(
+                      tiny ? widget.config.tinyVideoResolution.width : widget.config.videoResolution.width,
+                      tiny ? widget.config.tinyVideoResolution.height : widget.config.videoResolution.height,
+                      tiny,
+                    );
                     Navigator.pop(context);
                   },
                 ),
@@ -1142,7 +1157,7 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                     icon: Icon(
                       Icons.add,
                     ),
-                    onPressed: layouts.length < widget.users.length ? () => _showCustomLayoutConfig(context, setter, layouts) : null,
+                    onPressed: layouts.length < widget.items.length ? () => _showCustomLayoutConfig(context, setter, layouts) : null,
                   ),
                 ],
               ),
@@ -1234,28 +1249,44 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
     );
   }
 
-  List<DropdownMenuItem<String>> _buildUserItems(List<RCRTCCustomLayout> layouts) {
-    List<DropdownMenuItem<String>> items = [];
-    widget.users.forEach((user) {
-      if (layouts.indexWhere((layout) => layout.userId == user) < 0) {
-        items.add(DropdownMenuItem(
-          value: user,
-          child: Text(
-            '$user',
-            style: TextStyle(
-              fontSize: 10.sp,
-              color: Colors.black,
-              decoration: TextDecoration.none,
+  List<DropdownMenuItem<LiveMixItem>> _buildUserItems(List<RCRTCCustomLayout> layouts) {
+    List<DropdownMenuItem<LiveMixItem>> items = [];
+    widget.items.forEach((item) {
+      if (item.tag != null) {
+        if (layouts.indexWhere((layout) => layout.tag == item.tag) < 0) {
+          items.add(DropdownMenuItem(
+            value: item,
+            child: Text(
+              '${item.tag}',
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.black,
+                decoration: TextDecoration.none,
+              ),
             ),
-          ),
-        ));
+          ));
+        }
+      } else {
+        if (layouts.indexWhere((layout) => layout.userId == item.id) < 0) {
+          items.add(DropdownMenuItem(
+            value: item,
+            child: Text(
+              '${item.id}',
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.black,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          ));
+        }
       }
     });
     return items;
   }
 
   void _showCustomLayoutConfig(BuildContext context, StateSetter setter, List<RCRTCCustomLayout> layouts) {
-    String? userId;
+    LiveMixItem? selected;
     TextEditingController videoXInputController = TextEditingController();
     TextEditingController videoYInputController = TextEditingController();
     TextEditingController videoWidthInputController = TextEditingController();
@@ -1276,12 +1307,12 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButton(
-                  hint: Text('选择一个用户'),
-                  value: userId,
+                  hint: Text('选择一个用户/自定义流'),
+                  value: selected,
                   items: _buildUserItems(layouts),
-                  onChanged: (dynamic user) {
+                  onChanged: (dynamic obj) {
                     _setter(() {
-                      userId = user;
+                      selected = obj;
                     });
                   },
                 ),
@@ -1392,18 +1423,27 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                   String y = videoYInputController.text;
                   String width = videoWidthInputController.text;
                   String height = videoHeightInputController.text;
-                  if (userId?.isEmpty ?? true) return 'User id should not be null!'.toast();
+                  if (selected == null) return 'Please select user or custom stream!'.toast();
                   if (x.isEmpty) return 'X should not be null!'.toast();
                   if (y.isEmpty) return 'Y should not be null!'.toast();
                   if (width.isEmpty) return 'Width should not be null!'.toast();
                   if (height.isEmpty) return 'Height should not be null!'.toast();
-                  RCRTCCustomLayout layout = RCRTCCustomLayout.create(
-                    userId: userId!,
-                    x: x.toInt,
-                    y: y.toInt,
-                    width: width.toInt,
-                    height: height.toInt,
-                  );
+                  RCRTCCustomLayout layout = selected!.tag != null
+                      ? RCRTCCustomLayout.createCustomStreamLayout(
+                          userId: selected!.id,
+                          tag: selected!.tag,
+                          x: x.toInt,
+                          y: y.toInt,
+                          width: width.toInt,
+                          height: height.toInt,
+                        )
+                      : RCRTCCustomLayout.create(
+                          userId: selected!.id,
+                          x: x.toInt,
+                          y: y.toInt,
+                          width: width.toInt,
+                          height: height.toInt,
+                        );
                   Navigator.pop(context);
                   setter(() {
                     layouts.add(layout);
@@ -1479,8 +1519,8 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
 
   void _showMixAudioConfig(BuildContext context) {
     Map<String, bool> mixes = {};
-    widget.users.forEach((user) {
-      mixes[user] = widget.config.audios.contains(user);
+    Utils.users.forEach((user) {
+      mixes[user.id] = widget.config.audios.contains(user.id);
     });
 
     showDialog(
@@ -2294,7 +2334,6 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
           value: i,
           groupValue: index,
           onChanged: (dynamic value) {
-            print('GPTest got you');
             if (index != value) {
               widget.engine.stopAudioMixing();
               setState(() {

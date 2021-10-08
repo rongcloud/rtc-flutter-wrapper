@@ -22,8 +22,10 @@ import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWListener;
-import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnAudioFrameListener;
-import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnVideoFrameListener;
+import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableAudioFrameListener;
+import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableVideoFrameListener;
+import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableAudioFrameListener;
+import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableVideoFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWStatusListener;
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterAssets;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -59,18 +61,66 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         channel.setMethodCallHandler(null);
     }
 
-    public int setAudioListener(RCRTCIWOnAudioFrameListener listener) {
+    public int setLocalAudioCapturedListener(RCRTCIWOnWritableAudioFrameListener listener) {
         int code = -1;
         if (engine != null) {
-            code = engine.setAudioListener(listener);
+            code = engine.setLocalAudioCapturedListener(listener);
         }
         return code;
     }
 
-    public int setVideoListener(RCRTCIWOnVideoFrameListener listener) {
+    public int setLocalAudioMixedListener(RCRTCIWOnReadableAudioFrameListener listener) {
         int code = -1;
         if (engine != null) {
-            code = engine.setVideoListener(listener);
+            code = engine.setLocalAudioMixedListener(listener);
+        }
+        return code;
+    }
+
+    public int setRemoteAudioReceivedListener(String userId, RCRTCIWOnReadableAudioFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setRemoteAudioReceivedListener(userId, listener);
+        }
+        return code;
+    }
+
+    public int setRemoteAudioMixedListener(RCRTCIWOnWritableAudioFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setRemoteAudioMixedListener(listener);
+        }
+        return code;
+    }
+
+    public int setLocalVideoProcessedListener(RCRTCIWOnWritableVideoFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setLocalVideoProcessedListener(listener);
+        }
+        return code;
+    }
+
+    public int setRemoteVideoProcessedListener(String userId, RCRTCIWOnReadableVideoFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setRemoteVideoProcessedListener(userId, listener);
+        }
+        return code;
+    }
+
+    public int setLocalCustomVideoProcessedListener(String tag, RCRTCIWOnWritableVideoFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setLocalCustomVideoProcessedListener(tag, listener);
+        }
+        return code;
+    }
+
+    public int setRemoteCustomVideoProcessedListener(String userId, String tag, RCRTCIWOnReadableVideoFrameListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setRemoteCustomVideoProcessedListener(userId, tag, listener);
         }
         return code;
     }
@@ -288,6 +338,42 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             case "getSessionId":
                 getSessionId(result);
                 break;
+            case "createCustomStreamFromFile":
+                createCustomStreamFromFile(call, result);
+                break;
+            case "setCustomStreamVideoConfig":
+                setCustomStreamVideoConfig(call, result);
+                break;
+            case "muteLocalCustomStream":
+                muteLocalCustomStream(call, result);
+                break;
+            case "setLocalCustomStreamView":
+                setLocalCustomStreamView(call, result);
+                break;
+            case "removeLocalCustomStreamView":
+                removeLocalCustomStreamView(call, result);
+                break;
+            case "publishCustomStream":
+                publishCustomStream(call, result);
+                break;
+            case "unpublishCustomStream":
+                unpublishCustomStream(call, result);
+                break;
+            case "muteRemoteCustomStream":
+                muteRemoteCustomStream(call, result);
+                break;
+            case "setRemoteCustomStreamView":
+                setRemoteCustomStreamView(call, result);
+                break;
+            case "removeRemoteCustomStreamView":
+                removeRemoteCustomStreamView(call, result);
+                break;
+            case "subscribeCustomStream":
+                subscribeCustomStream(call, result);
+                break;
+            case "unsubscribeCustomStream":
+                unsubscribeCustomStream(call, result);
+                break;
             default:
                 MainThreadPoster.notImplemented(result);
                 break;
@@ -443,11 +529,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (config != null);
             Boolean tiny = call.argument("tiny");
             assert (tiny != null);
-            if (!tiny) {
-                code = engine.setVideoConfig(ArgumentAdapter.toVideoConfig(config));
-            } else {
-                code = engine.setTinyVideoConfig(ArgumentAdapter.toVideoConfig(config));
-            }
+            code = engine.setVideoConfig(ArgumentAdapter.toVideoConfig(config), tiny);
         }
         MainThreadPoster.success(result, code);
     }
@@ -748,11 +830,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (bitrate != null);
             Boolean tiny = call.argument("tiny");
             assert (tiny != null);
-            if (!tiny) {
-                code = engine.setLiveMixVideoBitrate(bitrate);
-            } else {
-                code = engine.setLiveMixTinyVideoBitrate(bitrate);
-            }
+            code = engine.setLiveMixVideoBitrate(bitrate, tiny);
         }
         MainThreadPoster.success(result, code);
     }
@@ -760,15 +838,13 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     private void setLiveMixVideoResolution(@NonNull MethodCall call, @NonNull Result result) {
         int code = -1;
         if (engine != null) {
-            Integer resolution = call.argument("resolution");
-            assert (resolution != null);
+            Integer width = call.argument("width");
+            assert (width != null);
+            Integer height = call.argument("height");
+            assert (height != null);
             Boolean tiny = call.argument("tiny");
             assert (tiny != null);
-            if (!tiny) {
-                code = engine.setLiveMixVideoResolution(ArgumentAdapter.toVideoResolution(resolution));
-            } else {
-                code = engine.setLiveMixTinyVideoResolution(ArgumentAdapter.toVideoResolution(resolution));
-            }
+            code = engine.setLiveMixVideoResolution(width, height, tiny);
         }
         MainThreadPoster.success(result, code);
     }
@@ -780,11 +856,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (fps != null);
             Boolean tiny = call.argument("tiny");
             assert (tiny != null);
-            if (!tiny) {
-                code = engine.setLiveMixVideoFps(ArgumentAdapter.toVideoFps(fps));
-            } else {
-                code = engine.setLiveMixTinyVideoFps(ArgumentAdapter.toVideoFps(fps));
-            }
+            code = engine.setLiveMixVideoFps(ArgumentAdapter.toVideoFps(fps), tiny);
         }
         MainThreadPoster.success(result, code);
     }
@@ -1053,6 +1125,174 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         String code = null;
         if (engine != null) {
             code = engine.getSessionId();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void createCustomStreamFromFile(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String path = call.argument("path");
+            String assets = call.argument("assets");
+            String file = path != null ? path : getAssetsPath(assets);
+            assert (file != null);
+            URI uri = null;
+            try {
+                uri = new URI(file);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            assert (uri != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            Boolean replace = call.argument("replace");
+            assert (replace != null);
+            Boolean playback = call.argument("playback");
+            assert (playback != null);
+            code = engine.createCustomStreamFromFile(uri, tag, replace, playback);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setCustomStreamVideoConfig(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = call.argument("tag");
+            assert (tag != null);
+            HashMap<String, Object> config = call.argument("config");
+            assert (config != null);
+            code = engine.setCustomStreamVideoConfig(tag, ArgumentAdapter.toVideoConfig(config));
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void muteLocalCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = call.argument("tag");
+            assert (tag != null);
+            Boolean mute = call.argument("mute");
+            assert (mute != null);
+            code = engine.muteLocalCustomStream(tag, mute);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setLocalCustomStreamView(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = call.argument("tag");
+            assert (tag != null);
+            Integer view = call.argument("view");
+            assert (view != null);
+            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
+            assert (origin != null);
+            try {
+                Integer ret = (Integer) SET_LOCAL_CUSTOM_VIEW_METHOD.invoke(engine, tag, origin.view);
+                assert (ret != null);
+                code = ret;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void removeLocalCustomStreamView(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = (String) call.arguments;
+            code = engine.removeLocalCustomStreamView(tag);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void publishCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = (String) call.arguments;
+            code = engine.publishCustomStream(tag);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void unpublishCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String tag = (String) call.arguments;
+            code = engine.unpublishCustomStream(tag);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void muteRemoteCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            Boolean mute = call.argument("mute");
+            assert (mute != null);
+            code = engine.muteRemoteCustomStream(id, tag, mute);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setRemoteCustomStreamView(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            Integer view = call.argument("view");
+            assert (view != null);
+            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
+            assert (origin != null);
+            try {
+                Integer ret = (Integer) SET_REMOTE_CUSTOM_VIEW_METHOD.invoke(engine, id, tag, origin.view);
+                assert (ret != null);
+                code = ret;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void removeRemoteCustomStreamView(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            code = engine.removeRemoteCustomStreamView(id, tag);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void subscribeCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            code = engine.subscribeCustomStream(id, tag);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void unsubscribeCustomStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            String tag = call.argument("tag");
+            assert (tag != null);
+            code = engine.unsubscribeCustomStream(id, tag);
         }
         MainThreadPoster.success(result, code);
     }
@@ -1337,9 +1577,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onLiveMixVideoBitrateSet(int code, String message) {
+        public void onLiveMixVideoBitrateSet(boolean tiny, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", false);
+            arguments.put("tiny", tiny);
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {
@@ -1351,23 +1591,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onLiveMixTinyVideoBitrateSet(int code, String message) {
+        public void onLiveMixVideoResolutionSet(boolean tiny, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", true);
-            arguments.put("code", code);
-            arguments.put("message", message);
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onLiveMixVideoBitrateSet", arguments);
-                }
-            });
-        }
-
-        @Override
-        public void onLiveMixVideoResolutionSet(int code, String message) {
-            final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", false);
+            arguments.put("tiny", tiny);
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {
@@ -1379,37 +1605,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onLiveMixTinyVideoResolutionSet(int code, String message) {
+        public void onLiveMixVideoFpsSet(boolean tiny, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", true);
-            arguments.put("code", code);
-            arguments.put("message", message);
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onLiveMixVideoResolutionSet", arguments);
-                }
-            });
-        }
-
-        @Override
-        public void onLiveMixVideoFpsSet(int code, String message) {
-            final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", false);
-            arguments.put("code", code);
-            arguments.put("message", message);
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onLiveMixVideoFpsSet", arguments);
-                }
-            });
-        }
-
-        @Override
-        public void onLiveMixTinyVideoFpsSet(int code, String message) {
-            final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("tiny", true);
+            arguments.put("tiny", tiny);
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {
@@ -1607,6 +1805,128 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 }
             });
         }
+
+        @Override
+        public void onCustomStreamPublished(String tag, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("tag", tag);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onCustomStreamPublished", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onCustomStreamUnpublished(String tag, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("tag", tag);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onCustomStreamUnpublished", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomStreamPublished(String userId, String tag) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteCustomStreamPublished", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onCustomStreamPublishFinished(String tag) {
+            final String argument = tag;
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onCustomStreamPublishFinished", argument);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomStreamUnpublished(String userId, String tag) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteCustomStreamUnpublished", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomStreamStateChanged(String userId, String tag, boolean disabled) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            arguments.put("disabled", disabled);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteCustomStreamStateChanged", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomStreamFirstFrame(String userId, String tag) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteCustomStreamFirstFrame", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onCustomStreamSubscribed(String userId, String tag, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onCustomStreamSubscribed", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onCustomStreamUnsubscribed(String userId, String tag, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onCustomStreamUnsubscribed", arguments);
+                }
+            });
+        }
     }
 
     private class StatsListenerImpl extends RCRTCIWStatusListener {
@@ -1644,23 +1964,103 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteAudioStats(RCRTCIWRemoteAudioStats stats) {
-            final HashMap<String, Object> argument = ArgumentAdapter.fromRemoteAudioStats(stats);
+        public void onRemoteAudioStats(String id, RCRTCIWRemoteAudioStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", id);
+            arguments.put("stats", ArgumentAdapter.fromRemoteAudioStats(stats));
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
-                    channel.invokeMethod("stats:onRemoteAudioStats", argument);
+                    channel.invokeMethod("stats:onRemoteAudioStats", arguments);
                 }
             });
         }
 
         @Override
-        public void onRemoteVideoStats(RCRTCIWRemoteVideoStats stats) {
+        public void onRemoteVideoStats(String id, RCRTCIWRemoteVideoStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", id);
+            arguments.put("stats", ArgumentAdapter.fromRemoteVideoStats(stats));
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onRemoteVideoStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixAudioStats(RCRTCIWRemoteAudioStats stats) {
+            final HashMap<String, Object> argument = ArgumentAdapter.fromRemoteAudioStats(stats);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onLiveMixAudioStats", argument);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixVideoStats(RCRTCIWRemoteVideoStats stats) {
             final HashMap<String, Object> argument = ArgumentAdapter.fromRemoteVideoStats(stats);
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
-                    channel.invokeMethod("stats:onRemoteVideoStats", argument);
+                    channel.invokeMethod("stats:onLiveMixVideoStats", argument);
+                }
+            });
+        }
+
+        @Override
+        public void onLocalCustomAudioStats(String tag, RCRTCIWLocalAudioStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("tag", tag);
+            arguments.put("stats", ArgumentAdapter.fromLocalAudioStats(stats));
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onLocalCustomAudioStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLocalCustomVideoStats(String tag, RCRTCIWLocalVideoStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("tag", tag);
+            arguments.put("stats", ArgumentAdapter.fromLocalVideoStats(stats));
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onLocalCustomVideoStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomAudioStats(String id, String tag, RCRTCIWRemoteAudioStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", id);
+            arguments.put("tag", tag);
+            arguments.put("stats", ArgumentAdapter.fromRemoteAudioStats(stats));
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onRemoteCustomAudioStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomVideoStats(String id, String tag, RCRTCIWRemoteVideoStats stats) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", id);
+            arguments.put("tag", tag);
+            arguments.put("stats", ArgumentAdapter.fromRemoteVideoStats(stats));
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onRemoteCustomVideoStats", arguments);
                 }
             });
         }
@@ -1676,6 +2076,8 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     private static Method SET_LOCAL_VIEW_METHOD;
     private static Method SET_REMOTE_VIEW_METHOD;
     private static Method SET_LIVE_MIX_VIEW_METHOD;
+    private static Method SET_LOCAL_CUSTOM_VIEW_METHOD;
+    private static Method SET_REMOTE_CUSTOM_VIEW_METHOD;
 
     static {
         try {
@@ -1689,6 +2091,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             SET_REMOTE_VIEW_METHOD.setAccessible(true);
             SET_LIVE_MIX_VIEW_METHOD = clazz.getDeclaredMethod("setLiveMixView", viewClazz);
             SET_LIVE_MIX_VIEW_METHOD.setAccessible(true);
+            SET_LOCAL_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setLocalCustomStreamView", String.class, viewClazz);
+            SET_LOCAL_CUSTOM_VIEW_METHOD.setAccessible(true);
+            SET_REMOTE_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteCustomStreamView", String.class, String.class, viewClazz);
+            SET_REMOTE_CUSTOM_VIEW_METHOD.setAccessible(true);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             e.printStackTrace();
         }

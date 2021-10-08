@@ -76,12 +76,14 @@ class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Pre
     RCRTCMediaType type,
     RCRTCRole role,
     bool tiny,
+    bool yuv,
   ) {
     model.action(
       info,
       type,
       role,
       tiny,
+      yuv,
       (code, info) {
         if (code != 0) {
           view.onError(code, info);

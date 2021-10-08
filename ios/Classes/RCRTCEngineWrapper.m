@@ -19,6 +19,8 @@
 - (NSInteger)setLocalViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view;
 - (NSInteger)setRemoteViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view userId:(NSString *)userId;
 - (NSInteger)setLiveMixViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view;
+- (NSInteger)setLocalCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view tag:(NSString *)tag;
+- (NSInteger)setRemoteCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view userId:(NSString *)userId tag:(NSString *)tag;
 @end
 
 @interface RCFlutterMessageFactory
@@ -47,20 +49,76 @@
 
 SingleInstanceM(Instance);
 
-- (int)setAudioFrameDelegate:(NSObject<RCRTCIWAudioFrameDelegate> * _Nullable)delegate {
-    int code = -1;
+- (NSInteger)setLocalAudioCapturedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate {
+    NSInteger code = -1;
     if (engine != nil) {
-        [engine setAudioBufferDelegate:delegate];
-        code = 0;
+        code = [engine setLocalAudioCapturedDelegate:delegate];
     }
     return code;
 }
 
-- (int)setVideoFrameDelegate:(NSObject<RCRTCIWVideoFrameDelegate> * _Nullable)delegate {
-    int code = -1;
+- (NSInteger)setLocalAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate {
+    NSInteger code = -1;
     if (engine != nil) {
-        [engine setVideoBufferDelegate:delegate];
-        code = 0;
+        code = [engine setLocalAudioMixedDelegate:delegate];
+    }
+    return code;
+}
+
+- (NSInteger)setRemoteAudioReceivedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate
+                                     userId:(NSString *)userId {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setRemoteAudioReceivedDelegate:delegate
+                                               userId:userId];
+    }
+    return code;
+}
+
+- (NSInteger)setRemoteAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setRemoteAudioMixedDelegate:delegate];
+    }
+    return code;
+}
+
+- (NSInteger)setLocalVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setLocalVideoProcessedDelegate:delegate];
+    }
+    return code;
+}
+
+- (NSInteger)setRemoteVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+                                      userId:(NSString *)userId {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setRemoteVideoProcessedDelegate:delegate
+                                                userId:userId];
+    }
+    return code;
+}
+
+- (NSInteger)setLocalCustomVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate
+                                              tag:(NSString *)tag {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setLocalCustomVideoProcessedDelegate:delegate
+                                                        tag:tag];
+    }
+    return code;
+}
+
+- (NSInteger)setRemoteCustomVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+                                            userId:(NSString *)userId
+                                               tag:(NSString *)tag {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine setRemoteCustomVideoProcessedDelegate:delegate
+                                                      userId:userId
+                                                         tag:tag];
     }
     return code;
 }
@@ -251,11 +309,7 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         bool tiny = [arguments[@"tiny"] boolValue];
         NSDictionary *config = arguments[@"config"];
-        if (tiny) {
-            code = [engine setTinyVideoConfig:toVideoConfig(config)];
-        } else {
-            code = [engine setVideoConfig:toVideoConfig(config)];
-        }
+        code = [engine setVideoConfig:toVideoConfig(config) tiny:tiny];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -408,7 +462,7 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         NSInteger view = [arguments[@"view"] integerValue];
         RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
-        [engine setLocalViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]];
+        code = [engine setLocalViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -432,7 +486,7 @@ SingleInstanceM(Instance);
         NSString *uid = arguments[@"id"];
         NSInteger view = [arguments[@"view"] integerValue];
         RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
-        [engine setRemoteViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view] userId:uid];
+        code = [engine setRemoteViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view] userId:uid];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -456,7 +510,7 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         NSInteger view = [arguments[@"view"] integerValue];
         RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
-        [engine setLiveMixViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]];
+        code = [engine setLiveMixViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -585,11 +639,7 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         int bitrate = [arguments[@"bitrate"] intValue];
         bool tiny = [arguments[@"tiny"] boolValue];
-        if (tiny) {
-            code = [engine setLiveMixTinyVideoBitrate:bitrate];
-        } else {
-            code = [engine setLiveMixVideoBitrate:bitrate];
-        }
+        code = [engine setLiveMixVideoBitrate:bitrate tiny:tiny];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -600,13 +650,10 @@ SingleInstanceM(Instance);
     NSInteger code = -1;
     if (engine != nil) {
         NSDictionary *arguments = (NSDictionary *)call.arguments;
-        int resolution = [arguments[@"resolution"] intValue];
+        int width = [arguments[@"width"] intValue];
+        int height = [arguments[@"height"] intValue];
         bool tiny = [arguments[@"tiny"] boolValue];
-        if (tiny) {
-            code = [engine setLiveMixTinyVideoResolution:toVideoResolution(resolution)];
-        } else {
-            code = [engine setLiveMixVideoResolution:toVideoResolution(resolution)];
-        }
+        code = [engine setLiveMixVideoResolution:width height:height tiny:tiny];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -619,11 +666,7 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         int fps = [arguments[@"fps"] intValue];
         bool tiny = [arguments[@"tiny"] boolValue];
-        if (tiny) {
-            code = [engine setLiveMixTinyVideoFps:toVideoFps(fps)];
-        } else {
-            code = [engine setLiveMixVideoFps:toVideoFps(fps)];
-        }
+        code = [engine setLiveMixVideoFps:toVideoFps(fps) tiny:tiny];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -933,6 +976,177 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)createCustomStreamFromFile:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *path = arguments[@"path"];
+        NSString *assets = arguments[@"assets"];
+        NSString *file = !path ? [self getAssetsPath:assets] : path;
+        NSString *tag = arguments[@"tag"];
+        bool replace = [arguments[@"replace"] boolValue];
+        bool playback = [arguments[@"playback"] boolValue];
+        code = [engine createCustomStreamFromFile:[NSURL URLWithString:file]
+                                              tag:tag
+                                          replace:replace
+                                         playback:playback];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setCustomStreamVideoConfig:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *tag = arguments[@"tag"];
+        NSDictionary *config = arguments[@"config"];
+        code = [engine setCustomStreamVideoConfig:toVideoConfig(config)
+                                              tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)muteLocalCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *tag = arguments[@"tag"];
+        bool mute = [arguments[@"mute"] boolValue];
+        code = [engine muteLocalCustomStream:tag
+                                        mute:mute];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setLocalCustomStreamView:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *tag = arguments[@"tag"];
+        NSInteger view = [arguments[@"view"] integerValue];
+        RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
+        code = [engine setLocalCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]
+                                                            tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)removeLocalCustomStreamView:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSString *tag = (NSString *)call.arguments;
+        code = [engine removeLocalCustomStreamView:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)publishCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSString *tag = (NSString *)call.arguments;
+        code = [engine publishCustomStream:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)unpublishCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSString *tag = (NSString *)call.arguments;
+        code = [engine unpublishCustomStream:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)muteRemoteCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *uid = arguments[@"id"];
+        NSString *tag = arguments[@"tag"];
+        bool mute = [arguments[@"mute"] boolValue];
+        code = [engine muteRemoteCustomStream:uid
+                                          tag:tag
+                                         mute:mute];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setRemoteCustomStreamView:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *uid = arguments[@"id"];
+        NSString *tag = arguments[@"tag"];
+        NSInteger view = [arguments[@"view"] integerValue];
+        RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
+        code = [engine setRemoteCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]
+                                                          userId:uid
+                                                             tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)removeRemoteCustomStreamView:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *uid = arguments[@"id"];
+        NSString *tag = arguments[@"tag"];
+        code = [engine removeRemoteCustomStreamView:uid
+                                                tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)subscribeCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *uid = arguments[@"id"];
+        NSString *tag = arguments[@"tag"];
+        code = [engine subscribeCustomStream:uid
+                                         tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)unsubscribeCustomStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *uid = arguments[@"id"];
+        NSString *tag = arguments[@"tag"];
+        code = [engine unsubscribeCustomStream:uid
+                                           tag:tag];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
 #pragma mark *************** [C] ***************
 
 - (void)onError:(NSInteger)code message:(NSString *)errMsg {
@@ -1164,9 +1378,11 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onLiveMixVideoBitrateSet:(NSInteger)code message:(NSString *)errMsg {
+- (void)onLiveMixVideoBitrateSet:(BOOL)tiny
+                            code:(NSInteger)code
+                         message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(false) forKey:@"tiny"];
+    [arguments setObject:@(tiny) forKey:@"tiny"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:errMsg forKey:@"message"];
     __weak typeof (channel) weak = channel;
@@ -1176,21 +1392,11 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onLiveMixTinyVideoBitrateSet:(NSInteger)code message:(NSString *)errMsg {
+- (void)onLiveMixVideoResolutionSet:(BOOL)tiny
+                               code:(NSInteger)code
+                            message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(true) forKey:@"tiny"];
-    [arguments setObject:@(code) forKey:@"code"];
-    [arguments setObject:errMsg forKey:@"message"];
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onLiveMixVideoBitrateSet" arguments:arguments];
-    });
-}
-
-- (void)onLiveMixVideoResolutionSet:(NSInteger)code message:(NSString *)errMsg {
-    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(false) forKey:@"tiny"];
+    [arguments setObject:@(tiny) forKey:@"tiny"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:errMsg forKey:@"message"];
     __weak typeof (channel) weak = channel;
@@ -1200,33 +1406,11 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onLiveMixTinyVideoResolutionSet:(NSInteger)code message:(NSString *)errMsg {
+- (void)onLiveMixVideoFpsSet:(BOOL)tiny
+                        code:(NSInteger)code
+                     message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(true) forKey:@"tiny"];
-    [arguments setObject:@(code) forKey:@"code"];
-    [arguments setObject:errMsg forKey:@"message"];
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onLiveMixVideoResolutionSet" arguments:arguments];
-    });
-}
-
-- (void)onLiveMixVideoFpsSet:(NSInteger)code message:(NSString *)errMsg {
-    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(false) forKey:@"tiny"];
-    [arguments setObject:@(code) forKey:@"code"];
-    [arguments setObject:errMsg forKey:@"message"];
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onLiveMixVideoFpsSet" arguments:arguments];
-    });
-}
-
-- (void)onLiveMixTinyVideoFpsSet:(NSInteger)code message:(NSString *)errMsg {
-    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:@(true) forKey:@"tiny"];
+    [arguments setObject:@(tiny) forKey:@"tiny"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:errMsg forKey:@"message"];
     __weak typeof (channel) weak = channel;
@@ -1398,6 +1582,124 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)onCustomStreamPublished:(NSString *)tag
+                           code:(int)code
+                        message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCustomStreamPublished" arguments:arguments];
+    });
+}
+
+- (void)onCustomStreamUnpublished:(NSString *)tag
+                             code:(int)code
+                          message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCustomStreamUnpublished" arguments:arguments];
+    });
+}
+
+- (void)onCustomStreamPublishFinished:(NSString *)tag {
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCustomStreamPublishFinished" arguments:tag];
+    });
+}
+
+- (void)onRemoteCustomStreamPublished:(NSString *)userId
+                                  tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteCustomStreamPublished" arguments:arguments];
+    });
+}
+
+- (void)onRemoteCustomStreamUnpublished:(NSString *)userId
+                                    tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteCustomStreamUnpublished" arguments:arguments];
+    });
+}
+
+- (void)onRemoteCustomStreamStateChanged:(NSString *)userId
+                                     tag:(NSString *)tag
+                                disabled:(BOOL)disabled {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(disabled) forKey:@"disabled"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteCustomStreamStateChanged" arguments:arguments];
+    });
+}
+
+- (void)onRemoteCustomStreamFirstFrame:(NSString *)userId
+                                   tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteCustomStreamFirstFrame" arguments:arguments];
+    });
+}
+
+- (void)onCustomStreamSubscribed:(NSString *)userId
+                             tag:(NSString *)tag
+                            code:(int)code
+                         message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCustomStreamSubscribed" arguments:arguments];
+    });
+}
+
+- (void)onCustomStreamUnsubscribed:(NSString *)userId
+                               tag:(NSString *)tag
+                              code:(int)code
+                           message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCustomStreamUnsubscribed" arguments:arguments];
+    });
+}
+
 - (void)onNetworkStats:(RCRTCIWNetworkStats *)stats {
     NSDictionary *argument = fromNetworkStats(stats);
     __weak typeof (channel) weak = channel;
@@ -1425,21 +1727,97 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats {
+- (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                    userId:(NSString *)userId {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:fromRemoteAudioStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onRemoteAudioStats" arguments:arguments];
+    });
+}
+
+- (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                    userId:(NSString *)userId {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:fromRemoteVideoStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onRemoteVideoStats" arguments:arguments];
+    });
+}
+
+- (void)onLiveMixAudioStats:(RCRTCIWRemoteAudioStats *)stats {
     NSDictionary *argument = fromRemoteAudioStats(stats);
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
-        [strong invokeMethod:@"stats:onRemoteAudioStats" arguments:argument];
+        [strong invokeMethod:@"stats:onLiveMixAudioStats" arguments:argument];
     });
 }
 
-- (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats {
+- (void)onLiveMixVideoStats:(RCRTCIWRemoteVideoStats *)stats {
     NSDictionary *argument = fromRemoteVideoStats(stats);
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
-        [strong invokeMethod:@"stats:onRemoteVideoStats" arguments:argument];
+        [strong invokeMethod:@"stats:onLiveMixVideoStats" arguments:argument];
+    });
+}
+
+- (void)onLocalCustomAudioStats:(RCRTCIWLocalAudioStats *)stats
+                            tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:fromLocalAudioStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onLocalCustomAudioStats" arguments:arguments];
+    });
+}
+
+- (void)onLocalCustomVideoStats:(RCRTCIWLocalVideoStats *)stats
+                            tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:fromLocalVideoStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onLocalCustomVideoStats" arguments:arguments];
+    });
+}
+
+- (void)onRemoteCustomAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                          userId:(NSString *)userId
+                             tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:fromRemoteAudioStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onRemoteCustomAudioStats" arguments:arguments];
+    });
+}
+
+- (void)onRemoteCustomVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                          userId:(NSString *)userId
+                             tag:(NSString *)tag {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:fromRemoteVideoStats(stats) forKey:@"stats"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onRemoteCustomVideoStats" arguments:arguments];
     });
 }
 
@@ -1597,6 +1975,30 @@ SingleInstanceM(Instance);
         [self getAudioMixingDuration:result];
     } else if ([method isEqualToString:@"getSessionId"]) {
         [self getSessionId:result];
+    } else if ([method isEqualToString:@"createCustomStreamFromFile"]) {
+        [self createCustomStreamFromFile:call result:result];
+    } else if ([method isEqualToString:@"setCustomStreamVideoConfig"]) {
+        [self setCustomStreamVideoConfig:call result:result];
+    } else if ([method isEqualToString:@"muteLocalCustomStream"]) {
+        [self muteLocalCustomStream:call result:result];
+    } else if ([method isEqualToString:@"setLocalCustomStreamView"]) {
+        [self setLocalCustomStreamView:call result:result];
+    } else if ([method isEqualToString:@"removeLocalCustomStreamView"]) {
+        [self removeLocalCustomStreamView:call result:result];
+    } else if ([method isEqualToString:@"publishCustomStream"]) {
+        [self publishCustomStream:call result:result];
+    } else if ([method isEqualToString:@"unpublishCustomStream"]) {
+        [self unpublishCustomStream:call result:result];
+    } else if ([method isEqualToString:@"muteRemoteCustomStream"]) {
+        [self muteRemoteCustomStream:call result:result];
+    } else if ([method isEqualToString:@"setRemoteCustomStreamView"]) {
+        [self setRemoteCustomStreamView:call result:result];
+    } else if ([method isEqualToString:@"removeRemoteCustomStreamView"]) {
+        [self removeRemoteCustomStreamView:call result:result];
+    } else if ([method isEqualToString:@"subscribeCustomStream"]) {
+        [self subscribeCustomStream:call result:result];
+    } else if ([method isEqualToString:@"unsubscribeCustomStream"]) {
+        [self unsubscribeCustomStream:call result:result];
     } else {
         dispatch_to_main_queue(^{
             result(FlutterMethodNotImplemented);

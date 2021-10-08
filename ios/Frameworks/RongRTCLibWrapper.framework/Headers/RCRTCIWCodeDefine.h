@@ -18,7 +18,9 @@ typedef NS_ENUM(NSInteger, RCRTCWrapperCode) {
     RCRTCWrapperCodeStartAudioMixError = -15,              // 启动混音失败
     RCRTCWrapperCodeStreamNotExist = -16,                  // 流不存在
     RCRTCWrapperCodeParameterError = -17,                  // 参数错误
-    RCRTCWrapperCodeRoleError = -18,                       // 角色错误
+    RCRTCWrapperCodeCreateCustomStreamError = -18,         // 创建自定义流失败
+    RCRTCWrapperCodeNotSupportYet = -19,                   // 暂不支持
+    RCRTCWrapperCodeCustomFileOpenError = -20,             // 自定义视频文件打开失败
 };
 
 

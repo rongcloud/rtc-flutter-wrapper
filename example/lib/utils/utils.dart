@@ -73,6 +73,17 @@ class Utils {
             break;
         }
       };
+      _engine?.onRemoteCustomStreamPublished = (String id, String tag) {
+        UserState? user = _users.firstWhereOrNull((user) => user.id == id);
+        user?.customs.removeWhere((custom) => custom.tag == tag);
+        user?.customs.add(CustomState(tag));
+        onUserCustomStateChanged?.call(id, tag, true);
+      };
+      _engine?.onRemoteCustomStreamUnpublished = (String id, String tag) {
+        UserState? user = _users.firstWhereOrNull((user) => user.id == id);
+        user?.customs.removeWhere((custom) => custom.tag == tag);
+        onUserCustomStateChanged?.call(id, tag, false);
+      };
     } else {
       onUserJoined = null;
       onUserLeft = null;
@@ -83,6 +94,8 @@ class Utils {
       _engine?.onUserLeft = null;
       _engine?.onRemotePublished = null;
       _engine?.onRemoteUnpublished = null;
+      _engine?.onRemoteCustomStreamPublished = null;
+      _engine?.onRemoteCustomStreamUnpublished = null;
       _users.clear();
     }
   }
@@ -101,6 +114,7 @@ class Utils {
   static Function(String id)? onUserLeft;
   static Function(String id, bool published)? onUserAudioStateChanged;
   static Function(String id, bool published)? onUserVideoStateChanged;
+  static Function(String id, String tag, bool published)? onUserCustomStateChanged;
 
   static List<UserState> _users = [];
 }

@@ -8,9 +8,13 @@
 		<data>
 		t1SD1Sza1jhCYp78wX6+daBcjrc=
 		</data>
+		<key>Headers/RCRTCIWAudioFrame.h</key>
+		<data>
+		lT2us+AriogoOEgT9YvK8nrlj9k=
+		</data>
 		<key>Headers/RCRTCIWAudioFrameDelegate.h</key>
 		<data>
-		kTaNey9c0o5YMz5n16uQyF7z/5c=
+		v2SzEqXi3TO0hegWrTC+o9jnYIQ=
 		</data>
 		<key>Headers/RCRTCIWAudioSetup.h</key>
 		<data>
@@ -18,23 +22,23 @@
 		</data>
 		<key>Headers/RCRTCIWCodeDefine.h</key>
 		<data>
-		BGtTS03tIWngcbCc9/dgjn2z1T4=
+		t7ZcYfXWFwW2E6aGIJJ8JOVWmMU=
 		</data>
 		<key>Headers/RCRTCIWCustomLayout.h</key>
 		<data>
-		D+9G01G8F1Tu9iJiSufLihvOv0o=
+		BiebT4HSiwmsB/ARMVsPXfHNTYw=
 		</data>
 		<key>Headers/RCRTCIWDefine.h</key>
 		<data>
-		63bZtnloVquK7X4QKOBxKFo4iew=
+		cVViTd2I1tmCXakNzCRF55U/R4U=
 		</data>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<data>
-		KjMaGjC7AHWx6ULPhFQNsZHsi5c=
+		Ib9tn5O1NhIOsPVN/8NDmw5/LEo=
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
-		CGl9HFcZ+V25vbYAua8IUpqlb7A=
+		KzluihSYRxgerHSEwWdXJQnwSQA=
 		</data>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
 		<data>
@@ -54,11 +58,11 @@
 		</data>
 		<key>Headers/RCRTCIWRemoteAudioStats.h</key>
 		<data>
-		edOfq2FKLepFoHjOQHYjtj0B7OU=
+		oFqbl5uShDe9tUMN7zsCuqWdRv4=
 		</data>
 		<key>Headers/RCRTCIWRemoteVideoStats.h</key>
 		<data>
-		3LLUjgJwB/Da+WCCUoKZaYhtLVU=
+		RrYy5iIeY4tc2ee6ZWQfnWZPpVo=
 		</data>
 		<key>Headers/RCRTCIWRoomSetup.h</key>
 		<data>
@@ -66,7 +70,7 @@
 		</data>
 		<key>Headers/RCRTCIWStatsDelegate.h</key>
 		<data>
-		QKsGr56G6tvwYMXM1dhn+QLNc6k=
+		VuQbfSQ6sqZ7CO16ZaU95ukdQvQ=
 		</data>
 		<key>Headers/RCRTCIWVideoConfig.h</key>
 		<data>
@@ -74,7 +78,7 @@
 		</data>
 		<key>Headers/RCRTCIWVideoFrameDelegate.h</key>
 		<data>
-		NzUrUghIbwQjngiTOSM8qjvqQew=
+		tPqczYFLPlIVOS25ZSI3KtCyPOo=
 		</data>
 		<key>Headers/RCRTCIWVideoSetup.h</key>
 		<data>
@@ -86,11 +90,11 @@
 		</data>
 		<key>Headers/RongRTCLibWrapper.h</key>
 		<data>
-		SWfdSO8Y288r3MUgsYe4/Ly398g=
+		YlH+RAu5sQONjl+9XDUvBnMwHeg=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		RjKfA1SNX0i912LVdUXIDGF+vQM=
+		WlvlUIz1H0nf7ELSHv/hXnrB5Oc=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -110,15 +114,26 @@
 			gCMBb6rmrVo727LKkB1772t2cTv4fHC+OG4Lp7sxcgQ=
 			</data>
 		</dict>
+		<key>Headers/RCRTCIWAudioFrame.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			lT2us+AriogoOEgT9YvK8nrlj9k=
+			</data>
+			<key>hash2</key>
+			<data>
+			EeA2rJ0FZ2lMFe2L6VOoB1aTXlhE04fL03p/yulEI8o=
+			</data>
+		</dict>
 		<key>Headers/RCRTCIWAudioFrameDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			kTaNey9c0o5YMz5n16uQyF7z/5c=
+			v2SzEqXi3TO0hegWrTC+o9jnYIQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			PEIbPbpjk89mKhVVywGl/6BWfzIAC1WvSfnVp1G9t6A=
+			EwXNDJ5OZOchU3SMtOrg+DO5Pe71zEW1VBwpdzeh3aA=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWAudioSetup.h</key>
@@ -136,55 +151,55 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			BGtTS03tIWngcbCc9/dgjn2z1T4=
+			t7ZcYfXWFwW2E6aGIJJ8JOVWmMU=
 			</data>
 			<key>hash2</key>
 			<data>
-			ca2zdx3t1+vBE4Z99Rc4XF5jOl8eUujaXedntDLA+3Y=
+			Bp8zsCbSrhJUC2IypJipXRI9z5E3bhBQKksGhxjVsgI=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWCustomLayout.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			D+9G01G8F1Tu9iJiSufLihvOv0o=
+			BiebT4HSiwmsB/ARMVsPXfHNTYw=
 			</data>
 			<key>hash2</key>
 			<data>
-			iP67RZ4TTYko11f2EcibQMKuSJR2E9U1OCJfesMACIQ=
+			GuLXNMWD4m/y3nbFJUmxB3HW6tnla5MVLIlQsBbBt9w=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWDefine.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			63bZtnloVquK7X4QKOBxKFo4iew=
+			cVViTd2I1tmCXakNzCRF55U/R4U=
 			</data>
 			<key>hash2</key>
 			<data>
-			pqgWcl8eG38Uv4XjoaYzHRKs+XNAcUU3UAUwYZE6WC0=
+			951EB+rZFfbO4ox4i9Q83zP4IQUK4AxgRuLSud7hOhE=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			KjMaGjC7AHWx6ULPhFQNsZHsi5c=
+			Ib9tn5O1NhIOsPVN/8NDmw5/LEo=
 			</data>
 			<key>hash2</key>
 			<data>
-			3G1YXCHqc4B2cCJDIjmBs5X0TmpB9mW88AK9DIXtCP0=
+			+tblTZLeInGasOC7wsfgJsINtynZNBM18kdPT9AMDmg=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			CGl9HFcZ+V25vbYAua8IUpqlb7A=
+			KzluihSYRxgerHSEwWdXJQnwSQA=
 			</data>
 			<key>hash2</key>
 			<data>
-			8gDJt0NCQd5QBhZ0lWacEKFEPL+Ch4OAvtbmtPL0rjU=
+			TSxOtuzHD9aBbAG4rRgwzcBtatozn7SnrOswkOfJ2OI=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
@@ -235,22 +250,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			edOfq2FKLepFoHjOQHYjtj0B7OU=
+			oFqbl5uShDe9tUMN7zsCuqWdRv4=
 			</data>
 			<key>hash2</key>
 			<data>
-			ukwFcKwFob95/0jdKxfd4t0QxcMjluYz4CkswIEOuXQ=
+			3399wXAnuyYVacMB2ytzRnIPUZGf6KAU+vWtWP9rkKc=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWRemoteVideoStats.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			3LLUjgJwB/Da+WCCUoKZaYhtLVU=
+			RrYy5iIeY4tc2ee6ZWQfnWZPpVo=
 			</data>
 			<key>hash2</key>
 			<data>
-			8j1M0KHYSoc+LhTiv+UXAgCxZ1I1LIXXVx6f0qRou2A=
+			b86dLMnbMh/SHgVNQ4RwtE7C5xbaRf26y1E+kb6q2xg=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWRoomSetup.h</key>
@@ -268,11 +283,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			QKsGr56G6tvwYMXM1dhn+QLNc6k=
+			VuQbfSQ6sqZ7CO16ZaU95ukdQvQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			MS19idonfz0cthRC16hI67maLefZQlNs8HlEI0LfO5A=
+			BtBSEXTA3BuPyYJGRQ2fkXYzsHSlu6lPpoKjPWQ5D08=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWVideoConfig.h</key>
@@ -290,11 +305,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			NzUrUghIbwQjngiTOSM8qjvqQew=
+			tPqczYFLPlIVOS25ZSI3KtCyPOo=
 			</data>
 			<key>hash2</key>
 			<data>
-			zmSj3+vhlEmE0u79oLzU6AfipwZZNMVpwSP6X11siSo=
+			Yv9PAxnyxD5Q86hrgaEYyGrvY1NEn/Z323w5Qdcz/a4=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWVideoSetup.h</key>
@@ -323,11 +338,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			SWfdSO8Y288r3MUgsYe4/Ly398g=
+			YlH+RAu5sQONjl+9XDUvBnMwHeg=
 			</data>
 			<key>hash2</key>
 			<data>
-			HXMw65tgPDzkiGIY44CivCgEKyIQnYhjN9uspEHvk3o=
+			UN9u4vgLrJVaQmTOvJDovQGfnQwvs6EZP787iphcJSE=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

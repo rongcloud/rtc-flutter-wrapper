@@ -1,15 +1,19 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
+import 'package:path/path.dart' as Path;
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/extension.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/main.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/widgets/ui.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import 'host_page_contract.dart';
 import 'host_page_presenter.dart';
@@ -32,12 +36,14 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Map<String, dynamic> arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     _roomId = arguments['id'];
     _config = Config.fromJson(arguments['config']);
+    _yuv = arguments['yuv'] ?? false;
     _tinyConfig = RCRTCVideoConfig.create(
       minBitrate: 100,
       maxBitrate: 500,
       fps: RCRTCVideoFps.fps_15,
       resolution: RCRTCVideoResolution.resolution_180_320,
     );
+    _customConfig = RCRTCVideoConfig.create();
 
     Utils.engine?.setStatsListener(this);
   }
@@ -45,18 +51,21 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   @override
   void dispose() {
     _remotes.clear();
+    _remoteCustoms.clear();
 
     _networkStats = null;
     _localAudioStats = null;
     _localVideoStats.clear();
     _remoteAudioStats.clear();
     _remoteVideoStats.clear();
+    _remoteCustomVideoStats.clear();
 
     _networkStatsStateSetter = null;
     _localAudioStatsStateSetter = null;
     _localVideoStatsStateSetter = null;
     _remoteAudioStatsStateSetters.clear();
     _remoteVideoStatsStateSetters.clear();
+    _remoteCustomVideoStatsStateSetters.clear();
     super.dispose();
   }
 
@@ -266,6 +275,159 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                       padding: EdgeInsets.all(5.dp),
                       child: Container(
                         decoration: BoxDecoration(
+                          border: Border.all(color: Colors.green),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 170.dp,
+                              height: 150.dp,
+                              color: Colors.yellow,
+                              child: Stack(
+                                children: [
+                                  _custom ?? Container(),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 5.dp,
+                                      ),
+                                      child: Text(
+                                        '${DefaultData.user!.id.replaceAll('_', '')}Custom',
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                          decoration: TextDecoration.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 25.dp,
+                                      ),
+                                      child: BoxFitChooser(
+                                        fit: _custom?.fit ?? BoxFit.contain,
+                                        onSelected: (fit) {
+                                          setState(() {
+                                            _custom?.fit = fit;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            VerticalDivider(
+                              width: 10.dp,
+                              color: Colors.transparent,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 150.dp,
+                                  child: '已选文件:\n${_customPath != null ? Path.basename(_customPath!) : null} '.toText(),
+                                ),
+                                '选择文件'.onClick(() => _selectMovie(context), color: Colors.blue),
+                                Row(
+                                  children: [
+                                    CheckBoxes(
+                                      'YUV数据',
+                                      enable: _yuv && !_customPublished,
+                                      checked: _localYuv,
+                                      onChanged: (checked) => setState(() {
+                                        _localYuv = checked;
+                                      }),
+                                    ),
+                                    VerticalDivider(
+                                      width: 10.dp,
+                                      color: Colors.transparent,
+                                    ),
+                                    Button(
+                                      '${_customPublished ? '取消发布' : '发布'}',
+                                      size: 15.dp,
+                                      callback: () => _customAction(),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        isDense: true,
+                                        value: _customConfig.fps,
+                                        items: videoFpsItems(),
+                                        onChanged: (dynamic fps) => _changeCustomFps(fps),
+                                      ),
+                                    ),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        isDense: true,
+                                        value: _customConfig.resolution,
+                                        items: videoResolutionItems(),
+                                        onChanged: (dynamic resolution) => _changeCustomResolution(resolution),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '码率下限:',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15.sp,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                    ),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        isDense: true,
+                                        value: _customConfig.minBitrate,
+                                        items: minVideoKbpsItems(),
+                                        onChanged: (dynamic kbps) => _changeCustomMinBitrate(kbps),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '码率上限:',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15.sp,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                    ),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        isDense: true,
+                                        value: _customConfig.maxBitrate,
+                                        items: maxVideoKbpsItems(),
+                                        onChanged: (dynamic kbps) => _changeCustomMaxBitrate(kbps),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(5.dp),
+                      child: Container(
+                        decoration: BoxDecoration(
                           border: Border.all(color: Colors.blue),
                         ),
                         child: Row(
@@ -369,117 +531,221 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                   },
                   itemBuilder: (context, index) {
                     UserState user = Utils.users[index];
-                    return Row(
-                      mainAxisSize: MainAxisSize.max,
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 200.dp,
-                          height: 160.dp,
-                          color: Colors.blue,
-                          child: Stack(
-                            children: [
-                              _remotes[user.id] ?? Container(),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    top: 5.dp,
-                                  ),
-                                  child: Text(
-                                    '${user.id}',
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15.sp,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    bottom: 5.dp,
-                                  ),
-                                  child: Offstage(
-                                    offstage: !user.videoPublished,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        '切大流'.onClick(() {
-                                          _switchToNormalStream(user.id);
-                                        }),
-                                        VerticalDivider(
-                                          width: 10.dp,
-                                          color: Colors.transparent,
-                                        ),
-                                        '切小流'.onClick(() {
-                                          _switchToTinyStream(user.id);
-                                        }),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    top: 15.dp,
-                                  ),
-                                  child: BoxFitChooser(
-                                    fit: _remotes[user.id]?.fit ?? BoxFit.cover,
-                                    onSelected: (fit) {
-                                      setState(() {
-                                        _remotes[user.id]?.fit = fit;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          width: 2.dp,
-                          color: Colors.transparent,
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 200.dp,
+                              height: 160.dp,
+                              color: Colors.blue,
+                              child: Stack(
                                 children: [
-                                  CheckBoxes(
-                                    '订阅音频',
-                                    enable: user.audioPublished,
-                                    checked: user.audioSubscribed,
-                                    onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
+                                  _remotes[user.id] ?? Container(),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 5.dp,
+                                      ),
+                                      child: Text(
+                                        '${user.id}',
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                          decoration: TextDecoration.none,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  CheckBoxes(
-                                    '订阅视频',
-                                    enable: user.videoPublished,
-                                    checked: user.videoSubscribed,
-                                    onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
+                                  Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        bottom: 5.dp,
+                                      ),
+                                      child: Offstage(
+                                        offstage: !user.videoPublished,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            '切大流'.onClick(() {
+                                              _switchToNormalStream(user.id);
+                                            }),
+                                            VerticalDivider(
+                                              width: 10.dp,
+                                              color: Colors.transparent,
+                                            ),
+                                            '切小流'.onClick(() {
+                                              _switchToTinyStream(user.id);
+                                            }),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 15.dp,
+                                      ),
+                                      child: BoxFitChooser(
+                                        fit: _remotes[user.id]?.fit ?? BoxFit.cover,
+                                        onSelected: (fit) {
+                                          setState(() {
+                                            _remotes[user.id]?.fit = fit;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              StatefulBuilder(builder: (context, setter) {
-                                _remoteAudioStatsStateSetters[user.id] = setter;
-                                return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
-                              }),
-                              StatefulBuilder(builder: (context, setter) {
-                                _remoteVideoStatsStateSetters[user.id] = setter;
-                                return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
-                              }),
-                            ],
-                          ),
+                            ),
+                            VerticalDivider(
+                              width: 2.dp,
+                              color: Colors.transparent,
+                            ),
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CheckBoxes(
+                                        '订阅音频',
+                                        enable: user.audioPublished,
+                                        checked: user.audioSubscribed,
+                                        onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
+                                      ),
+                                      CheckBoxes(
+                                        '订阅视频',
+                                        enable: user.videoPublished,
+                                        checked: user.videoSubscribed,
+                                        onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
+                                      ),
+                                    ],
+                                  ),
+                                  StatefulBuilder(builder: (context, setter) {
+                                    _remoteAudioStatsStateSetters[user.id] = setter;
+                                    return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
+                                  }),
+                                  StatefulBuilder(builder: (context, setter) {
+                                    _remoteVideoStatsStateSetters[user.id] = setter;
+                                    return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
+                                  }),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: user.customs.length,
+                          separatorBuilder: (context, index) {
+                            return Divider(
+                              height: 5.dp,
+                              color: Colors.transparent,
+                            );
+                          },
+                          itemBuilder: (context, index) {
+                            CustomState custom = user.customs[index];
+                            String key = '${user.id}${custom.tag}';
+                            return Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 200.dp,
+                                  height: 160.dp,
+                                  color: Colors.yellow,
+                                  child: Stack(
+                                    children: [
+                                      _remoteCustoms[key] ?? Container(),
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: 5.dp,
+                                            top: 5.dp,
+                                          ),
+                                          child: Text(
+                                            '${user.customs[index].tag}',
+                                            softWrap: true,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15.sp,
+                                              decoration: TextDecoration.none,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: 5.dp,
+                                            top: 15.dp,
+                                          ),
+                                          child: BoxFitChooser(
+                                            fit: _remoteCustoms[key]?.fit ?? BoxFit.cover,
+                                            onSelected: (fit) {
+                                              setState(() {
+                                                _remoteCustoms[key]?.fit = fit;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                VerticalDivider(
+                                  width: 2.dp,
+                                  color: Colors.transparent,
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          CheckBoxes(
+                                            'YUV数据',
+                                            enable: _yuv && !custom.subscribed,
+                                            checked: custom.yuv,
+                                            onChanged: (checked) => setState(() {
+                                              custom.yuv = checked;
+                                            }),
+                                          ),
+                                          Spacer(),
+                                          CheckBoxes(
+                                            '订阅',
+                                            checked: custom.subscribed,
+                                            onChanged: (subscribe) => _changeRemoteCustom(user, custom, subscribe),
+                                          ),
+                                        ],
+                                      ),
+                                      StatefulBuilder(builder: (context, setter) {
+                                        _remoteCustomVideoStatsStateSetters['${user.id}@${custom.tag}'] = setter;
+                                        return RemoteVideoStatsTable(_remoteCustomVideoStats['${user.id}@${custom.tag}']);
+                                      }),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     );
@@ -512,15 +778,21 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   void _showMixInfo(BuildContext context) {
-    List<String> users = [];
-    users.add(DefaultData.user!.id);
+    List<LiveMixItem> items = [];
+    items.add(LiveMixItem(DefaultData.user!.id, null));
+    if (_customPublished) {
+      items.add(LiveMixItem(DefaultData.user!.id, '${DefaultData.user!.id.replaceAll('_', '')}Custom'));
+    }
     Utils.users.forEach((user) {
-      users.add(user.id);
+      items.add(LiveMixItem(user.id, null));
+      user.customs.forEach((custom) {
+        items.add(LiveMixItem(user.id, custom.tag));
+      });
     });
     showDialog(
       context: context,
       builder: (context) {
-        return LiveMixPanel(Utils.engine!, _liveMix, users);
+        return LiveMixPanel(Utils.engine!, _liveMix, items);
       },
     );
   }
@@ -634,6 +906,51 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     setState(() {});
   }
 
+  void _selectMovie(BuildContext context) async {
+    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, maxAssets: 1, requestType: RequestType.video);
+    File? file = await assets?.first.originFile;
+    setState(() {
+      _customPath = file?.absolute.path;
+    });
+  }
+
+  void _customAction() {
+    if (!_customPublished) {
+      if (_customPath?.isEmpty ?? true) {
+        return '请选择视频文件！'.toast();
+      }
+      Loading.show(context);
+      presenter.publishCustomVideo(_roomId, _customPath!, _customConfig, _localYuv);
+    } else {
+      Loading.show(context);
+      presenter.unpublishCustomVideo();
+    }
+  }
+
+  void _changeCustomFps(RCRTCVideoFps fps) async {
+    _customConfig.fps = fps;
+    await presenter.changeCustomConfig(_customConfig);
+    setState(() {});
+  }
+
+  void _changeCustomResolution(RCRTCVideoResolution resolution) async {
+    _customConfig.resolution = resolution;
+    await presenter.changeCustomConfig(_customConfig);
+    setState(() {});
+  }
+
+  void _changeCustomMinBitrate(int kbps) async {
+    _customConfig.minBitrate = kbps;
+    await presenter.changeCustomConfig(_customConfig);
+    setState(() {});
+  }
+
+  void _changeCustomMaxBitrate(int kbps) {
+    _customConfig.maxBitrate = kbps;
+    presenter.changeCustomConfig(_customConfig);
+    setState(() {});
+  }
+
   void _changeTinyResolution(RCRTCVideoResolution resolution) async {
     _tinyConfig.resolution = resolution;
     setState(() {});
@@ -688,8 +1005,29 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Loading.dismiss(context);
   }
 
+  void _changeRemoteCustom(UserState user, CustomState custom, bool subscribe) async {
+    Loading.show(context);
+    custom.subscribed = await presenter.changeRemoteCustomStatus(_roomId, user.id, custom.tag, custom.yuv, subscribe);
+    String key = '${user.id}${custom.tag}';
+    if (custom.subscribed) {
+      if (_remoteCustoms.containsKey(key)) _remoteCustoms.remove(key);
+      RCRTCView view = await RCRTCView.create(mirror: false);
+      _remoteCustoms[key] = view;
+      await Utils.engine?.setRemoteCustomStreamView(user.id, custom.tag, view);
+    } else {
+      if (_remoteCustoms.containsKey(key)) {
+        _remoteCustoms.remove(key);
+        await Utils.engine?.removeRemoteCustomStreamView(user.id, custom.tag);
+      }
+    }
+    setState(() {});
+    Loading.dismiss(context);
+  }
+
   Future<bool> _exit() async {
     Loading.show(context);
+    await Main.getInstance().disableLocalCustomYuv();
+    await Main.getInstance().disableAllRemoteCustomYuv();
     await Utils.engine?.setStatsListener(null);
     presenter.exit();
     return Future.value(false);
@@ -710,6 +1048,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   Future<void> _updateRemoteView() {
     Completer<void> completer = Completer();
     _remotes.clear();
+    _remoteCustoms.clear();
     int count = Utils.users.length;
     if (count > 0) {
       Utils.users.forEach((user) async {
@@ -718,6 +1057,13 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
           Utils.engine?.setRemoteView(user.id, view);
           _remotes[user.id] = view;
         }
+        user.customs.forEach((custom) async {
+          if (custom.subscribed) {
+            RCRTCView view = await RCRTCView.create(mirror: false);
+            Utils.engine?.setRemoteView(user.id, view);
+            _remoteCustoms['${user.id}${custom.tag}'] = view;
+          }
+        });
         count--;
         if (count <= 0) {
           completer.complete();
@@ -740,6 +1086,52 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
       if (_remotes.containsKey(id)) {
         _remotes.remove(id);
         Utils.engine?.removeRemoteView(id);
+      }
+    }
+    setState(() {});
+  }
+
+  @override
+  void onCustomVideoPublished() async {
+    Loading.dismiss(context);
+    _custom = await RCRTCView.create(mirror: false);
+    int code = await Utils.engine?.setLocalCustomStreamView('${DefaultData.user!.id.replaceAll('_', '')}Custom', _custom!) ?? -1;
+    if (code != 0) '设置自定义视频预览失败, $code'.toast();
+    setState(() {
+      _customPublished = true;
+    });
+  }
+
+  @override
+  void onCustomVideoPublishedError(int code) {
+    Loading.dismiss(context);
+    '发布自定义视频失败, $code'.toast();
+  }
+
+  @override
+  void onCustomVideoUnpublished() async {
+    await Main.getInstance().disableLocalCustomYuv();
+    Loading.dismiss(context);
+    setState(() {
+      _custom = null;
+      _customPublished = false;
+    });
+  }
+
+  @override
+  void onCustomVideoUnpublishedError(int code) {
+    Loading.dismiss(context);
+    '取消发布自定义视频失败, $code'.toast();
+  }
+
+  @override
+  void onUserCustomStateChanged(String id, String tag, bool published) async {
+    if (!published) {
+      await Main.getInstance().disableRemoteCustomYuv(id, tag);
+      String key = '$id$tag';
+      if (_remoteCustoms.containsKey(key)) {
+        _remoteCustoms.remove(key);
+        await Utils.engine?.removeRemoteCustomStreamView(id, tag);
       }
     }
     setState(() {});
@@ -780,17 +1172,41 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   @override
-  void onRemoteAudioStats(RCRTCRemoteAudioStats stats) {
-    _remoteAudioStatsStateSetters[stats.userId]?.call(() {
-      _remoteAudioStats[stats.userId] = stats;
+  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
+    _remoteAudioStatsStateSetters[userId]?.call(() {
+      _remoteAudioStats[userId] = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(RCRTCRemoteVideoStats stats) {
-    _remoteVideoStatsStateSetters[stats.userId]?.call(() {
-      _remoteVideoStats[stats.userId] = stats;
+  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
+    _remoteVideoStatsStateSetters[userId]?.call(() {
+      _remoteVideoStats[userId] = stats;
     });
+  }
+
+  @override
+  void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
+
+  @override
+  void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
+
+  @override
+  void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
+
+  @override
+  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {
+    _remoteCustomVideoStatsStateSetters['$userId@$tag']?.call(() {
+      _remoteCustomVideoStats['$userId@$tag'] = stats;
+    });
+    Main.getInstance().writeReceiveVideoFps(userId, tag, '${stats.fps}');
+    Main.getInstance().writeReceiveVideoBitrate(userId, tag, '${stats.bitrate}');
   }
 
   late String _roomId;
@@ -806,12 +1222,23 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   StateSetter? _localVideoStatsStateSetter;
   Map<String, StateSetter> _remoteAudioStatsStateSetters = {};
   Map<String, StateSetter> _remoteVideoStatsStateSetters = {};
+  Map<String, StateSetter> _remoteCustomVideoStatsStateSetters = {};
 
   RCRTCNetworkStats? _networkStats;
   RCRTCLocalAudioStats? _localAudioStats;
   Map<bool, RCRTCLocalVideoStats> _localVideoStats = {};
   Map<String, RCRTCRemoteAudioStats> _remoteAudioStats = {};
   Map<String, RCRTCRemoteVideoStats> _remoteVideoStats = {};
+  Map<String, RCRTCRemoteVideoStats> _remoteCustomVideoStats = {};
 
   LiveMix _liveMix = LiveMix();
+
+  RCRTCView? _custom;
+  String? _customPath;
+  bool _customPublished = false;
+  late RCRTCVideoConfig _customConfig;
+  bool _localYuv = false;
+  Map<String, RCRTCView?> _remoteCustoms = {};
+
+  bool _yuv = false;
 }

@@ -1,7 +1,6 @@
 /// @author Pan ming da
 /// @time 2021/6/8 15:51
 /// @version 1.0
-
 import 'dart:async';
 import 'dart:math';
 
@@ -360,11 +359,13 @@ class RCRTCEngine {
   }
 
   Future<int> setLiveMixVideoResolution(
-    RCRTCVideoResolution resolution, [
+    int width,
+    int height, [
     bool tiny = false,
   ]) async {
     Map<String, dynamic> arguments = {
-      'resolution': resolution.index,
+      'width': width,
+      'height': height,
       'tiny': tiny,
     };
     int code = await _channel.invokeMethod('setLiveMixVideoResolution', arguments) ?? -1;
@@ -568,6 +569,127 @@ class RCRTCEngine {
   Future<String?> getSessionId() async {
     String? id = await _channel.invokeMethod('getSessionId');
     return id;
+  }
+
+  Future<int> createCustomStreamFromAssetsFile({
+    required String path,
+    required String tag,
+    bool replace = false,
+    bool playback = true,
+  }) async {
+    Map<String, dynamic> arguments = {
+      'assets': path,
+      'tag': tag,
+      'replace': replace,
+      'playback': playback,
+    };
+    int code = await _channel.invokeMethod('createCustomStreamFromFile', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> createCustomStreamFromFile({
+    required String path,
+    required String tag,
+    bool replace = false,
+    bool playback = true,
+  }) async {
+    Map<String, dynamic> arguments = {
+      'path': path,
+      'tag': tag,
+      'replace': replace,
+      'playback': playback,
+    };
+    int code = await _channel.invokeMethod('createCustomStreamFromFile', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> setCustomStreamVideoConfig(String tag, RCRTCVideoConfig config) async {
+    Map<String, dynamic> arguments = {
+      'tag': tag,
+      'config': config.toJson(),
+    };
+    int code = await _channel.invokeMethod('setCustomStreamVideoConfig', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> muteLocalCustomStream(String tag, bool mute) async {
+    Map<String, dynamic> arguments = {
+      'tag': tag,
+      'mute': mute,
+    };
+    int code = await _channel.invokeMethod('muteLocalCustomStream', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> setLocalCustomStreamView(String tag, RCRTCView view) async {
+    Map<String, dynamic> arguments = {
+      'tag': tag,
+      'view': view._id,
+    };
+    int code = await _channel.invokeMethod('setLocalCustomStreamView', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> removeLocalCustomStreamView(String tag) async {
+    int code = await _channel.invokeMethod('removeLocalCustomStreamView', tag) ?? -1;
+    return code;
+  }
+
+  Future<int> publishCustomStream(String tag) async {
+    int code = await _channel.invokeMethod('publishCustomStream', tag) ?? -1;
+    return code;
+  }
+
+  Future<int> unpublishCustomStream(String tag) async {
+    int code = await _channel.invokeMethod('unpublishCustomStream', tag) ?? -1;
+    return code;
+  }
+
+  Future<int> muteRemoteCustomStream(String userId, String tag, bool mute) async {
+    Map<String, dynamic> arguments = {
+      'id': userId,
+      'tag': tag,
+      'mute': mute,
+    };
+    int code = await _channel.invokeMethod('muteRemoteCustomStream', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> setRemoteCustomStreamView(String userId, String tag, RCRTCView view) async {
+    Map<String, dynamic> arguments = {
+      'id': userId,
+      'tag': tag,
+      'view': view._id,
+    };
+    int code = await _channel.invokeMethod('setRemoteCustomStreamView', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> removeRemoteCustomStreamView(String userId, String tag) async {
+    Map<String, dynamic> arguments = {
+      'id': userId,
+      'tag': tag,
+    };
+    int code = await _channel.invokeMethod('removeRemoteCustomStreamView', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> subscribeCustomStream(String userId, String tag) async {
+    Map<String, dynamic> arguments = {
+      'id': userId,
+      'tag': tag,
+    };
+    int code = await _channel.invokeMethod('subscribeCustomStream', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> unsubscribeCustomStream(String userId, String tag) async {
+    Map<String, dynamic> arguments = {
+      'id': userId,
+      'tag': tag,
+    };
+    int code = await _channel.invokeMethod('unsubscribeCustomStream', arguments) ?? -1;
+    return code;
   }
 
   Future<dynamic> _handler(MethodCall call) async {
@@ -796,6 +918,65 @@ class RCRTCEngine {
         Message? message = MessageFactory.instance?.string2Message(argument);
         if (message != null) onMessageReceived?.call(message);
         break;
+      case 'engine:onCustomStreamPublished':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String tag = arguments['tag'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onCustomStreamPublished?.call(tag, code, message);
+        break;
+      case 'engine:onCustomStreamPublishFinished':
+        String argument = call.arguments;
+        onCustomStreamPublishFinished?.call(argument);
+        break;
+      case 'engine:onCustomStreamUnpublished':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String tag = arguments['tag'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onCustomStreamUnpublished?.call(tag, code, message);
+        break;
+      case 'engine:onRemoteCustomStreamPublished':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        onRemoteCustomStreamPublished?.call(id, tag);
+        break;
+      case 'engine:onRemoteCustomStreamUnpublished':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        onRemoteCustomStreamUnpublished?.call(id, tag);
+        break;
+      case 'engine:onRemoteCustomStreamStateChanged':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        bool disabled = arguments['disabled'];
+        onRemoteCustomStreamStateChanged?.call(id, tag, disabled);
+        break;
+      case 'engine:onRemoteCustomStreamFirstFrame':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        onRemoteCustomStreamFirstFrame?.call(id, tag);
+        break;
+      case 'engine:onCustomStreamSubscribed':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onCustomStreamSubscribed?.call(id, tag, code, message);
+        break;
+      case 'engine:onCustomStreamUnsubscribed':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onCustomStreamUnsubscribed?.call(id, tag, code, message);
+        break;
       case 'stats:onNetworkStats':
         Map<dynamic, dynamic> arguments = call.arguments;
         _statsListener?.onNetworkStats(RCRTCNetworkStats.fromJson(arguments));
@@ -810,11 +991,49 @@ class RCRTCEngine {
         break;
       case 'stats:onRemoteAudioStats':
         Map<dynamic, dynamic> arguments = call.arguments;
-        _statsListener?.onRemoteAudioStats(RCRTCRemoteAudioStats.fromJson(arguments));
+        String id = arguments['id'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onRemoteAudioStats(id, RCRTCRemoteAudioStats.fromJson(stats));
         break;
       case 'stats:onRemoteVideoStats':
         Map<dynamic, dynamic> arguments = call.arguments;
-        _statsListener?.onRemoteVideoStats(RCRTCRemoteVideoStats.fromJson(arguments));
+        String id = arguments['id'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onRemoteVideoStats(id, RCRTCRemoteVideoStats.fromJson(stats));
+        break;
+      case 'stats:onLiveMixAudioStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        _statsListener?.onLiveMixAudioStats(RCRTCRemoteAudioStats.fromJson(arguments));
+        break;
+      case 'stats:onLiveMixVideoStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        _statsListener?.onLiveMixVideoStats(RCRTCRemoteVideoStats.fromJson(arguments));
+        break;
+      case 'stats:onLocalCustomAudioStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String tag = arguments['tag'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onLocalCustomAudioStats(tag, RCRTCLocalAudioStats.fromJson(stats));
+        break;
+      case 'stats:onLocalCustomVideoStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String tag = arguments['tag'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onLocalCustomVideoStats(tag, RCRTCLocalVideoStats.fromJson(stats));
+        break;
+      case 'stats:onRemoteCustomAudioStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onRemoteCustomAudioStats(id, tag, RCRTCRemoteAudioStats.fromJson(stats));
+        break;
+      case 'stats:onRemoteCustomVideoStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        Map<dynamic, dynamic> stats = arguments['stats'];
+        _statsListener?.onRemoteCustomVideoStats(id, tag, RCRTCRemoteVideoStats.fromJson(stats));
         break;
     }
   }
@@ -885,4 +1104,18 @@ class RCRTCEngine {
   Function(RCRTCMediaType type)? onRemoteLiveMixFirstFrame;
 
   Function(Message message)? onMessageReceived;
+
+  Function(String tag, int code, String? errMsg)? onCustomStreamPublished;
+  Function(String tag)? onCustomStreamPublishFinished;
+  Function(String tag, int code, String? errMsg)? onCustomStreamUnpublished;
+
+  Function(String userId, String tag)? onRemoteCustomStreamPublished;
+  Function(String userId, String tag)? onRemoteCustomStreamUnpublished;
+
+  Function(String userId, String tag, bool disabled)? onRemoteCustomStreamStateChanged;
+
+  Function(String userId, String tag)? onRemoteCustomStreamFirstFrame;
+
+  Function(String userId, String tag, int code, String? errMsg)? onCustomStreamSubscribed;
+  Function(String userId, String tag, int code, String? errMsg)? onCustomStreamUnsubscribed;
 }

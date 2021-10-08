@@ -9,15 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RCRTCIWVideoFrameDelegate <NSObject>
+@protocol RCRTCIWPixelBufferVideoFrameDelegate <NSObject>
 
-/*!
- 发送前上报摄像头采集的视频数据
- @param sampleBuffer 视频数据
- @discussion
- 发送前上报摄像头采集的视频数据
- */
-- (CMSampleBufferRef)onVideoFrame:(CMSampleBufferRef)sampleBuffer;
+- (void)onPixelBuffer:(CVPixelBufferRef)pixelBuffer;
+
+@end
+
+@protocol RCRTCIWSampleBufferVideoFrameDelegate <NSObject>
+
+- (CMSampleBufferRef)onSampleBuffer:(CMSampleBufferRef)sampleBuffer;
 
 @end
 

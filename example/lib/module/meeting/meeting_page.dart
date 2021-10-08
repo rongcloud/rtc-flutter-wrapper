@@ -784,18 +784,36 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
   }
 
   @override
-  void onRemoteAudioStats(RCRTCRemoteAudioStats stats) {
-    _remoteAudioStatsStateSetters[stats.userId]?.call(() {
-      _remoteAudioStats[stats.userId] = stats;
+  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
+    _remoteAudioStatsStateSetters[userId]?.call(() {
+      _remoteAudioStats[userId] = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(RCRTCRemoteVideoStats stats) {
-    _remoteVideoStatsStateSetters[stats.userId]?.call(() {
-      _remoteVideoStats[stats.userId] = stats;
+  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
+    _remoteVideoStatsStateSetters[userId]?.call(() {
+      _remoteVideoStats[userId] = stats;
     });
   }
+
+  @override
+  void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
+
+  @override
+  void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
+
+  @override
+  void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
+
+  @override
+  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {}
 
   late String _roomId;
   late Config _config;

@@ -305,7 +305,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     if (info.isEmpty) return '${_getHint()} should not be null!'.toast();
     Loading.show(context);
     RCRTCMediaType type = _role == RCRTCRole.live_broadcaster ? _type : RCRTCMediaType.audio_video;
-    presenter.action(info, type, _role, _config.enableTinyStream);
+    presenter.action(info, type, _role, _config.enableTinyStream, false);
   }
 
   @override

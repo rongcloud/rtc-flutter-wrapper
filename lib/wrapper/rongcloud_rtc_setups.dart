@@ -62,7 +62,7 @@ class RCRTCVideoSetup {
     this.enableHardwareEncoder = true,
     this.enableHardwareEncoderHighProfile = false,
     this.hardwareEncoderFrameRate = 30,
-    this.enableEncoderTexture = true,
+    this.enableTexture = true,
   });
 
   Map<String, dynamic> toJson() => {
@@ -70,7 +70,7 @@ class RCRTCVideoSetup {
         'enableHardwareEncoder': enableHardwareEncoder,
         'enableHardwareEncoderHighProfile': enableHardwareEncoderHighProfile,
         'hardwareEncoderFrameRate': hardwareEncoderFrameRate,
-        'enableEncoderTexture': enableEncoderTexture,
+        'enableEncoderTexture': enableTexture,
         'enableTinyStream': enableTinyStream,
       };
 
@@ -81,7 +81,7 @@ class RCRTCVideoSetup {
   final bool enableHardwareEncoder;
   final bool enableHardwareEncoderHighProfile;
   final int hardwareEncoderFrameRate;
-  final bool enableEncoderTexture;
+  final bool enableTexture;
 }
 
 class RCRTCRoomSetup {

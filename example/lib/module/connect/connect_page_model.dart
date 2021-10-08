@@ -133,9 +133,13 @@ class ConnectPageModel extends AbstractModel implements Model {
     RCRTCMediaType type,
     RCRTCRole role,
     bool tiny,
+    bool yuv,
     StateCallback callback,
   ) async {
-    RCRTCVideoSetup videoSetup = RCRTCVideoSetup.create(enableTinyStream: tiny);
+    RCRTCVideoSetup videoSetup = RCRTCVideoSetup.create(
+      enableTinyStream: tiny,
+      enableTexture: !yuv,
+    );
     RCRTCEngineSetup engineSetup = RCRTCEngineSetup.create(
       mediaUrl: _media,
       videoSetup: videoSetup,

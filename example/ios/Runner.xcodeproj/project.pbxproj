@@ -13,6 +13,8 @@
 		3E03BC3326846F9500593D6C /* GPUImageOutputCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E03BC2F26846F9500593D6C /* GPUImageOutputCamera.m */; };
 		3E03BC3426846F9500593D6C /* GPUImageHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E03BC3026846F9500593D6C /* GPUImageHandle.m */; };
 		3E03BC3526846F9500593D6C /* GPUImageBeautyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E03BC3126846F9500593D6C /* GPUImageBeautyFilter.m */; };
+		3EAA6D2026FC919D004127B9 /* RemoteCustomVideoFrameDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EAA6D1F26FC919D004127B9 /* RemoteCustomVideoFrameDelegate.m */; };
+		3EAA6D2326FC9346004127B9 /* LocalCustomVideoFrameDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EAA6D2226FC9346004127B9 /* LocalCustomVideoFrameDelegate.m */; };
 		9329CF2B8B68DF404E0BF40D /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE947E7643CC35AB23C24BF1 /* Pods_Runner.framework */; };
 		978B8F6F1D3862AE00F588F7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AFFD8EE1D35381100E5BB4D /* AppDelegate.m */; };
 		97C146F31CF9000F007C117D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C146F21CF9000F007C117D /* main.m */; };
@@ -46,6 +48,10 @@
 		3E03BC2F26846F9500593D6C /* GPUImageOutputCamera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageOutputCamera.m; sourceTree = "<group>"; };
 		3E03BC3026846F9500593D6C /* GPUImageHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageHandle.m; sourceTree = "<group>"; };
 		3E03BC3126846F9500593D6C /* GPUImageBeautyFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageBeautyFilter.m; sourceTree = "<group>"; };
+		3EAA6D1E26FC919D004127B9 /* RemoteCustomVideoFrameDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteCustomVideoFrameDelegate.h; sourceTree = "<group>"; };
+		3EAA6D1F26FC919D004127B9 /* RemoteCustomVideoFrameDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteCustomVideoFrameDelegate.m; sourceTree = "<group>"; };
+		3EAA6D2126FC9346004127B9 /* LocalCustomVideoFrameDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalCustomVideoFrameDelegate.h; sourceTree = "<group>"; };
+		3EAA6D2226FC9346004127B9 /* LocalCustomVideoFrameDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalCustomVideoFrameDelegate.m; sourceTree = "<group>"; };
 		75CA5B7228887760CCF6A913 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		7AFFD8ED1D35381100E5BB4D /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -86,6 +92,17 @@
 				3E03BC3126846F9500593D6C /* GPUImageBeautyFilter.m */,
 			);
 			path = GPUImage;
+			sourceTree = "<group>";
+		};
+		3EAA6D1D26FC919D004127B9 /* Yuv */ = {
+			isa = PBXGroup;
+			children = (
+				3EAA6D2126FC9346004127B9 /* LocalCustomVideoFrameDelegate.h */,
+				3EAA6D2226FC9346004127B9 /* LocalCustomVideoFrameDelegate.m */,
+				3EAA6D1E26FC919D004127B9 /* RemoteCustomVideoFrameDelegate.h */,
+				3EAA6D1F26FC919D004127B9 /* RemoteCustomVideoFrameDelegate.m */,
+			);
+			path = Yuv;
 			sourceTree = "<group>";
 		};
 		82BBD284C8021C4E92FF4CFD /* Frameworks */ = {
@@ -129,6 +146,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				3EAA6D1D26FC919D004127B9 /* Yuv */,
 				3E03BC2B26846F9500593D6C /* GPUImage */,
 				3E03BC2A26846F9500593D6C /* GPUImage.framework */,
 				7AFFD8ED1D35381100E5BB4D /* AppDelegate.h */,
@@ -327,9 +345,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				978B8F6F1D3862AE00F588F7 /* AppDelegate.m in Sources */,
+				3EAA6D2026FC919D004127B9 /* RemoteCustomVideoFrameDelegate.m in Sources */,
 				3E03BC3426846F9500593D6C /* GPUImageHandle.m in Sources */,
 				97C146F31CF9000F007C117D /* main.m in Sources */,
 				3E03BC3326846F9500593D6C /* GPUImageOutputCamera.m in Sources */,
+				3EAA6D2326FC9346004127B9 /* LocalCustomVideoFrameDelegate.m in Sources */,
 				3E03BC3526846F9500593D6C /* GPUImageBeautyFilter.m in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
