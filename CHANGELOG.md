@@ -1,3 +1,8 @@
+## 5.1.1+1
+
+* 适配Rongcloud RTC 5.1.11 SDK
+* 增加 iOS 其他App混音配置项
+
 ## 5.1.1
 
 * 适配Rongcloud RTC 5.1.9 SDK

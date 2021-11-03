@@ -67,10 +67,16 @@ RCRTCIWAudioScenario toAudioScenario(int scenario) {
     return (RCRTCIWAudioScenario) scenario;
 }
 
+RCRTCIWStreamType toStreamType(int type) {
+    return (RCRTCIWStreamType) (type - 1);
+}
+
 RCRTCIWAudioSetup *toAudioSetup(NSDictionary *arguments) {
     int codec = [arguments[@"codec"] intValue];
+    bool mixOtherAppsAudio = [arguments[@"mixOtherAppsAudio"] boolValue];
     RCRTCIWAudioSetup *setup = [[RCRTCIWAudioSetup alloc] init];
     setup.type = toAudioCodecType(codec);
+    setup.mixOtherAppsAudio = mixOtherAppsAudio;
     return setup;
 }
 
@@ -136,7 +142,7 @@ RCRTCIWVideoConfig *toVideoConfig(NSDictionary *arguments) {
 }
 
 RCRTCIWCustomLayout *toLiveMixCustomLayout(NSDictionary *arguments) {
-    RCRTCIWStreamType type = (RCRTCIWStreamType) [arguments[@"type"] intValue];
+    RCRTCIWStreamType type = toStreamType([arguments[@"type"] intValue]);
     NSString *uid = arguments[@"id"];
     NSString *tag = arguments[@"tag"];
     int x = [arguments[@"x"] intValue];

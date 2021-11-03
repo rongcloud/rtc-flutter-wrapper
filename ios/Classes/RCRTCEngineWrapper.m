@@ -842,7 +842,7 @@ SingleInstanceM(Instance);
         int mode = [arguments[@"mode"] intValue];
         bool playback = [arguments[@"playback"] boolValue];
         int loop = [arguments[@"loop"] intValue];
-        code = [engine startAudioMixing:[NSURL URLWithString:file]
+        code = [engine startAudioMixing:[NSURL fileURLWithPath:file]
                                    mode:toAudioMixingMode(mode)
                                playback:playback
                                    loop:loop];

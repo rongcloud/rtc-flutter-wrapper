@@ -3,6 +3,7 @@
 /// @version 1.0
 
 enum _RCRTCStreamType {
+  not_normal,
   normal,
   file,
   screen,

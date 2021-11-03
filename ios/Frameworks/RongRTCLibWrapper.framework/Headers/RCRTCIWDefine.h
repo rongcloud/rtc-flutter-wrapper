@@ -34,9 +34,9 @@ typedef NS_ENUM(NSUInteger, RCRTCIWVideoCodecType) {
  设置音频通话质量类型
  */
 typedef NS_ENUM(NSInteger, RCRTCIWAudioQuality) {
-    RCRTCIWAudioQualitySpeech = 32,         // 人声音质，编码码率最大值为 32Kbps
-    RCRTCIWAudioQualityMusic = 64,          // 标清音乐音质，编码码率最大值为 64Kbps
-    RCRTCIWAudioQualityMusicHigh = 128      // 高清音乐音质，编码码率最大值为 128Kbps
+    RCRTCIWAudioQualitySpeech = 0,         // 人声音质，编码码率最大值为 32Kbps
+    RCRTCIWAudioQualityMusic,          // 标清音乐音质，编码码率最大值为 64Kbps
+    RCRTCIWAudioQualityMusicHigh      // 高清音乐音质，编码码率最大值为 128Kbps
 };
 
 /*!

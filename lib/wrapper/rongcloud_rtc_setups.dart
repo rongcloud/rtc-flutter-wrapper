@@ -1,7 +1,6 @@
 /// @author Pan ming da
 /// @time 2021/6/8 15:56
 /// @version 1.0
-
 import 'rongcloud_rtc_constants.dart';
 
 class RCRTCEngineSetup {
@@ -36,6 +35,7 @@ class RCRTCAudioSetup {
     this.audioSampleRate = 16000,
     this.enableMicrophone = true,
     this.enableStereo = true,
+    this.mixOtherAppsAudio = true,
   });
 
   Map<String, dynamic> toJson() => {
@@ -44,11 +44,15 @@ class RCRTCAudioSetup {
         'audioSampleRate': audioSampleRate,
         'enableMicrophone': enableMicrophone,
         'enableStereo': enableStereo,
+        'mixOtherAppsAudio': mixOtherAppsAudio,
       };
 
   final RCRTCAudioCodecType codec;
 
-  /// 以下参数仅在android平台生效
+  /// 仅在 iOS 平台生效
+  final bool mixOtherAppsAudio;
+
+  /// 以下参数仅在 android 平台生效
   final RCRTCAudioSource audioSource;
   final int audioSampleRate;
   final bool enableMicrophone;
