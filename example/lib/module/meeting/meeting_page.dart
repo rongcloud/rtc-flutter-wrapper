@@ -424,16 +424,32 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        '切大流'.onClick(() {
-                                          _switchToNormalStream(user.id);
-                                        }),
+                                        Radios(
+                                          '订阅大流',
+                                          color: Colors.yellow,
+                                          value: false,
+                                          groupValue: user.tiny,
+                                          onChanged: (dynamic value) {
+                                            setState(() {
+                                              user.tiny = value;
+                                            });
+                                          },
+                                        ),
                                         VerticalDivider(
                                           width: 10.dp,
                                           color: Colors.transparent,
                                         ),
-                                        '切小流'.onClick(() {
-                                          _switchToTinyStream(user.id);
-                                        }),
+                                        Radios(
+                                          '订阅小流',
+                                          color: Colors.yellow,
+                                          value: true,
+                                          groupValue: user.tiny,
+                                          onChanged: (dynamic value) {
+                                            setState(() {
+                                              user.tiny = value;
+                                            });
+                                          },
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -659,14 +675,6 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     (ret ? '设置成功' : '设置失败').toast();
   }
 
-  void _switchToNormalStream(String id) {
-    presenter.switchToNormalStream(id);
-  }
-
-  void _switchToTinyStream(String id) {
-    presenter.switchToTinyStream(id);
-  }
-
   void _changeRemoteAudio(UserState user, bool subscribe) async {
     Loading.show(context);
     user.audioSubscribed = await presenter.changeRemoteAudioStatus(user.id, subscribe);
@@ -676,7 +684,7 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
 
   void _changeRemoteVideo(UserState user, bool subscribe) async {
     Loading.show(context);
-    user.videoSubscribed = await presenter.changeRemoteVideoStatus(user.id, subscribe);
+    user.videoSubscribed = await presenter.changeRemoteVideoStatus(user.id, subscribe, user.tiny);
     if (user.videoSubscribed) {
       if (_remotes.containsKey(user.id)) _remotes.remove(user.id);
       RCRTCView view = await RCRTCView.create(mirror: false);
@@ -700,13 +708,7 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
   }
 
   @override
-  void onUserJoined(String id) async {
-    await _updateRemoteView();
-    setState(() {});
-  }
-
-  @override
-  void onUserLeft(String id) async {
+  void onUserListChanged() async {
     await _updateRemoteView();
     setState(() {});
   }
@@ -784,14 +786,14 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
   }
 
   @override
-  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
+  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {
     _remoteAudioStatsStateSetters[userId]?.call(() {
       _remoteAudioStats[userId] = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
+  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {
     _remoteVideoStatsStateSetters[userId]?.call(() {
       _remoteVideoStats[userId] = stats;
     });
@@ -810,10 +812,10 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {}
 
   @override
-  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {}
+  void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {}
 
   late String _roomId;
   late Config _config;

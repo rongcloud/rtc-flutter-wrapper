@@ -29,18 +29,15 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
       resolution: RCRTCVideoResolution.resolution_180_320,
     ));
 
+    view.onUserListChanged();
+
     Utils.users.forEach((user) {
-      view.onUserJoined(user.id);
       view.onUserAudioStateChanged(user.id, user.audioPublished);
       view.onUserVideoStateChanged(user.id, user.videoPublished);
     });
 
-    Utils.onUserJoined = (id) {
-      view.onUserJoined(id);
-    };
-
-    Utils.onUserLeft = (id) {
-      view.onUserLeft(id);
+    Utils.onUserListChanged = () {
+      view.onUserListChanged();
     };
 
     Utils.onUserAudioStateChanged = (id, published) {
@@ -57,6 +54,14 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
 
     Utils.engine?.onCustomStreamPublishFinished = (tag) {
       view.onCustomVideoUnpublished();
+    };
+
+    Utils.engine?.onJoinSubRoomRequestReceived = (roomId, userId, extra) {
+      view.onReceiveJoinRequest(roomId, userId);
+    };
+
+    Utils.engine?.onJoinSubRoomRequestResponseReceived = (roomId, userId, agree, extra) {
+      view.onReceiveJoinResponse(roomId, userId, agree);
     };
   }
 
@@ -154,6 +159,11 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
   @override
   Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe) {
     return model.changeRemoteCustomStatus(rid, uid, tag, yuv, subscribe);
+  }
+
+  @override
+  Future<int> responseJoinSubRoom(String rid, String uid, bool agree) {
+    return model.responseJoinSubRoom(rid, uid, agree);
   }
 
   @override

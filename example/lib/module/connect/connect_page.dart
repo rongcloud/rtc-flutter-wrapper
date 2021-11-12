@@ -129,23 +129,36 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
                           height: 15.dp,
                           color: Colors.transparent,
                         ),
-                        _role != RCRTCRole.live_audience
-                            ? CheckBoxes(
-                                '开启大小流',
-                                checked: _config.enableTinyStream,
-                                onChanged: (checked) {
-                                  setState(() {
-                                    _config.enableTinyStream = checked;
-                                  });
-                                },
-                              )
-                            : Container(),
-                        _role != RCRTCRole.live_audience
-                            ? Divider(
-                                height: 15.dp,
-                                color: Colors.transparent,
-                              )
-                            : Container(),
+                        Row(
+                          children: [
+                            CheckBoxes(
+                              'SRTP加密',
+                              checked: _srtp,
+                              onChanged: (checked) {
+                                setState(() {
+                                  _srtp = checked;
+                                });
+                              },
+                            ),
+                            Spacer(),
+                            _role != RCRTCRole.live_audience
+                                ? CheckBoxes(
+                                    '大小流',
+                                    checked: _config.enableTinyStream,
+                                    onChanged: (checked) {
+                                      setState(() {
+                                        _config.enableTinyStream = checked;
+                                      });
+                                    },
+                                  )
+                                : Container(),
+                            _role != RCRTCRole.live_audience ? Spacer() : Container(),
+                          ],
+                        ),
+                        Divider(
+                          height: 15.dp,
+                          color: Colors.transparent,
+                        ),
                         Row(
                           children: [
                             Spacer(),
@@ -305,7 +318,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     if (info.isEmpty) return '${_getHint()} should not be null!'.toast();
     Loading.show(context);
     RCRTCMediaType type = _role == RCRTCRole.live_broadcaster ? _type : RCRTCMediaType.audio_video;
-    presenter.action(info, type, _role, _config.enableTinyStream, false);
+    presenter.action(info, type, _role, _config.enableTinyStream, false, _srtp);
   }
 
   @override
@@ -386,4 +399,6 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
   RCRTCMediaType _type = RCRTCMediaType.audio_video;
 
   Config _config = Config.config();
+
+  bool _srtp = false;
 }

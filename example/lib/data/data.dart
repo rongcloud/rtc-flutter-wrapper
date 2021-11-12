@@ -21,12 +21,14 @@ class CustomState {
 }
 
 class UserState {
-  UserState(this.id)
+  UserState(this.room, this.id)
       : audioPublished = false,
         videoPublished = false,
         audioSubscribed = false,
-        videoSubscribed = false;
+        videoSubscribed = false,
+        tiny = false;
 
+  final String room;
   final String id;
 
   bool audioPublished;
@@ -34,6 +36,8 @@ class UserState {
 
   bool audioSubscribed;
   bool videoSubscribed;
+
+  bool tiny;
 
   final List<CustomState> customs = [];
 }

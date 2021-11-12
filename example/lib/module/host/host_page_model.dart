@@ -291,6 +291,21 @@ class HostPageModel extends AbstractModel implements Model {
   }
 
   @override
+  Future<int> responseJoinSubRoom(String rid, String uid, bool agree) async {
+    Completer<int> completer = Completer();
+    Utils.engine?.onJoinSubRoomRequestResponded = (roomId, userId, code, message) {
+      Utils.engine?.onJoinSubRoomRequestResponded = null;
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.responseJoinSubRoomRequest(rid, uid, agree) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onJoinSubRoomRequestResponded = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  @override
   Future<int> exit() async {
     Completer<int> completer = Completer();
     Utils.engine?.onRoomLeft = (int code, String? message) async {

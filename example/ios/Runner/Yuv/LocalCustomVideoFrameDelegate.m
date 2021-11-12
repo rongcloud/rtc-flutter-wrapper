@@ -60,8 +60,13 @@
 
 - (CMSampleBufferRef)onSampleBuffer:(CMSampleBufferRef)sampleBuffer {
     self.frameCount++;
+    CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    size_t width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t height = CVPixelBufferGetHeight(pixelBuffer);
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     long current = (long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    NSString *data = [NSString stringWithFormat:@",%zd,%ld", self.frameCount, current];
+    NSString *data = [NSString stringWithFormat:@",%zd,%ld,%ld,%ld", self.frameCount, width, height, current];
     [self.timeWriter writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
     return sampleBuffer;
 }

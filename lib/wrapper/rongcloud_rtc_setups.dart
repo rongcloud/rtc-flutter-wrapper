@@ -7,6 +7,7 @@ class RCRTCEngineSetup {
   RCRTCEngineSetup.create({
     this.reconnectable = true,
     this.statsReportInterval = 1000,
+    this.enableSRTP = false,
     this.mediaUrl,
     this.audioSetup,
     this.videoSetup,
@@ -15,6 +16,7 @@ class RCRTCEngineSetup {
   Map<String, dynamic> toJson() => {
         'reconnectable': reconnectable,
         'statsReportInterval': statsReportInterval,
+        'enableSRTP': enableSRTP,
         'mediaUrl': mediaUrl,
         'audioSetup': audioSetup?.toJson(),
         'videoSetup': videoSetup?.toJson(),
@@ -22,6 +24,7 @@ class RCRTCEngineSetup {
 
   final bool reconnectable;
   final int statsReportInterval;
+  final bool enableSRTP;
   final String? mediaUrl;
 
   final RCRTCAudioSetup? audioSetup;

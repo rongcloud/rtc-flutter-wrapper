@@ -14,29 +14,17 @@ PODS:
     - FlutterMacOS
   - rongcloud_im_plugin (0.0.1):
     - Flutter
-    - RongCloudIM/ChatRoom (= 5.1.4.1)
-    - RongCloudIM/PublicService (= 5.1.4.1)
+    - RongCloudIM/ChatRoom (= 5.1.5.2)
+    - RongCloudIM/IMLibCore (= 5.1.5.2)
+    - RongCloudIM/PublicService (= 5.1.5.2)
   - rongcloud_rtc_wrapper_plugin (0.0.1):
     - Flutter
-    - RongCloudIM/IMLib (= 5.1.4.1)
+    - RongCloudIM/IMLibCore (= 5.1.5.2)
     - RongCloudRTC/RongRTCLib (= 5.1.11)
-  - RongCloudIM/ChatRoom (5.1.4.1):
+  - RongCloudIM/ChatRoom (5.1.5.2):
     - RongCloudIM/IMLibCore
-  - RongCloudIM/CustomerService (5.1.4.1):
-    - RongCloudIM/IMLibCore
-  - RongCloudIM/Discussion (5.1.4.1):
-    - RongCloudIM/IMLibCore
-  - RongCloudIM/IMLib (5.1.4.1):
-    - RongCloudIM/ChatRoom
-    - RongCloudIM/CustomerService
-    - RongCloudIM/Discussion
-    - RongCloudIM/IMLibCore
-    - RongCloudIM/Location
-    - RongCloudIM/PublicService
-  - RongCloudIM/IMLibCore (5.1.4.1)
-  - RongCloudIM/Location (5.1.4.1):
-    - RongCloudIM/IMLibCore
-  - RongCloudIM/PublicService (5.1.4.1):
+  - RongCloudIM/IMLibCore (5.1.5.2)
+  - RongCloudIM/PublicService (5.1.5.2):
     - RongCloudIM/IMLibCore
   - RongCloudRTC/RongRTCLib (5.1.11):
     - RongCloudIM/IMLibCore (>= 5.1.3)
@@ -100,9 +88,9 @@ SPEC CHECKSUMS:
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   photo_manager: 84fa94fbeb82e607333ea9a13c43b58e0903a463
-  rongcloud_im_plugin: 92048312b9159769ae71620fb5f18adc9ee17833
-  rongcloud_rtc_wrapper_plugin: 1cc6664681eb7765d533888016d18b4e40bd4d23
-  RongCloudIM: bf1279dae817727c3f3cc0c106123b5bf96ae3d2
+  rongcloud_im_plugin: f5331cd536717b5c0ed11e111da0150a127e9595
+  rongcloud_rtc_wrapper_plugin: e38c7c0971638d24dccc11b169b2979d21f3d18f
+  RongCloudIM: 711a59ec12070ebc80099728cad4a82dad2d5ebf
   RongCloudRTC: 1b77ee3f94af8d28e58e7f3086609db8e824d4f3
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904

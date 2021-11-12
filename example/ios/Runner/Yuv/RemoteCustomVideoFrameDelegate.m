@@ -96,18 +96,18 @@
 }
 
 - (void)onPixelBuffer:(CVPixelBufferRef)pixelBuffer {
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     size_t width = CVPixelBufferGetWidth(pixelBuffer);
     size_t height = CVPixelBufferGetHeight(pixelBuffer);
     NSLog(@"width = %ld, height = %ld", width, height);
     size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
 //    size_t bytesPerPixel = bytesPerRow / width;
     size_t length = bytesPerRow * height;
-    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     void *address = CVPixelBufferGetBaseAddress(pixelBuffer);
     [self.yuvOutputStream write:address maxLength:length];
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     long current = (long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    NSString *time = [NSString stringWithFormat:@",%ld", current];
+    NSString *time = [NSString stringWithFormat:@",%ld,%ld,%ld", width, height, current];
     [self.timeWriter writeData:[time dataUsingEncoding:NSUTF8StringEncoding]];
 }
 

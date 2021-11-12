@@ -242,6 +242,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             case "setLiveMixRenderMode":
                 setLiveMixRenderMode(call, result);
                 break;
+            case "setLiveMixBackgroundColor":
+                setLiveMixBackgroundColor(call, result);
+                break;
             case "setLiveMixCustomLayouts":
                 setLiveMixCustomLayouts(call, result);
                 break;
@@ -373,6 +376,21 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 break;
             case "unsubscribeCustomStream":
                 unsubscribeCustomStream(call, result);
+                break;
+            case "requestJoinSubRoom":
+                requestJoinSubRoom(call, result);
+                break;
+            case "cancelJoinSubRoomRequest":
+                cancelJoinSubRoomRequest(call, result);
+                break;
+            case "responseJoinSubRoomRequest":
+                responseJoinSubRoomRequest(call, result);
+                break;
+            case "joinSubRoom":
+                joinSubRoom(call, result);
+                break;
+            case "leaveSubRoom":
+                leaveSubRoom(call, result);
                 break;
             default:
                 MainThreadPoster.notImplemented(result);
@@ -794,6 +812,20 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         MainThreadPoster.success(result, code);
     }
 
+    private void setLiveMixBackgroundColor(@NonNull MethodCall call, @NonNull Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer red = call.argument("red");
+            assert (red != null);
+            Integer green = call.argument("green");
+            assert (green != null);
+            Integer blue = call.argument("blue");
+            assert (blue != null);
+            code = engine.setLiveMixBackgroundColor(red, green, blue);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
     private void setLiveMixCustomLayouts(@NonNull MethodCall call, @NonNull Result result) {
         int code = -1;
         if (engine != null) {
@@ -989,7 +1021,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     private void getAudioEffectVolume(@NonNull MethodCall call, @NonNull Result result) {
         int code = -1;
         if (engine != null) {
-            int id = (int) call.arguments();
+            int id = call.arguments();
             code = engine.getAudioEffectVolume(id);
         }
         MainThreadPoster.success(result, code);
@@ -998,7 +1030,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     private void adjustAllAudioEffectsVolume(@NonNull MethodCall call, @NonNull Result result) {
         int code = -1;
         if (engine != null) {
-            int volume = (int) call.arguments();
+            int volume = call.arguments();
             code = engine.adjustAllAudioEffectsVolume(volume);
         }
         MainThreadPoster.success(result, code);
@@ -1297,6 +1329,72 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         MainThreadPoster.success(result, code);
     }
 
+    private void requestJoinSubRoom(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String rid = call.argument("rid");
+            assert (rid != null);
+            String uid = call.argument("uid");
+            assert (uid != null);
+            Boolean auto = call.argument("auto");
+            assert (auto != null);
+            String extra = call.argument("extra");
+            code = engine.requestJoinSubRoom(rid, uid, auto, extra);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void cancelJoinSubRoomRequest(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String rid = call.argument("rid");
+            assert (rid != null);
+            String uid = call.argument("uid");
+            assert (uid != null);
+            String extra = call.argument("extra");
+            code = engine.cancelJoinSubRoomRequest(rid, uid, extra);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void responseJoinSubRoomRequest(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String rid = call.argument("rid");
+            assert (rid != null);
+            String uid = call.argument("uid");
+            assert (uid != null);
+            Boolean agree = call.argument("agree");
+            assert (agree != null);
+            Boolean auto = call.argument("auto");
+            assert (auto != null);
+            String extra = call.argument("extra");
+            code = engine.responseJoinSubRoomRequest(rid, uid, agree, auto, extra);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void joinSubRoom(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.arguments();
+            code = engine.joinSubRoom(id);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void leaveSubRoom(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String id = call.argument("id");
+            assert (id != null);
+            Boolean disband = call.argument("disband");
+            assert (disband != null);
+            code = engine.leaveSubRoom(id, disband);
+        }
+        MainThreadPoster.success(result, code);
+    }
+    
     EglBase.Context getEglBaseContext() {
         if (engine != null) {
             try {
@@ -1538,6 +1636,19 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
+        public void onLiveMixBackgroundColorSet(int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveMixBackgroundColorSet", arguments);
+                }
+            });
+        }
+
+        @Override
         public void onLiveMixCustomLayoutsSet(int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("code", code);
@@ -1683,39 +1794,49 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onUserJoined(final String id) {
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onUserJoined", id);
-                }
-            });
-        }
-
-        @Override
-        public void onUserOffline(final String id) {
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onUserOffline", id);
-                }
-            });
-        }
-
-        @Override
-        public void onUserLeft(final String id) {
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onUserLeft", id);
-                }
-            });
-        }
-
-        @Override
-        public void onRemotePublished(String id, RCRTCIWMediaType type) {
+        public void onUserJoined(String roomId, String userId) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onUserJoined", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onUserOffline(String roomId, String userId) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onUserOffline", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onUserLeft(String roomId, String userId) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onUserLeft", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemotePublished(String roomId, String userId, RCRTCIWMediaType type) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("type", type.ordinal());
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1726,9 +1847,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteUnpublished(String id, RCRTCIWMediaType type) {
+        public void onRemoteUnpublished(String roomId, String userId, RCRTCIWMediaType type) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("type", type.ordinal());
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1759,9 +1881,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteStateChanged(String id, RCRTCIWMediaType type, boolean disabled) {
+        public void onRemoteStateChanged(String roomId, String userId, RCRTCIWMediaType type, boolean disabled) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("type", type.ordinal());
             arguments.put("disabled", disabled);
             MainThreadPoster.post(new Runnable() {
@@ -1773,9 +1896,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteFirstFrame(String id, RCRTCIWMediaType type) {
+        public void onRemoteFirstFrame(String roomId, String userId, RCRTCIWMediaType type) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("type", type.ordinal());
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1796,12 +1920,14 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onMessageReceived(Message message) {
-            final String argument = MessageFactory.getInstance().message2String(message);
+        public void onMessageReceived(String roomId, Message message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", roomId);
+            arguments.put("message", MessageFactory.getInstance().message2String(message));
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
-                    channel.invokeMethod("engine:onMessageReceived", argument);
+                    channel.invokeMethod("engine:onMessageReceived", arguments);
                 }
             });
         }
@@ -1835,9 +1961,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamPublished(String userId, String tag) {
+        public void onRemoteCustomStreamPublished(String roomId, String userId, String tag) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", userId);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1859,9 +1986,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamUnpublished(String userId, String tag) {
+        public void onRemoteCustomStreamUnpublished(String roomId, String userId, String tag) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", userId);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1872,9 +2000,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamStateChanged(String userId, String tag, boolean disabled) {
+        public void onRemoteCustomStreamStateChanged(String roomId, String userId, String tag, boolean disabled) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", userId);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             arguments.put("disabled", disabled);
             MainThreadPoster.post(new Runnable() {
@@ -1886,9 +2015,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamFirstFrame(String userId, String tag) {
+        public void onRemoteCustomStreamFirstFrame(String roomId, String userId, String tag) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", userId);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1924,6 +2054,145 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 @Override
                 public void run() {
                     channel.invokeMethod("engine:onCustomStreamUnsubscribed", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onJoinSubRoomRequested(String roomId, String userId, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequested", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onJoinSubRoomRequestCanceled(String roomId, String userId, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequestCanceled", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onJoinSubRoomRequestResponded(String roomId, String userId, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequestResponded", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onSubRoomJoined(String roomId, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", roomId);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSubRoomJoined", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onSubRoomLeft(String roomId, int code, String message) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", roomId);
+            arguments.put("code", code);
+            arguments.put("message", message);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSubRoomLeft", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onJoinSubRoomRequestReceived(String roomId, String userId, String extra) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("extra", extra);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequestReceived", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onCancelJoinSubRoomRequestReceived(String roomId, String userId, String extra) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("extra", extra);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequestReceived", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onJoinSubRoomRequestResponseReceived(String roomId, String userId, boolean agree, String extra) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("agree", agree);
+            arguments.put("extra", extra);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onJoinSubRoomRequestResponseReceived", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onSubRoomBanded(final String roomId) {
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSubRoomBanded", roomId);
+                }
+            });
+        }
+
+        @Override
+        public void onSubRoomDisband(String roomId, String userId) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSubRoomDisband", arguments);
                 }
             });
         }
@@ -1964,9 +2233,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteAudioStats(String id, RCRTCIWRemoteAudioStats stats) {
+        public void onRemoteAudioStats(String roomId, String userId, RCRTCIWRemoteAudioStats stats) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("stats", ArgumentAdapter.fromRemoteAudioStats(stats));
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -1977,9 +2247,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteVideoStats(String id, RCRTCIWRemoteVideoStats stats) {
+        public void onRemoteVideoStats(String roomId, String userId, RCRTCIWRemoteVideoStats stats) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("stats", ArgumentAdapter.fromRemoteVideoStats(stats));
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -2038,9 +2309,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomAudioStats(String id, String tag, RCRTCIWRemoteAudioStats stats) {
+        public void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCIWRemoteAudioStats stats) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             arguments.put("stats", ArgumentAdapter.fromRemoteAudioStats(stats));
             MainThreadPoster.post(new Runnable() {
@@ -2052,9 +2324,10 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomVideoStats(String id, String tag, RCRTCIWRemoteVideoStats stats) {
+        public void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCIWRemoteVideoStats stats) {
             final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", id);
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
             arguments.put("tag", tag);
             arguments.put("stats", ArgumentAdapter.fromRemoteVideoStats(stats));
             MainThreadPoster.post(new Runnable() {

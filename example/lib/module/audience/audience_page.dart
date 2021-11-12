@@ -265,14 +265,14 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
   void onLocalVideoStats(RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
+  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {
     _remoteAudioStatsStateSetter?.call(() {
       _remoteAudioStats = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
+  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {
     _remoteVideoStatsStateSetter?.call(() {
       _remoteVideoStats = stats;
     });
@@ -291,10 +291,10 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {}
 
   @override
-  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {}
+  void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {}
 
   late String _roomId;
   RCRTCView? _host;

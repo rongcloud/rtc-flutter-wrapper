@@ -77,6 +77,7 @@ class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Pre
     RCRTCRole role,
     bool tiny,
     bool yuv,
+    bool srtp,
   ) {
     model.action(
       info,
@@ -84,6 +85,7 @@ class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Pre
       role,
       tiny,
       yuv,
+      srtp,
       (code, info) {
         if (code != 0) {
           view.onError(code, info);

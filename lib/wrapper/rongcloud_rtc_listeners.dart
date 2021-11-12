@@ -11,9 +11,9 @@ abstract class RCRTCStatsListener {
 
   void onLocalVideoStats(RCRTCLocalVideoStats stats) {}
 
-  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {}
+  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {}
 
-  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {}
+  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {}
 
   void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {}
 
@@ -23,7 +23,7 @@ abstract class RCRTCStatsListener {
 
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
 
-  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {}
 
-  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {}
+  void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {}
 }

@@ -156,12 +156,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 本地会议用户或直播主播用户收到远端用户第一帧回调
 /*!
  收到远端用户第一个音频或视频关键帧回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param type 媒体类型
  @discussion
  收到远端用户第一个音频或视频关键帧回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemoteFirstFrame:(NSString *)userId type:(RCRTCIWMediaType)type;
+- (void)onRemoteFirstFrame:(NSString *)roomId
+                    userId:(NSString *)userId
+                      type:(RCRTCIWMediaType)type;
 
 #pragma mark - 观众用户收到远端用户第一帧回调
 /*!
@@ -215,6 +218,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onLiveMixRenderModeSet:(NSInteger)code
                        message:(NSString *)errMsg;
+/*!
+ 设置合流布局背景颜色操作回调, 仅供直播主播用户使用
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 设置合流布局背景颜色操作回调, 仅供直播主播用户使用
+ */
+- (void)onLiveMixBackgroundColorSet:(NSInteger)code
+                            message:(NSString *)errMsg;
 
 /*!
  设置合流自定义布局操作回调, 仅供直播主播用户使用
@@ -341,56 +353,68 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 本地用户收到消息
 /*!
  本地用户收到远端用记发送消息
+ @param roomId 房间id
  @param message 消息
  @discussion
  本地用户收到远端用记发送消息
  */
-- (void)onMessageReceived:(RCMessage *)message;
+- (void)onMessageReceived:(NSString *)roomId
+                  message:(RCMessage *)message;
 
 #pragma mark - 远端用户房间相关操作回调
 /*!
  远端用户加入房间操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @discussion
  远端用户加入房间操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onUserJoined:(NSString *)userId;
+- (void)onUserJoined:(NSString *)roomId
+              userId:(NSString *)userId;
 
 /*!
  远端用户离开房间操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @discussion
  远端用户离开房间操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onUserLeft:(NSString *)userId;
+- (void)onUserLeft:(NSString *)roomId
+            userId:(NSString *)userId;
 
 /*!
  远端用户因离线离开房间操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @discussion
  远端用户因离线离开房间操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onUserOffline:(NSString *)userId;
+- (void)onUserOffline:(NSString *)roomId
+               userId:(NSString *)userId;
 
 #pragma mark - 远端用户发布资源操作回调
 /*!
  远端用户发布资源操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param type 媒体类型
  @discussion
  远端用户发布资源操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemotePublished:(NSString *)userId
+- (void)onRemotePublished:(NSString *)roomId
+                   userId:(NSString *)userId
                 mediaType:(RCRTCIWMediaType)type;
 
 /*!
  远端用户取消发布资源操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param type 媒体类型
  @discussion
  远端用户取消发布资源操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemoteUnpublished:(NSString *)userId
+- (void)onRemoteUnpublished:(NSString *)roomId
+                     userId:(NSString *)userId
                   mediaType:(RCRTCIWMediaType)type;
 
 #pragma mark - 远端用户发布直播合流操作回调
@@ -413,13 +437,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 远端用户开关设备操作回调
 /*!
  远端用户开关麦克风或摄像头操作回调
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param type 媒体类型
  @param disabled 是否关闭, YES: 关闭, NO: 打开
  @discussion
  远端用户开关麦克风或摄像头操作回调
  */
-- (void)onRemoteStateChanged:(NSString *)userId
+- (void)onRemoteStateChanged:(NSString *)roomId
+                      userId:(NSString *)userId
                         type:(RCRTCIWMediaType)type
                     disabled:(BOOL)disabled;
 
@@ -433,7 +459,7 @@ NS_ASSUME_NONNULL_BEGIN
  本地用户发布本地自定义流操作回调
  */
 - (void)onCustomStreamPublished:(NSString *)tag
-                           code:(int)code
+                           code:(NSInteger)code
                         message:(NSString *)errMsg;
 
 #pragma mark - 本地用户取消发布本地自定义流操作回调
@@ -446,7 +472,7 @@ NS_ASSUME_NONNULL_BEGIN
  本地用户取消发布本地自定义流操作回调
  */
 - (void)onCustomStreamUnpublished:(NSString *)tag
-                             code:(int)code
+                             code:(NSInteger)code
                           message:(NSString *)errMsg;
 
 #pragma mark - 本地自定义流发布结束回调
@@ -461,47 +487,55 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 远端用户发布自定义流操作回调
 /*!
  远端用户发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
  @discussion
  远端用户发布自定义流操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemoteCustomStreamPublished:(NSString *)userId
+- (void)onRemoteCustomStreamPublished:(NSString *)roomId
+                               userId:(NSString *)userId
                                   tag:(NSString *)tag;
 
 #pragma mark - 远端用户取消发布自定义流操作回调
 /*!
  远端用户取消发布自定义流操作回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
  @discussion
  远端用户取消发布自定义流操作回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemoteCustomStreamUnpublished:(NSString *)userId
+- (void)onRemoteCustomStreamUnpublished:(NSString *)roomId
+                                 userId:(NSString *)userId
                                     tag:(NSString *)tag;
 
 #pragma mark - 远端用户开关自定义流操作回调
 /*!
  远端用户开关自定义流操作回调
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
  @param disabled 是否关闭, YES: 关闭, NO: 打开
  @discussion
  远端用户开关自定义流操作回调
  */
-- (void)onRemoteCustomStreamStateChanged:(NSString *)userId
+- (void)onRemoteCustomStreamStateChanged:(NSString *)roomId
+                                  userId:(NSString *)userId
                                      tag:(NSString *)tag
                                 disabled:(BOOL)disabled;
 
 #pragma mark - 本地会议用户或直播主播用户收到远端用户自定义流第一帧回调
 /*!
  收到远端用户自定义流第一个关键帧回调, 仅供会议用户或直播主播用户使用
+ @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
  @discussion
  收到远端用户自定义流第一个关键帧回调, 仅供会议用户或直播主播用户使用
  */
-- (void)onRemoteCustomStreamFirstFrame:(NSString *)userId
+- (void)onRemoteCustomStreamFirstFrame:(NSString *)roomId
+                                userId:(NSString *)userId
                                    tag:(NSString *)tag;
 
 #pragma mark - 本地会议用户或直播主播用户订阅自定义流操作回调
@@ -516,7 +550,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onCustomStreamSubscribed:(NSString *)userId
                              tag:(NSString *)tag
-                            code:(int)code
+                            code:(NSInteger)code
                          message:(NSString *)errMsg;
 
 #pragma mark - 本地会议用户或直播主播用户取消订阅自定义流操作回调
@@ -531,8 +565,140 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onCustomStreamUnsubscribed:(NSString *)userId
                                tag:(NSString *)tag
-                              code:(int)code
+                              code:(NSInteger)code
                            message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户请求加入子房间回调
+/*!
+ 请求加入子房间回调, 仅供直播主播用户使用
+ @param roomId 目标房间id
+ @param userId 目标主播id
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 请求加入子房间回调, 仅供直播主播用户使用
+ */
+- (void)onJoinSubRoomRequested:(NSString *)roomId
+                        userId:(NSString *)userId
+                          code:(NSInteger)code
+                       message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户取消请求加入子房间回调
+/*!
+ 取消请求加入子房间回调, 仅供直播主播用户使用
+ @param roomId 目标房间id
+ @param userId 目标主播id
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 取消请求加入子房间回调, 仅供直播主播用户使用
+ */
+- (void)onJoinSubRoomRequestCanceled:(NSString *)roomId
+                              userId:(NSString *)userId
+                                code:(NSInteger)code
+                             message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户响应请求加入子房间回调
+/*!
+ 响应请求加入子房间回调, 仅供直播主播用户使用
+ @param roomId 目标房间id
+ @param userId 目标主播id
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 响应请求加入子房间回调, 仅供直播主播用户使用
+ */
+- (void)onJoinSubRoomRequestResponded:(NSString *)roomId
+                               userId:(NSString *)userId
+                                 code:(NSInteger)code
+                              message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户收到加入请求回调
+/*!
+ 收到加入请求回调, 仅供直播主播用户使用
+ @param roomId 目标房间id
+ @param userId 目标主播id
+ @param extra 扩展信息
+ @discussion
+ 收到加入请求回调, 仅供直播主播用户使用
+ */
+- (void)onJoinSubRoomRequestReceived:(NSString *)roomId
+                              userId:(NSString *)userId
+                               extra:(NSString *)extra;
+
+#pragma mark - 直播主播用户收到取消加入请求回调
+/*!
+ 收到加入请求回调, 仅供直播主播用户使用
+ @param roomId 目标房间id
+ @param userId 目标主播id
+ @param extra 扩展信息
+ @discussion
+ 收到加入请求回调, 仅供直播主播用户使用
+ */
+- (void)onCancelJoinSubRoomRequestReceived:(NSString *)roomId
+                                    userId:(NSString *)userId
+                                     extra:(NSString *)extra;
+
+#pragma mark - 直播主播用户收到加入请求响应回调
+/*!
+ 收到加入请求响应回调 仅供直播主播用户使用
+ @param roomId 响应来源房间id
+ @param userId 响应来源主播id
+ @param agree 是否同意
+ @param extra 扩展信息
+ @discussion
+ 收到加入请求响应回调, 仅供直播主播用户使用
+ */
+- (void)onJoinSubRoomRequestResponseReceived:(NSString *)roomId
+                                      userId:(NSString *)userId
+                                       agree:(BOOL)agree
+                                       extra:(NSString *)extra;
+
+#pragma mark - 直播主播用户加入子房间回调
+/*!
+ 加入子房间回调, 仅供直播主播用户使用
+ @param roomId 子房间id
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 加入子房间回调, 仅供直播主播用户使用
+ */
+- (void)onSubRoomJoined:(NSString *)roomId
+                   code:(NSInteger)code
+                message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户离开子房间回调
+/*!
+ 离开子房间回调, 仅供直播主播用户使用
+ @param roomId 子房间id
+ @param code 返回码
+ @param errMsg 返回消息
+ @discussion
+ 离开子房间回调 仅供直播主播用户使用
+ */
+- (void)onSubRoomLeft:(NSString *)roomId
+                 code:(NSInteger)code
+              message:(NSString *)errMsg;
+
+#pragma mark - 直播主播用户连麦中的子房间回调
+/*!
+ 连麦中的子房间回调, 仅供直播主播用户使用
+ @param roomId 子房间id
+ @discussion
+ 连麦中的子房间回调 仅供直播主播用户使用
+ */
+- (void)onSubRoomBanded:(NSString *)roomId;
+
+#pragma mark - 直播主播用户子房间结束连麦回调
+/*!
+ 子房间结束连麦回调, 仅供直播主播用户使用
+ @param roomId 子房间id
+ @param userId 结束连麦的用户id
+ @discussion
+ 子房间结束连麦回调 仅供直播主播用户使用
+ */
+- (void)onSubRoomDisband:(NSString *)roomId
+                  userId:(NSString *)userId;
 
 @end
 

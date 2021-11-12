@@ -31,7 +31,7 @@
 dependencies:
   flutter:
     sdk: flutter
-  rongcloud_rtc_wrapper_plugin: ^5.1.1+1
+  rongcloud_rtc_wrapper_plugin: ^5.1.2
 ```
 
 iOS 需要在 Info.plist 中需要加入对相机和麦克风的权限申请
@@ -126,14 +126,14 @@ engine.publish(RCRTCMediaType.audio_video);
 `当用户加入的时候，不要做订阅渲染的处理`，因为此时该用户可能刚加入房间成功，但是尚未发布资源
 
 ```dart
-engine.onUserJoined = (userId) {
+engine.onUserJoined = (roomId, userId) {
 };
 ```
 
 ### 监听远端用户发布资源的回调
 
 ```dart
-engine.onRemotePublished = (userId, type) {
+engine.onRemotePublished = (roomId, userId, type) {
 
 };
 ```
@@ -203,14 +203,14 @@ engine.publish(RCRTCMediaType.audio_video);
 `当主播加入的时候，不要做订阅渲染的处理`，因为此时该主播可能刚加入房间成功，但是尚未发布资源
 
 ```dart
-engine.onUserJoined = (userId) {
+engine.onUserJoined = (roomId, userId) {
 };
 ```
 
 ### 监听远端主播发布资源的回调
 
 ```dart
-engine.onRemotePublished = (userId, type) {
+engine.onRemotePublished = (roomId, userId, type) {
 
 };
 ```
@@ -287,14 +287,14 @@ engine.joinRoom(id, setup);
 `当主播加入的时候，不要做订阅渲染的处理`，因为此时该主播可能刚加入房间成功，但是尚未发布资源
 
 ```dart
-engine.onUserJoined = (userId) {
+engine.onUserJoined = (roomId, userId) {
 };
 ```
 
 ### 监听远端主播发布资源的回调
 
 ```dart
-engine.onRemotePublished = (userId, type) {
+engine.onRemotePublished = (roomId, userId, type) {
 
 };
 ```

@@ -44,21 +44,25 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  上报远端音频统计信息
  @param stats 音频统计信息
+ @param roomId 房间ID
  @param userId 远端用户ID
  @discussion
  上报远端音频统计信息
  */
 - (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                    roomId:(NSString *)roomId
                     userId:(NSString *)userId;
 
 /*!
  上报远端视频统计信息
  @param stats 视频统计信息
+ @param roomId 房间ID
  @param userId 远端用户ID
  @discussion
  上报远端视频统计信息
  */
 - (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                    roomId:(NSString *)roomId
                     userId:(NSString *)userId;
 
 /*!
@@ -100,24 +104,28 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  上报远端自定义音频统计信息
  @param stats 音频统计信息
+ @param roomId 房间ID
  @param userId 远端用户ID
  @param tag 自定义音频tag
  @discussion
  上报远端自定义音频统计信息
  */
 - (void)onRemoteCustomAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                          roomId:(NSString *)roomId
                           userId:(NSString *)userId
                              tag:(NSString *)tag;
 
 /*!
  上报远端自定义视频统计信息
  @param stats 视频统计信息
+ @param roomId 房间ID
  @param userId 远端用户ID
  @param tag 自定义视频tag
  @discussion
  上报远端自定义视频统计信息
  */
 - (void)onRemoteCustomVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                          roomId:(NSString *)roomId
                           userId:(NSString *)userId
                              tag:(NSString *)tag;
 

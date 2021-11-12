@@ -90,12 +90,14 @@ RCRTCIWVideoSetup *toVideoSetup(NSDictionary *arguments) {
 RCRTCIWEngineSetup *toEngineSetup(NSDictionary *arguments) {
     bool reconnectable = [arguments[@"reconnectable"] boolValue];
     int statsReportInterval = [arguments[@"statsReportInterval"] intValue];
+    bool enableSRTP = [arguments[@"enableSRTP"] boolValue];
     id mediaUrl = arguments[@"mediaUrl"];
     id audioSetup = arguments[@"audioSetup"];
     id videoSetup = arguments[@"videoSetup"];
     RCRTCIWEngineSetup *setup = [[RCRTCIWEngineSetup alloc] init];
     setup.reconnectable = reconnectable;
     setup.statsReportInterval = statsReportInterval;
+    setup.enableSRTP = enableSRTP;
     if (![mediaUrl isEqual:[NSNull null]]) {
         setup.mediaUrl = mediaUrl;
     }

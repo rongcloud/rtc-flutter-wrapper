@@ -142,9 +142,12 @@ final class ArgumentAdapter {
         assert (reconnectable != null);
         Integer statsReportInterval = (Integer) setup.get("statsReportInterval");
         assert (statsReportInterval != null);
+        Boolean enableSRTP = (Boolean) setup.get("enableSRTP");
+        assert (enableSRTP != null);
         RCRTCIWEngineSetup.Builder builder = RCRTCIWEngineSetup.Builder.create()
                 .withReconnectable(reconnectable)
-                .withStatusReportInterval(statsReportInterval);
+                .withStatsReportInterval(statsReportInterval)
+                .withEnableSRTP(enableSRTP);
         Object mediaUrl = setup.get("mediaUrl");
         if (mediaUrl != null) {
             builder.withMediaUrl((String) mediaUrl);

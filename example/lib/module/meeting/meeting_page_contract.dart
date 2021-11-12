@@ -4,9 +4,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presente
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dart';
 
 abstract class View implements IView {
-  void onUserJoined(String id);
-
-  void onUserLeft(String id);
+  void onUserListChanged();
 
   void onUserAudioStateChanged(String id, bool published);
 
@@ -34,13 +32,9 @@ abstract class Model implements IModel {
 
   Future<bool> changeTinyVideoConfig(RCRTCVideoConfig config);
 
-  Future<bool> switchToNormalStream(String id);
-
-  Future<bool> switchToTinyStream(String id);
-
   Future<bool> changeRemoteAudioStatus(String id, bool subscribe);
 
-  Future<bool> changeRemoteVideoStatus(String id, bool subscribe);
+  Future<bool> changeRemoteVideoStatus(String id, bool subscribe, bool tiny);
 
   Future<int> exit();
 }
@@ -62,13 +56,9 @@ abstract class Presenter implements IPresenter {
 
   Future<bool> changeTinyVideoConfig(RCRTCVideoConfig config);
 
-  Future<bool> switchToNormalStream(String id);
-
-  Future<bool> switchToTinyStream(String id);
-
   Future<bool> changeRemoteAudioStatus(String id, bool subscribe);
 
-  Future<bool> changeRemoteVideoStatus(String id, bool subscribe);
+  Future<bool> changeRemoteVideoStatus(String id, bool subscribe, bool tiny);
 
   void exit();
 }

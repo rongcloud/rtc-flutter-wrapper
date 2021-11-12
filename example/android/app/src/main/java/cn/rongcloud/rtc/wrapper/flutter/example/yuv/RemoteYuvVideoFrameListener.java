@@ -74,6 +74,10 @@ public class RemoteYuvVideoFrameListener implements RCRTCIWOnReadableVideoFrameL
             }
             yuvTagOutputStream.write(tagData);
             timeWriter.append(",");
+            timeWriter.append(String.valueOf(frame.getWidth()));
+            timeWriter.append(",");
+            timeWriter.append(String.valueOf(frame.getHeight()));
+            timeWriter.append(",");
             timeWriter.append(String.valueOf(System.currentTimeMillis()));
         } catch (IOException e) {
             e.printStackTrace();

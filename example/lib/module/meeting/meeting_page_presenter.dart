@@ -29,18 +29,15 @@ class MeetingPagePresenter extends AbstractPresenter<View, Model> implements Pre
       resolution: RCRTCVideoResolution.resolution_180_320,
     ));
 
+    view.onUserListChanged();
+
     Utils.users.forEach((user) {
-      view.onUserJoined(user.id);
       view.onUserAudioStateChanged(user.id, user.audioPublished);
       view.onUserVideoStateChanged(user.id, user.videoPublished);
     });
 
-    Utils.onUserJoined = (id) {
-      view.onUserJoined(id);
-    };
-
-    Utils.onUserLeft = (id) {
-      view.onUserLeft(id);
+    Utils.onUserListChanged = () {
+      view.onUserListChanged();
     };
 
     Utils.onUserAudioStateChanged = (id, published) {
@@ -93,23 +90,13 @@ class MeetingPagePresenter extends AbstractPresenter<View, Model> implements Pre
   }
 
   @override
-  Future<bool> switchToNormalStream(String id) {
-    return model.switchToNormalStream(id);
-  }
-
-  @override
-  Future<bool> switchToTinyStream(String id) {
-    return model.switchToTinyStream(id);
-  }
-
-  @override
   Future<bool> changeRemoteAudioStatus(String id, bool subscribe) {
     return model.changeRemoteAudioStatus(id, subscribe);
   }
 
   @override
-  Future<bool> changeRemoteVideoStatus(String id, bool subscribe) {
-    return model.changeRemoteVideoStatus(id, subscribe);
+  Future<bool> changeRemoteVideoStatus(String id, bool subscribe, bool tiny) {
+    return model.changeRemoteVideoStatus(id, subscribe, tiny);
   }
 
   @override

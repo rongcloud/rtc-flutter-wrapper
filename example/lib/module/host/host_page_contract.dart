@@ -4,9 +4,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presente
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dart';
 
 abstract class View implements IView {
-  void onUserJoined(String id);
-
-  void onUserLeft(String id);
+  void onUserListChanged();
 
   void onUserAudioStateChanged(String id, bool published);
 
@@ -21,6 +19,10 @@ abstract class View implements IView {
   void onCustomVideoUnpublishedError(int code);
 
   void onUserCustomStateChanged(String id, String tag, bool published);
+
+  void onReceiveJoinRequest(String roomId, String userId);
+
+  void onReceiveJoinResponse(String roomId, String userId, bool agree);
 
   void onExit();
 
@@ -60,6 +62,8 @@ abstract class Model implements IModel {
 
   Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
 
+  Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
+
   Future<int> exit();
 }
 
@@ -95,6 +99,8 @@ abstract class Presenter implements IPresenter {
   Future<bool> changeCustomConfig(RCRTCVideoConfig config);
 
   Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
+
+  Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
 
   void exit();
 }

@@ -134,6 +134,7 @@ class ConnectPageModel extends AbstractModel implements Model {
     RCRTCRole role,
     bool tiny,
     bool yuv,
+    bool srtp,
     StateCallback callback,
   ) async {
     RCRTCVideoSetup videoSetup = RCRTCVideoSetup.create(
@@ -141,6 +142,7 @@ class ConnectPageModel extends AbstractModel implements Model {
       enableTexture: !yuv,
     );
     RCRTCEngineSetup engineSetup = RCRTCEngineSetup.create(
+      enableSRTP: srtp,
       mediaUrl: _media,
       videoSetup: videoSetup,
     );

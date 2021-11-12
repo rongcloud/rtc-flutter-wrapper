@@ -34,11 +34,11 @@
 		</data>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<data>
-		Ib9tn5O1NhIOsPVN/8NDmw5/LEo=
+		AYE61YbynzqCWCFzgcRZVYWhKOM=
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
-		KzluihSYRxgerHSEwWdXJQnwSQA=
+		/io+jbEr5Ol758Ib+JPnIhDGuo0=
 		</data>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Headers/RCRTCIWStatsDelegate.h</key>
 		<data>
-		VuQbfSQ6sqZ7CO16ZaU95ukdQvQ=
+		HrqDSyzcddFtxE3Wf0Z1dx90XIQ=
 		</data>
 		<key>Headers/RCRTCIWVideoConfig.h</key>
 		<data>
@@ -184,22 +184,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Ib9tn5O1NhIOsPVN/8NDmw5/LEo=
+			AYE61YbynzqCWCFzgcRZVYWhKOM=
 			</data>
 			<key>hash2</key>
 			<data>
-			+tblTZLeInGasOC7wsfgJsINtynZNBM18kdPT9AMDmg=
+			+A0I9DxAnhRiNUNyEpgcQUjxxr7kbk1XFSU0HB+WkZk=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			KzluihSYRxgerHSEwWdXJQnwSQA=
+			/io+jbEr5Ol758Ib+JPnIhDGuo0=
 			</data>
 			<key>hash2</key>
 			<data>
-			TSxOtuzHD9aBbAG4rRgwzcBtatozn7SnrOswkOfJ2OI=
+			AmMVZxlWJvjnpeLgz+uklsykHVHjj7XCN7BytNNlz2Y=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
@@ -283,11 +283,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			VuQbfSQ6sqZ7CO16ZaU95ukdQvQ=
+			HrqDSyzcddFtxE3Wf0Z1dx90XIQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			BtBSEXTA3BuPyYJGRQ2fkXYzsHSlu6lPpoKjPWQ5D08=
+			1llMsQvmpThRUPirU/YLxXfgGIK7PBbEZLFqyXtl+is=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWVideoConfig.h</key>

@@ -44,6 +44,7 @@ abstract class Model implements IModel {
     RCRTCRole role,
     bool tiny,
     bool yuv,
+    bool srtp,
     StateCallback callback,
   );
 }
@@ -73,5 +74,6 @@ abstract class Presenter implements IPresenter {
     RCRTCRole role,
     bool tiny,
     bool yuv,
+    bool srtp,
   );
 }

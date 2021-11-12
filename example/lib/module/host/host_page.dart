@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:context_holder/context_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
@@ -74,8 +75,17 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('房间号: $_roomId'),
+          title: Text(
+            '$_roomId',
+            style: TextStyle(fontSize: 15.sp),
+          ),
           actions: [
+            IconButton(
+              icon: Icon(
+                Icons.link,
+              ),
+              onPressed: () => _showBandOption(context),
+            ),
             IconButton(
               icon: Icon(
                 Icons.alt_route,
@@ -760,6 +770,20 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     );
   }
 
+  void _showBandOption(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return JoinSubRoomPanel(
+          Utils.engine!,
+          _roomId,
+          Utils.joinedSubRooms,
+          Utils.joinableSubRooms,
+        );
+      },
+    );
+  }
+
   void _showCDNInfo(BuildContext context) async {
     Loading.show(context);
     final String? id = await Utils.engine?.getSessionId();
@@ -1034,13 +1058,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   @override
-  void onUserJoined(String id) async {
-    await _updateRemoteView();
-    setState(() {});
-  }
-
-  @override
-  void onUserLeft(String id) async {
+  void onUserListChanged() async {
     await _updateRemoteView();
     setState(() {});
   }
@@ -1138,6 +1156,52 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   @override
+  void onReceiveJoinRequest(String roomId, String userId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('收到连麦请求'),
+          content: Text('来自$roomId的$userId邀请你一起连麦，是否同意？'),
+          actions: [
+            TextButton(
+              child: Text('同意'),
+              onPressed: () => _bandAction(context, roomId, userId, true),
+            ),
+            TextButton(
+              child: Text('拒绝'),
+              onPressed: () => _bandAction(context, roomId, userId, false),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _bandAction(BuildContext context, String roomId, String userId, bool agree) async {
+    Navigator.pop(context);
+    Loading.show(context);
+    int ret = await presenter.responseJoinSubRoom(roomId, userId, agree);
+    Loading.dismiss(context);
+    if (ret == 0 && agree) {
+      Utils.joinSubRoom(context, roomId);
+    }
+    if (ret != 0) {
+      '响应加入子房间请求失败, code:$ret'.toast();
+    }
+  }
+
+  @override
+  void onReceiveJoinResponse(String roomId, String userId, bool agree) {
+    if (agree) {
+      '$roomId的$userId同意了你的加入申请，正在加入..'.toast();
+      Utils.joinSubRoom(context, roomId);
+    } else {
+      '$roomId的$userId拒绝了你的加入申请'.toast();
+    }
+  }
+
+  @override
   void onExit() {
     Loading.dismiss(context);
     Navigator.pop(context);
@@ -1172,14 +1236,14 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   @override
-  void onRemoteAudioStats(String userId, RCRTCRemoteAudioStats stats) {
+  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {
     _remoteAudioStatsStateSetters[userId]?.call(() {
       _remoteAudioStats[userId] = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(String userId, RCRTCRemoteVideoStats stats) {
+  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {
     _remoteVideoStatsStateSetters[userId]?.call(() {
       _remoteVideoStats[userId] = stats;
     });
@@ -1198,10 +1262,10 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteCustomAudioStats(String userId, String tag, RCRTCRemoteAudioStats stats) {}
+  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {}
 
   @override
-  void onRemoteCustomVideoStats(String userId, String tag, RCRTCRemoteVideoStats stats) {
+  void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {
     _remoteCustomVideoStatsStateSetters['$userId@$tag']?.call(() {
       _remoteCustomVideoStats['$userId@$tag'] = stats;
     });

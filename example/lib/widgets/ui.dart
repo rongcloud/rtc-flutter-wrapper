@@ -5,6 +5,7 @@ import 'package:context_holder/context_holder.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:handy_toast/handy_toast.dart';
 import 'package:rongcloud_im_plugin/rongcloud_im_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
@@ -255,6 +256,7 @@ class Button extends StatelessWidget {
 class Radios<T> extends StatelessWidget {
   Radios(
     this.text, {
+    this.color = Colors.blue,
     required this.value,
     required this.groupValue,
     required this.onChanged,
@@ -269,7 +271,7 @@ class Radios<T> extends StatelessWidget {
         children: [
           Icon(
             value == groupValue ? Icons.radio_button_on : Icons.radio_button_off,
-            color: Colors.blue,
+            color: color,
           ),
           Text(
             text,
@@ -286,6 +288,7 @@ class Radios<T> extends StatelessWidget {
   }
 
   final String text;
+  final Color color;
   final T value;
   final T groupValue;
   final void Function(T value) onChanged;
@@ -964,6 +967,12 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
               ),
             ],
           ),
+          Button(
+            '背景颜色设置',
+            callback: () {
+              _showColorPicker(context);
+            },
+          ),
           Divider(
             height: 10.dp,
             color: Colors.transparent,
@@ -1016,6 +1025,36 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showColorPicker(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setter) {
+            return AlertDialog(
+              title: Text('选择背景颜色'),
+              content: MaterialColorPicker(
+                allowShades: false,
+                selectedColor: Colors.red,
+                colors: [
+                  Colors.red,
+                  Colors.green,
+                  Colors.blue,
+                  Colors.orange,
+                  Colors.yellow,
+                ],
+                onMainColorChange: (color) {
+                  Utils.engine?.setLiveMixBackgroundColor(color![900]!);
+                  Navigator.pop(context);
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1581,6 +1620,174 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
       },
     );
   }
+}
+
+class JoinSubRoomPanel extends StatelessWidget {
+  JoinSubRoomPanel(
+    this.engine,
+    this.room,
+    this.joined,
+    this.joinable,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('跨房间连麦'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('已加入的子房间:'),
+          joined.length > 0
+              ? ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Text('${joined[index]}'),
+                        Spacer(),
+                        Button(
+                          '离开',
+                          callback: () => _left(context, joined[index], false),
+                        ),
+                        VerticalDivider(
+                          width: 10.dp,
+                          color: Colors.transparent,
+                        ),
+                        Button(
+                          '离开并解散',
+                          callback: () => _left(context, joined[index], true),
+                        ),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      height: 5.dp,
+                    );
+                  },
+                  itemCount: joined.length,
+                )
+              : Text('暂未加入任何子房间'),
+          Divider(
+            height: 10.dp,
+            color: Colors.blue,
+          ),
+          Text('申请加入子房间:'),
+          Padding(
+            padding: EdgeInsets.all(10.dp),
+            child: InputBox(
+              hint: '输入子房间ID',
+              controller: _roomInputController,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.dp),
+            child: InputBox(
+              hint: '输入子房间用户ID',
+              controller: _userInputController,
+            ),
+          ),
+          Row(
+            children: [
+              Spacer(),
+              Button(
+                '申请',
+                callback: () => _request(context),
+              ),
+              Spacer(),
+            ],
+          ),
+          Divider(
+            height: 10.dp,
+            color: Colors.blue,
+          ),
+          Text('加入已连麦的子房间:'),
+          joinable.length > 0
+              ? ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Text('${joinable[index]}'),
+                        Button(
+                          '加入',
+                          callback: () => Utils.joinSubRoom(context, joinable[index]),
+                        ),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      height: 5.dp,
+                    );
+                  },
+                  itemCount: joinable.length,
+                )
+              : Text('暂时没有可以直接加入的子房间.'),
+        ],
+      ),
+    );
+  }
+
+  void _left(BuildContext context, String roomId, bool disband) async {
+    Loading.show(context);
+    engine.onSubRoomLeft = (roomId, code, message) {
+      engine.onSubRoomLeft = null;
+      Loading.dismiss(context);
+      if (code != 0) {
+        '离开$roomId子房间失败, code:$code, message:$message'.toast();
+      } else {
+        '离开$roomId子房间成功'.toast();
+        Utils.clearRoomUser(roomId, disband);
+        Navigator.pop(context);
+      }
+    };
+    int code = await engine.leaveSubRoom(roomId, disband);
+    if (code != 0) {
+      engine.onJoinSubRoomRequested = null;
+      Loading.dismiss(context);
+      '离开$roomId子房间失败, code:$code'.toast();
+    }
+  }
+
+  void _request(BuildContext context) async {
+    String rid = _roomInputController.text;
+    if (rid.isEmpty) return '子房间ID不能为空'.toast();
+    String uid = _userInputController.text;
+    if (uid.isEmpty) return '子房间用户ID不能为空'.toast();
+
+    if (room == rid) return '子房间ID不能是当前房间ID'.toast();
+    if (joined.indexOf(rid) != -1) return '该子房间已经加入'.toast();
+    if (joinable.indexOf(rid) != -1) return '该子房间可直接加入，无需申请'.toast();
+
+    Loading.show(context);
+    engine.onJoinSubRoomRequested = (roomId, userId, code, message) {
+      engine.onJoinSubRoomRequested = null;
+      Loading.dismiss(context);
+      if (code != 0) {
+        '申请加入$roomId子房间失败, code:$code, message:$message'.toast();
+      } else {
+        '已提交加入$roomId子房间申请, 等待对方处理'.toast();
+      }
+    };
+    int code = await engine.requestJoinSubRoom(rid, uid);
+    if (code != 0) {
+      engine.onJoinSubRoomRequested = null;
+      Loading.dismiss(context);
+      '申请加入$rid子房间失败, code:$code'.toast();
+    }
+  }
+
+  final String room;
+  final List<String> joinable;
+  final List<String> joined;
+  final RCRTCEngine engine;
+
+  final TextEditingController _roomInputController = TextEditingController();
+  final TextEditingController _userInputController = TextEditingController();
 }
 
 class CDNConfig extends StatefulWidget {

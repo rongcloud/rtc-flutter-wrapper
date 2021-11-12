@@ -39,6 +39,10 @@ public class LocalYuvVideoFrameListener implements RCRTCIWOnWritableVideoFrameLi
             timeWriter.append(",");
             timeWriter.append(String.valueOf(frameCount));
             timeWriter.append(",");
+            timeWriter.append(String.valueOf(frame.getWidth()));
+            timeWriter.append(",");
+            timeWriter.append(String.valueOf(frame.getHeight()));
+            timeWriter.append(",");
             timeWriter.append(String.valueOf(System.currentTimeMillis()));
         } catch (IOException e) {
             e.printStackTrace();

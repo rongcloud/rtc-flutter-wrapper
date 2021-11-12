@@ -131,36 +131,6 @@ class MeetingPageModel extends AbstractModel implements Model {
   }
 
   @override
-  Future<bool> switchToNormalStream(String id) async {
-    Completer<bool> completer = Completer();
-    Utils.engine?.onSubscribed = (String id, RCRTCMediaType type, int code, String? message) {
-      Utils.engine?.onSubscribed = null;
-      completer.complete(code == 0);
-    };
-    int code = await Utils.engine?.subscribe(id, RCRTCMediaType.video, false) ?? -1;
-    if (code != 0) {
-      Utils.engine?.onSubscribed = null;
-      return false;
-    }
-    return completer.future;
-  }
-
-  @override
-  Future<bool> switchToTinyStream(String id) async {
-    Completer<bool> completer = Completer();
-    Utils.engine?.onSubscribed = (String id, RCRTCMediaType type, int code, String? message) {
-      Utils.engine?.onSubscribed = null;
-      completer.complete(code == 0);
-    };
-    int code = await Utils.engine?.subscribe(id, RCRTCMediaType.video, true) ?? -1;
-    if (code != 0) {
-      Utils.engine?.onSubscribed = null;
-      return false;
-    }
-    return completer.future;
-  }
-
-  @override
   Future<bool> changeRemoteAudioStatus(String id, bool subscribe) async {
     Completer<bool> completer = Completer();
     int code = -1;
@@ -186,7 +156,7 @@ class MeetingPageModel extends AbstractModel implements Model {
   }
 
   @override
-  Future<bool> changeRemoteVideoStatus(String id, bool subscribe) async {
+  Future<bool> changeRemoteVideoStatus(String id, bool subscribe, bool tiny) async {
     Completer<bool> completer = Completer();
     int code = -1;
     if (subscribe) {
@@ -194,7 +164,7 @@ class MeetingPageModel extends AbstractModel implements Model {
         Utils.engine?.onSubscribed = null;
         completer.complete(code != 0 ? !subscribe : subscribe);
       };
-      code = await Utils.engine?.subscribe(id, RCRTCMediaType.video) ?? -1;
+      code = await Utils.engine?.subscribe(id, RCRTCMediaType.video, tiny) ?? -1;
     } else {
       Utils.engine?.onUnsubscribed = (String id, RCRTCMediaType type, int code, String? message) {
         Utils.engine?.onUnsubscribed = null;

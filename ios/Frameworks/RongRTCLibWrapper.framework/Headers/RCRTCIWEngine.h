@@ -48,50 +48,50 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  设置状态报表监听
  */
-- (NSInteger)setStatsDelegate:(id<RCRTCIWStatsDelegate>)delegate;
+- (NSInteger)setStatsDelegate:(id<RCRTCIWStatsDelegate> _Nullable)delegate;
 
 /*!
  设置本地音频前处理回调
  */
-- (NSInteger)setLocalAudioCapturedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+- (NSInteger)setLocalAudioCapturedDelegate:(id<RCRTCIWAudioFrameDelegate> _Nullable)delegate;
 
 /*!
  设置本地音频后处理回调
  */
-- (NSInteger)setLocalAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+- (NSInteger)setLocalAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate> _Nullable)delegate;
 
 /*!
  设置远端音频前处理回调
  */
-- (NSInteger)setRemoteAudioReceivedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate
+- (NSInteger)setRemoteAudioReceivedDelegate:(id<RCRTCIWAudioFrameDelegate> _Nullable)delegate
                                      userId:(NSString *)userId;
 
 /*!
  设置本地音频后处理回调
  */
-- (NSInteger)setRemoteAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate>)delegate;
+- (NSInteger)setRemoteAudioMixedDelegate:(id<RCRTCIWAudioFrameDelegate> _Nullable)delegate;
 
 /*!
  设置本地视频后处理回调
  */
-- (NSInteger)setLocalVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate;
+- (NSInteger)setLocalVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate> _Nullable)delegate;
 
 /*!
  设置远端视频后处理回调
  */
-- (NSInteger)setRemoteVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+- (NSInteger)setRemoteVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate> _Nullable)delegate
                                       userId:(NSString *)userId;
 
 /*!
  设置本地自定义视频后处理回调
  */
-- (NSInteger)setLocalCustomVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate>)delegate
+- (NSInteger)setLocalCustomVideoProcessedDelegate:(id<RCRTCIWSampleBufferVideoFrameDelegate> _Nullable)delegate
                                               tag:(NSString *)tag;
 
 /*!
  设置远端自定义视频后处理回调
  */
-- (NSInteger)setRemoteCustomVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate>)delegate
+- (NSInteger)setRemoteCustomVideoProcessedDelegate:(id<RCRTCIWPixelBufferVideoFrameDelegate> _Nullable)delegate
                                             userId:(NSString *)userId
                                                tag:(NSString *)tag;
 
@@ -446,6 +446,26 @@ NS_ASSUME_NONNULL_BEGIN
  设置直播合流布局填充类型, 仅供直播主播用户使用
  */
 - (NSInteger)setLiveMixRenderMode:(RCRTCIWLiveMixRenderMode)mode;
+
+/*!
+ 设置直播合流布局背景颜色 仅供直播主播用户使用
+ @param color 背景颜色, 取值范围: 0x000000 ~ 0xffffff
+ @discussion
+ 设置直播合流布局背景颜色, 仅供直播主播用户使用
+ */
+- (NSInteger)setLiveMixBackgroundColor:(NSUInteger)color;
+
+/*!
+ 设置直播合流布局背景颜色 仅供直播主播用户使用
+ @param red 取值范围: 0 ~ 255
+ @param green 取值范围: 0 ~ 255
+ @param blue 取值范围: 0 ~ 255
+ @discussion
+ 设置直播合流布局背景颜色, 仅供直播主播用户使用
+ */
+- (NSInteger)setLiveMixBackgroundColorWithRed:(NSUInteger)red
+                                        green:(NSUInteger)green
+                                         blue:(NSUInteger)blue;
 
 /*!
  设置直播混流布局配置, 仅供直播主播用户使用
@@ -865,6 +885,28 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSInteger)unsubscribeCustomStream:(NSString *)userId
                                  tag:(NSString *)tag;
+
+#pragma mark - 跨房间连麦
+
+- (NSInteger)requestJoinSubRoom:(NSString *)roomId
+                         userId:(NSString *)userId
+                     autoLayout:(BOOL)autoLayout
+                          extra:(NSString * _Nullable)extra;
+
+- (NSInteger)cancelJoinSubRoomRequest:(NSString *)roomId
+                               userId:(NSString *)userId
+                                extra:(NSString * _Nullable)extra;
+
+- (NSInteger)responseJoinSubRoomRequest:(NSString *)roomId
+                                 userId:(NSString *)userId
+                                  agree:(BOOL)agree
+                             autoLayout:(BOOL)autoLayout
+                                  extra:(NSString *)extra;
+
+- (NSInteger)joinSubRoom:(NSString *)roomId;
+
+- (NSInteger)leaveSubRoom:(NSString *)roomId
+                  disband:(BOOL)disband;
 
 #pragma mark - Version
 /*!

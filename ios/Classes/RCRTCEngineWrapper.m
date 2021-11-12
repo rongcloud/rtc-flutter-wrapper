@@ -7,7 +7,7 @@
 
 #import "RCRTCEngineWrapper.h"
 
-#import <RongIMLib/RongIMLib.h>
+#import <RongIMLibCore/RongIMLibCore.h>
 
 #import "RCRTCViewWrapper.h"
 #import "MainThreadPoster.h"
@@ -598,6 +598,22 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)setLiveMixBackgroundColor:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        int red = [arguments[@"red"] intValue];
+        int green = [arguments[@"green"] intValue];
+        int blue = [arguments[@"blue"] intValue];
+        code = [engine setLiveMixBackgroundColorWithRed:red
+                                                  green:green
+                                                   blue:blue];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
 - (void)setLiveMixCustomAudios:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSInteger code = -1;
     if (engine != nil) {
@@ -1147,6 +1163,85 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)requestJoinSubRoom:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *rid = arguments[@"rid"];
+        NSString *uid = arguments[@"uid"];
+        bool autoLayout = [arguments[@"auto"] boolValue];
+        NSString *extra = arguments[@"extra"];
+        code = [engine requestJoinSubRoom:rid
+                                   userId:uid
+                               autoLayout:autoLayout
+                                    extra:extra];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)cancelJoinSubRoomRequest:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *rid = arguments[@"rid"];
+        NSString *uid = arguments[@"uid"];
+        NSString *extra = arguments[@"extra"];
+        code = [engine cancelJoinSubRoomRequest:rid
+                                         userId:uid
+                                          extra:extra];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)responseJoinSubRoomRequest:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *rid = arguments[@"rid"];
+        NSString *uid = arguments[@"uid"];
+        bool agree = [arguments[@"agree"] boolValue];
+        bool autoLayout = [arguments[@"auto"] boolValue];
+        NSString *extra = arguments[@"extra"];
+        code = [engine responseJoinSubRoomRequest:rid
+                                           userId:uid
+                                            agree:agree
+                                       autoLayout:autoLayout
+                                            extra:extra];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)joinSubRoom:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSString *argument = (NSString *)call.arguments;
+        code = [engine joinSubRoom:argument];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)leaveSubRoom:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *rid = arguments[@"id"];
+        bool disband = [arguments[@"disband"] boolValue];
+        code = [engine leaveSubRoom:rid
+                            disband:disband];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
 #pragma mark *************** [C] ***************
 
 - (void)onError:(NSInteger)code message:(NSString *)errMsg {
@@ -1345,6 +1440,17 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)onLiveMixBackgroundColorSet:(NSInteger)code message:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveMixBackgroundColorSet" arguments:arguments];
+    });
+}
+
 - (void)onLiveMixCustomAudiosSet:(NSInteger)code message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:@(code) forKey:@"code"];
@@ -1480,33 +1586,48 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onUserJoined:(NSString *)userId {
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onUserJoined" arguments:userId];
-    });
-}
-
-- (void)onUserOffline:(NSString *)userId {
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onUserOffline" arguments:userId];
-    });
-}
-
-- (void)onUserLeft:(NSString *)userId {
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onUserLeft" arguments:userId];
-    });
-}
-
-- (void)onRemotePublished:(NSString *)userId mediaType:(RCRTCIWMediaType)type {
+- (void)onUserJoined:(NSString *)roomId
+              userId:(NSString *)userId {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onUserJoined" arguments:arguments];
+    });
+}
+
+- (void)onUserOffline:(NSString *)roomId
+               userId:(NSString *)userId {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onUserOffline" arguments:arguments];
+    });
+}
+
+- (void)onUserLeft:(NSString *)roomId
+            userId:(NSString *)userId {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onUserLeft" arguments:arguments];
+    });
+}
+
+- (void)onRemotePublished:(NSString *)roomId
+                   userId:(NSString *)userId
+                mediaType:(RCRTCIWMediaType)type {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1515,9 +1636,12 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteUnpublished:(NSString *)userId mediaType:(RCRTCIWMediaType)type {
+- (void)onRemoteUnpublished:(NSString *)roomId
+                     userId:(NSString *)userId
+                  mediaType:(RCRTCIWMediaType)type {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1542,9 +1666,13 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteStateChanged:(NSString *)userId type:(RCRTCIWMediaType)type disabled:(BOOL)disabled {
+- (void)onRemoteStateChanged:(NSString *)roomId
+                      userId:(NSString *)userId
+                        type:(RCRTCIWMediaType)type
+                    disabled:(BOOL)disabled {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:@((int) type) forKey:@"type"];
     [arguments setObject:@(disabled) forKey:@"disabled"];
     __weak typeof (channel) weak = channel;
@@ -1554,9 +1682,12 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteFirstFrame:(NSString *)userId type:(RCRTCIWMediaType)type {
+- (void)onRemoteFirstFrame:(NSString *)roomId
+                    userId:(NSString *)userId
+                      type:(RCRTCIWMediaType)type {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1573,17 +1704,20 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onMessageReceived:(RCMessage *)message {
-    NSString *argument = [RCFlutterMessageFactory message2String:message];
+- (void)onMessageReceived:(NSString *)roomId
+                  message:(RCMessage *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"id"];
+    [arguments setObject:[RCFlutterMessageFactory message2String:message] forKey:@"message"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:argument];
+        [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:arguments];
     });
 }
 
 - (void)onCustomStreamPublished:(NSString *)tag
-                           code:(int)code
+                           code:(NSInteger)code
                         message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:tag forKey:@"tag"];
@@ -1597,7 +1731,7 @@ SingleInstanceM(Instance);
 }
 
 - (void)onCustomStreamUnpublished:(NSString *)tag
-                             code:(int)code
+                             code:(NSInteger)code
                           message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:tag forKey:@"tag"];
@@ -1618,10 +1752,12 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteCustomStreamPublished:(NSString *)userId
+- (void)onRemoteCustomStreamPublished:(NSString *)roomId
+                               userId:(NSString *)userId
                                   tag:(NSString *)tag {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1630,10 +1766,12 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteCustomStreamUnpublished:(NSString *)userId
+- (void)onRemoteCustomStreamUnpublished:(NSString *)roomId
+                                 userId:(NSString *)userId
                                     tag:(NSString *)tag {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1642,11 +1780,13 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteCustomStreamStateChanged:(NSString *)userId
+- (void)onRemoteCustomStreamStateChanged:(NSString *)roomId
+                                  userId:(NSString *)userId
                                      tag:(NSString *)tag
                                 disabled:(BOOL)disabled {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     [arguments setObject:@(disabled) forKey:@"disabled"];
     __weak typeof (channel) weak = channel;
@@ -1656,10 +1796,12 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onRemoteCustomStreamFirstFrame:(NSString *)userId
+- (void)onRemoteCustomStreamFirstFrame:(NSString *)roomId
+                                userId:(NSString *)userId
                                    tag:(NSString *)tag {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1670,7 +1812,7 @@ SingleInstanceM(Instance);
 
 - (void)onCustomStreamSubscribed:(NSString *)userId
                              tag:(NSString *)tag
-                            code:(int)code
+                            code:(NSInteger)code
                          message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:userId forKey:@"id"];
@@ -1686,7 +1828,7 @@ SingleInstanceM(Instance);
 
 - (void)onCustomStreamUnsubscribed:(NSString *)userId
                                tag:(NSString *)tag
-                              code:(int)code
+                              code:(NSInteger)code
                            message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:userId forKey:@"id"];
@@ -1697,6 +1839,152 @@ SingleInstanceM(Instance);
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
         [strong invokeMethod:@"engine:onCustomStreamUnsubscribed" arguments:arguments];
+    });
+}
+
+- (void)onJoinSubRoomRequested:(NSString *)roomId
+                        userId:(NSString *)userId
+                          code:(NSInteger)code
+                       message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onJoinSubRoomRequested" arguments:arguments];
+    });
+}
+
+- (void)onJoinSubRoomRequestCanceled:(NSString *)roomId
+                              userId:(NSString *)userId
+                                code:(NSInteger)code
+                             message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onJoinSubRoomRequestCanceled" arguments:arguments];
+    });
+}
+
+- (void)onJoinSubRoomRequestResponded:(NSString *)roomId
+                               userId:(NSString *)userId
+                                 code:(NSInteger)code
+                              message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onJoinSubRoomRequestResponded" arguments:arguments];
+    });
+}
+
+- (void)onJoinSubRoomRequestReceived:(NSString *)roomId
+                              userId:(NSString *)userId
+                               extra:(NSString *)extra {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    if (extra) {
+        [arguments setObject:extra forKey:@"extra"];
+    }
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onJoinSubRoomRequestReceived" arguments:arguments];
+    });
+}
+
+- (void)onCancelJoinSubRoomRequestReceived:(NSString *)roomId
+                                    userId:(NSString *)userId
+                                     extra:(NSString *)extra {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    if (extra) {
+        [arguments setObject:extra forKey:@"extra"];
+    }
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onCancelJoinSubRoomRequestReceived" arguments:arguments];
+    });
+}
+
+- (void)onJoinSubRoomRequestResponseReceived:(NSString *)roomId
+                                      userId:(NSString *)userId
+                                       agree:(BOOL)agree
+                                       extra:(NSString *)extra {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(agree) forKey:@"agree"];
+    if (extra) {
+        [arguments setObject:extra forKey:@"extra"];
+    }
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onJoinSubRoomRequestResponseReceived" arguments:arguments];
+    });
+}
+
+- (void)onSubRoomJoined:(NSString *)roomId
+                   code:(NSInteger)code
+                message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"id"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSubRoomJoined" arguments:arguments];
+    });
+}
+
+- (void)onSubRoomLeft:(NSString *)roomId
+                 code:(NSInteger)code
+              message:(NSString *)message {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"id"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:message forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSubRoomLeft" arguments:arguments];
+    });
+}
+
+- (void)onSubRoomBanded:(NSString *)roomId {
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSubRoomBanded" arguments:roomId];
+    });
+}
+
+- (void)onSubRoomDisband:(NSString *)roomId
+                  userId:(NSString *)userId {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSubRoomDisband" arguments:arguments];
     });
 }
 
@@ -1728,9 +2016,11 @@ SingleInstanceM(Instance);
 }
 
 - (void)onRemoteAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                    roomId:(NSString *)roomId
                     userId:(NSString *)userId {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:fromRemoteAudioStats(stats) forKey:@"stats"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1740,9 +2030,11 @@ SingleInstanceM(Instance);
 }
 
 - (void)onRemoteVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                    roomId:(NSString *)roomId
                     userId:(NSString *)userId {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:fromRemoteVideoStats(stats) forKey:@"stats"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1794,10 +2086,12 @@ SingleInstanceM(Instance);
 }
 
 - (void)onRemoteCustomAudioStats:(RCRTCIWRemoteAudioStats *)stats
+                          roomId:(NSString *)roomId
                           userId:(NSString *)userId
                              tag:(NSString *)tag {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     [arguments setObject:fromRemoteAudioStats(stats) forKey:@"stats"];
     __weak typeof (channel) weak = channel;
@@ -1808,10 +2102,12 @@ SingleInstanceM(Instance);
 }
 
 - (void)onRemoteCustomVideoStats:(RCRTCIWRemoteVideoStats *)stats
+                          roomId:(NSString *)roomId
                           userId:(NSString *)userId
                              tag:(NSString *)tag {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
     [arguments setObject:fromRemoteVideoStats(stats) forKey:@"stats"];
     __weak typeof (channel) weak = channel;
@@ -1911,6 +2207,8 @@ SingleInstanceM(Instance);
         [self setLiveMixLayoutMode:call result:result];
     } else if ([method isEqualToString:@"setLiveMixRenderMode"]) {
         [self setLiveMixRenderMode:call result:result];
+    } else if ([method isEqualToString:@"setLiveMixBackgroundColor"]) {
+        [self setLiveMixBackgroundColor:call result:result];
     } else if ([method isEqualToString:@"setLiveMixCustomAudios"]) {
         [self setLiveMixCustomAudios:call result:result];
     } else if ([method isEqualToString:@"setLiveMixCustomLayouts"]) {
@@ -1999,6 +2297,16 @@ SingleInstanceM(Instance);
         [self subscribeCustomStream:call result:result];
     } else if ([method isEqualToString:@"unsubscribeCustomStream"]) {
         [self unsubscribeCustomStream:call result:result];
+    } else if ([method isEqualToString:@"requestJoinSubRoom"]) {
+        [self requestJoinSubRoom:call result:result];
+    } else if ([method isEqualToString:@"cancelJoinSubRoomRequest"]) {
+        [self cancelJoinSubRoomRequest:call result:result];
+    } else if ([method isEqualToString:@"responseJoinSubRoomRequest"]) {
+        [self responseJoinSubRoomRequest:call result:result];
+    } else if ([method isEqualToString:@"joinSubRoom"]) {
+        [self joinSubRoom:call result:result];
+    } else if ([method isEqualToString:@"leaveSubRoom"]) {
+        [self leaveSubRoom:call result:result];
     } else {
         dispatch_to_main_queue(^{
             result(FlutterMethodNotImplemented);

@@ -2,7 +2,7 @@
 #import "GeneratedPluginRegistrant.h"
 
 #import <rongcloud_rtc_wrapper_plugin/RCRTCEngineWrapper.h>
-#import <RongIMLib/RongIMLib.h>
+#import <RongIMLibCore/RongIMLibCore.h>
 
 #import "GPUImage/GPUImageHandle.h"
 #import "LocalCustomVideoFrameDelegate.h"
@@ -19,7 +19,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[RCIMClient sharedRCIMClient] setLogLevel:RC_Log_Level_Verbose];
+    [[RCCoreClient sharedCoreClient] setLogLevel:RC_Log_Level_Verbose];
     
     FlutterViewController *controller = (FlutterViewController *) self.window.rootViewController;
     FlutterMethodChannel *channel = [FlutterMethodChannel methodChannelWithName:@"cn.rongcloud.rtc.flutter.demo"
