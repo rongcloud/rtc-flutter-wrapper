@@ -2,6 +2,13 @@ typedef void Callback(info);
 
 typedef void StateCallback(code, info);
 
+const List<String> CameraCaptureOrientationStrings = [
+  '↑',
+  '↓',
+  '→',
+  '←',
+];
+
 const List<String> FPSStrings = [
   '10',
   '15',
@@ -50,23 +57,9 @@ const List<int> TinyMaxVideoKbps = [
   1200,
 ];
 
-const List<int> MinVideoKbps = [
-  300,
-  500,
-  700,
-  900,
-  1200,
-  1500
-];
+const List<int> MinVideoKbps = [300, 500, 700, 900, 1200, 1500];
 
-const List<int> MaxVideoKbps = [
-  2000,
-  2200,
-  3500,
-  4400,
-  6000,
-  8000
-];
+const List<int> MaxVideoKbps = [2000, 2200, 3500, 4400, 6000, 8000];
 
 enum Role {
   Local,

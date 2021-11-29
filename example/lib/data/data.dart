@@ -12,11 +12,21 @@ class Result {
 
 class CustomState {
   CustomState(this.tag)
-      : subscribed = false,
+      : audioPublished = false,
+        videoPublished = false,
+        audioSubscribed = false,
+        videoSubscribed = false,
+        tiny = false,
         yuv = false;
 
   String tag;
-  bool subscribed;
+
+  bool audioPublished;
+  bool videoPublished;
+  bool audioSubscribed;
+  bool videoSubscribed;
+  bool tiny;
+
   bool yuv;
 }
 
@@ -105,6 +115,7 @@ class Config {
   int maxVideoKbps;
   RCRTCVideoFps fps;
   RCRTCVideoResolution resolution;
+  RCRTCCameraCaptureOrientation orientation;
 
   Config.config()
       : enableTinyStream = true,
@@ -118,7 +129,8 @@ class Config {
         minVideoKbps = 500,
         maxVideoKbps = 2200,
         fps = RCRTCVideoFps.fps_30,
-        resolution = RCRTCVideoResolution.resolution_720_1280;
+        resolution = RCRTCVideoResolution.resolution_720_1280,
+        orientation = RCRTCCameraCaptureOrientation.portrait;
 
   RCRTCVideoConfig get videoConfig {
     _videoConfig.minBitrate = minVideoKbps;
@@ -141,6 +153,7 @@ class Config {
         'maxVideoKbps': maxVideoKbps,
         'fps': fps.index,
         'resolution': resolution.index,
+        'orientation': orientation.index,
       };
 
   Config.fromJson(Map<String, dynamic> json)
@@ -155,7 +168,8 @@ class Config {
         minVideoKbps = json['minVideoKbps'],
         maxVideoKbps = json['maxVideoKbps'],
         fps = RCRTCVideoFps.values[json['fps']],
-        resolution = RCRTCVideoResolution.values[json['resolution']];
+        resolution = RCRTCVideoResolution.values[json['resolution']],
+        orientation = RCRTCCameraCaptureOrientation.values[json['orientation']];
 
   final RCRTCVideoConfig _videoConfig = RCRTCVideoConfig.create(
     minBitrate: 500,

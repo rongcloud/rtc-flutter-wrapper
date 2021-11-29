@@ -34,11 +34,11 @@
 		</data>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<data>
-		AYE61YbynzqCWCFzgcRZVYWhKOM=
+		JdNK4stnO/tJNBBpmelr1ZZH4lo=
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
-		/io+jbEr5Ol758Ib+JPnIhDGuo0=
+		qWOm1wcQ267P0q+87QoS+OnJugs=
 		</data>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Headers/RCRTCIWStatsDelegate.h</key>
 		<data>
-		HrqDSyzcddFtxE3Wf0Z1dx90XIQ=
+		vWibEfp9HJDFLy3ej/OCWZRCxzg=
 		</data>
 		<key>Headers/RCRTCIWVideoConfig.h</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		Dy6lHIjb1GYjoH7XNdtVhxvAUBQ=
+		3+D4Trsc5RRGubVJ51GKGOoqCi4=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -184,22 +184,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			AYE61YbynzqCWCFzgcRZVYWhKOM=
+			JdNK4stnO/tJNBBpmelr1ZZH4lo=
 			</data>
 			<key>hash2</key>
 			<data>
-			+A0I9DxAnhRiNUNyEpgcQUjxxr7kbk1XFSU0HB+WkZk=
+			vYZ5yGGWtsUe4flI25lRdcBrKUFZGSNfiZ393ZTnkJQ=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			/io+jbEr5Ol758Ib+JPnIhDGuo0=
+			qWOm1wcQ267P0q+87QoS+OnJugs=
 			</data>
 			<key>hash2</key>
 			<data>
-			AmMVZxlWJvjnpeLgz+uklsykHVHjj7XCN7BytNNlz2Y=
+			oHSYSFED3XKSWJ+INssiuA3wz49Q9NrM7M8JDfmy0xE=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
@@ -283,11 +283,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HrqDSyzcddFtxE3Wf0Z1dx90XIQ=
+			vWibEfp9HJDFLy3ej/OCWZRCxzg=
 			</data>
 			<key>hash2</key>
 			<data>
-			1llMsQvmpThRUPirU/YLxXfgGIK7PBbEZLFqyXtl+is=
+			4M/JlADILz03t6xg+W3GAhNiuAc6QhFec9JL0bXTVYM=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWVideoConfig.h</key>

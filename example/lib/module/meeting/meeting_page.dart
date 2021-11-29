@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/data/constants.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
@@ -208,6 +209,14 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
                                   _config.speaker ? '扬声器' : '听筒',
                                   size: 15.sp,
                                   callback: () => _changeSpeaker(),
+                                ),
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    isDense: true,
+                                    value: _config.orientation,
+                                    items: _cameraCaptureOrientations(),
+                                    onChanged: (dynamic orientation) => _changeCameraCaptureOrientation(orientation),
+                                  ),
                                 ),
                               ],
                             ),
@@ -630,6 +639,33 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     });
   }
 
+  List<DropdownMenuItem<RCRTCCameraCaptureOrientation>> _cameraCaptureOrientations() {
+    List<DropdownMenuItem<RCRTCCameraCaptureOrientation>> items = [];
+    RCRTCCameraCaptureOrientation.values.forEach((orientation) {
+      items.add(DropdownMenuItem(
+        value: orientation,
+        child: Text(
+          '采集方向：${CameraCaptureOrientationStrings[orientation.index]}',
+          style: TextStyle(
+            fontSize: 15.sp,
+            color: Colors.black,
+            decoration: TextDecoration.none,
+          ),
+        ),
+      ));
+    });
+    return items;
+  }
+
+  void _changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation) async {
+    bool ok = await presenter.changeCameraCaptureOrientation(orientation);
+    if (ok) {
+      setState(() {
+        _config.orientation = orientation;
+      });
+    }
+  }
+
   void _changeFps(RCRTCVideoFps fps) {
     _config.fps = fps;
     presenter.changeVideoConfig(_config.videoConfig);
@@ -804,6 +840,12 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
 
   @override
   void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
+
+  @override
+  void onLiveMixMemberAudioStats(String userId, int volume) {}
+
+  @override
+  void onLiveMixMemberCustomAudioStats(String userId, String tag, int volume) {}
 
   @override
   void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}

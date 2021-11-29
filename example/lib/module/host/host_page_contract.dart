@@ -18,7 +18,7 @@ abstract class View implements IView {
 
   void onCustomVideoUnpublishedError(int code);
 
-  void onUserCustomStateChanged(String id, String tag, bool published);
+  void onUserCustomStateChanged(String id, String tag, bool audio, bool video);
 
   void onReceiveJoinRequest(String roomId, String userId);
 
@@ -60,7 +60,9 @@ abstract class Model implements IModel {
 
   Future<bool> changeCustomConfig(RCRTCVideoConfig config);
 
-  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
+  Future<bool> changeRemoteCustomVideoStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
+
+  Future<bool> changeRemoteCustomAudioStatus(String rid, String uid, String tag, bool subscribe);
 
   Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
 
@@ -98,7 +100,9 @@ abstract class Presenter implements IPresenter {
 
   Future<bool> changeCustomConfig(RCRTCVideoConfig config);
 
-  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
+  Future<bool> changeRemoteCustomVideoStatus(String rid, String uid, String tag, bool yuv, bool subscribe);
+
+  Future<bool> changeRemoteCustomAudioStatus(String rid, String uid, String tag, bool subscribe);
 
   Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
 

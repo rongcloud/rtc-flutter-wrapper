@@ -82,6 +82,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onLiveMixVideoStats:(RCRTCIWRemoteVideoStats *)stats;
 
 /*!
+ 上报远端分流音频统计信息
+ @param userId 用户id
+ @param volume 音量
+ @discussion
+ 上报远端分流音频统计信息
+ */
+- (void)onLiveMixMemberAudioStats:(NSString *)userId
+                           volume:(NSInteger)volume;
+
+/*!
+ 上报远端分流自定义音频统计信息
+ @param userId 用户id
+ @param tag 自定义音频流标签
+ @param volume 音量
+ @discussion
+ 上报远端分流自定义音频统计信息
+ */
+- (void)onLiveMixMemberCustomAudioStats:(NSString *)userId
+                                    tag:(NSString *)tag
+                                 volume:(NSInteger)volume;
+
+/*!
  上报本地自定义音频统计信息
  @param stats 音频统计信息
  @param tag 自定义音频tag

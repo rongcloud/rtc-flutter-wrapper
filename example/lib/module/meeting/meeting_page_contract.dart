@@ -28,6 +28,8 @@ abstract class Model implements IModel {
 
   Future<bool> changeSpeaker(bool speaker);
 
+  Future<bool> changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation);
+
   Future<bool> changeVideoConfig(RCRTCVideoConfig config);
 
   Future<bool> changeTinyVideoConfig(RCRTCVideoConfig config);
@@ -51,6 +53,8 @@ abstract class Presenter implements IPresenter {
   Future<bool> changeFrontCamera(bool front);
 
   Future<bool> changeSpeaker(bool speaker);
+
+  Future<bool> changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation);
 
   Future<bool> changeVideoConfig(RCRTCVideoConfig config);
 

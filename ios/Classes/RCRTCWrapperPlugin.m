@@ -2,7 +2,7 @@
 #import "RCRTCEngineWrapper.h"
 #import "RCRTCViewWrapper.h"
 
-static NSString * const VER = @"5.1.2";
+static NSString * const VER = @"5.1.3";
 
 @implementation RCRTCWrapperPlugin
 

@@ -490,12 +490,14 @@ NS_ASSUME_NONNULL_BEGIN
  @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @discussion
  远端用户发布自定义流操作回调, 仅供会议用户或直播主播用户使用
  */
 - (void)onRemoteCustomStreamPublished:(NSString *)roomId
                                userId:(NSString *)userId
-                                  tag:(NSString *)tag;
+                                  tag:(NSString *)tag
+                                 type:(RCRTCIWMediaType)type;
 
 #pragma mark - 远端用户取消发布自定义流操作回调
 /*!
@@ -503,12 +505,14 @@ NS_ASSUME_NONNULL_BEGIN
  @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @discussion
  远端用户取消发布自定义流操作回调, 仅供会议用户或直播主播用户使用
  */
 - (void)onRemoteCustomStreamUnpublished:(NSString *)roomId
                                  userId:(NSString *)userId
-                                    tag:(NSString *)tag;
+                                    tag:(NSString *)tag
+                                   type:(RCRTCIWMediaType)type;
 
 #pragma mark - 远端用户开关自定义流操作回调
 /*!
@@ -516,6 +520,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @param disabled 是否关闭, YES: 关闭, NO: 打开
  @discussion
  远端用户开关自定义流操作回调
@@ -523,6 +528,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onRemoteCustomStreamStateChanged:(NSString *)roomId
                                   userId:(NSString *)userId
                                      tag:(NSString *)tag
+                                    type:(RCRTCIWMediaType)type
                                 disabled:(BOOL)disabled;
 
 #pragma mark - 本地会议用户或直播主播用户收到远端用户自定义流第一帧回调
@@ -531,18 +537,21 @@ NS_ASSUME_NONNULL_BEGIN
  @param roomId 房间id
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @discussion
  收到远端用户自定义流第一个关键帧回调, 仅供会议用户或直播主播用户使用
  */
 - (void)onRemoteCustomStreamFirstFrame:(NSString *)roomId
                                 userId:(NSString *)userId
-                                   tag:(NSString *)tag;
+                                   tag:(NSString *)tag
+                                  type:(RCRTCIWMediaType)type;
 
 #pragma mark - 本地会议用户或直播主播用户订阅自定义流操作回调
 /*!
  订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @param code 返回码
  @param errMsg 返回消息
  @discussion
@@ -550,6 +559,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onCustomStreamSubscribed:(NSString *)userId
                              tag:(NSString *)tag
+                            type:(RCRTCIWMediaType)type
                             code:(NSInteger)code
                          message:(NSString *)errMsg;
 
@@ -558,6 +568,7 @@ NS_ASSUME_NONNULL_BEGIN
  取消订阅远端用户发布的自定义流操作回调, 仅供会议用户或直播主播用户使用
  @param userId 远端用户UserId
  @param tag 自定义流标签
+ @param type 远端自定义流类型
  @param code 返回码
  @param errMsg 返回消息
  @discussion
@@ -565,6 +576,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onCustomStreamUnsubscribed:(NSString *)userId
                                tag:(NSString *)tag
+                              type:(RCRTCIWMediaType)type
                               code:(NSInteger)code
                            message:(NSString *)errMsg;
 

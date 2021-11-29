@@ -19,6 +19,10 @@ abstract class RCRTCStatsListener {
 
   void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
 
+  void onLiveMixMemberAudioStats(String userId, int volume) {}
+
+  void onLiveMixMemberCustomAudioStats(String userId, String tag, int volume) {}
+
   void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
 
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}

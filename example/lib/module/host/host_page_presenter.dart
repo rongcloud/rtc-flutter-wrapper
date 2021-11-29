@@ -48,8 +48,8 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
       view.onUserVideoStateChanged(id, published);
     };
 
-    Utils.onUserCustomStateChanged = (id, tag, published) {
-      view.onUserCustomStateChanged(id, tag, published);
+    Utils.onUserCustomStateChanged = (id, tag, audio, video) {
+      view.onUserCustomStateChanged(id, tag, audio, video);
     };
 
     Utils.engine?.onCustomStreamPublishFinished = (tag) {
@@ -157,8 +157,13 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
   }
 
   @override
-  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe) {
-    return model.changeRemoteCustomStatus(rid, uid, tag, yuv, subscribe);
+  Future<bool> changeRemoteCustomVideoStatus(String rid, String uid, String tag, bool yuv, bool subscribe) {
+    return model.changeRemoteCustomVideoStatus(rid, uid, tag, yuv, subscribe);
+  }
+
+  @override
+  Future<bool> changeRemoteCustomAudioStatus(String rid, String uid, String tag, bool subscribe) {
+    return model.changeRemoteCustomAudioStatus(rid, uid, tag, subscribe);
   }
 
   @override

@@ -4,12 +4,11 @@ import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import cn.rongcloud.rtc.api.stream.RCRTCTextureView;
-import cn.rongcloud.rtc.core.RendererCommon;
+import cn.rongcloud.rtc.wrapper.platform.flutter.RCRTCIWFlutterRenderEventsListener;
+import cn.rongcloud.rtc.wrapper.platform.flutter.RCRTCIWFlutterView;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -92,17 +91,16 @@ class RCRTCViewWrapper implements MethodCallHandler {
         private static final RCRTCViewWrapper instance = new RCRTCViewWrapper();
     }
 
-    static class RCRTCView implements EventChannel.StreamHandler, RendererCommon.RendererEvents {
+    static class RCRTCView extends RCRTCIWFlutterRenderEventsListener implements EventChannel.StreamHandler {
 
         private RCRTCView(TextureRegistry registry, BinaryMessenger messenger) throws IllegalAccessException, InvocationTargetException, InstantiationException {
             entry = registry.createSurfaceTexture();
             id = entry.id();
             channel = new EventChannel(messenger, "cn.rongcloud.rtc.flutter/view:" + id);
             channel.setStreamHandler(this);
-            view = VIEW_CONSTRUCTOR.newInstance("RCRTCView[" + id + "]");
-            RCRTCTextureView view = (RCRTCTextureView) this.view;
-            view.init(RCRTCEngineWrapper.getInstance().getEglBaseContext(), this);
-            view.surfaceCreated(entry.surfaceTexture());
+            view = new RCRTCIWFlutterView("RCRTCView[" + id + "]");
+            view.setRendererEventsListener(this);
+            view.createSurface(entry.surfaceTexture());
         }
 
         @Override
@@ -116,7 +114,7 @@ class RCRTCViewWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onFirstFrameRendered() {
+        public void onFirstFrame() {
             if (sink != null) {
                 HashMap<String, Object> arguments = new HashMap<>();
                 arguments.put("event", "onFirstFrame");
@@ -125,35 +123,18 @@ class RCRTCViewWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onFrameResolutionChanged(int width, int height, int rotation) {
+        public void onFrameSizeChanged(int width, int height) {
             if (sink != null) {
-                if (width != this.width || height != this.height) {
-                    HashMap<String, Object> arguments = new HashMap<>();
-                    arguments.put("event", "onSizeChanged");
-                    arguments.put("width", width);
-                    arguments.put("height", height);
-                    arguments.put("rotation", rotation);
-                    this.width = width;
-                    this.height = height;
-                    this.rotation = rotation;
-                    sink.success(arguments);
-                }
-                if (rotation != this.rotation) {
-                    HashMap<String, Object> arguments = new HashMap<>();
-                    arguments.put("event", "onRotationChanged");
-                    arguments.put("rotation", rotation);
-                    this.rotation = rotation;
-                    sink.success(arguments);
-                }
+                HashMap<String, Object> arguments = new HashMap<>();
+                arguments.put("event", "onSizeChanged");
+                arguments.put("width", width);
+                arguments.put("height", height);
+                sink.success(arguments);
             }
         }
 
-        @Override
-        public void onCreateEglFailed(Exception e) {
-        }
-
         private void destroy() {
-            RCRTCTextureView view = (RCRTCTextureView) this.view;
+            view.destroySurface();
             view.release();
             channel.setStreamHandler(null);
             entry.release();
@@ -162,12 +143,9 @@ class RCRTCViewWrapper implements MethodCallHandler {
         private final TextureRegistry.SurfaceTextureEntry entry;
         private final long id;
         private final EventChannel channel;
-        final Object view;
+        final RCRTCIWFlutterView view;
 
         private EventChannel.EventSink sink;
-
-        private int rotation = -1;
-        private int width = 0, height = 0;
     }
 
     private TextureRegistry registry;
@@ -176,15 +154,4 @@ class RCRTCViewWrapper implements MethodCallHandler {
 
     private final LongSparseArray<RCRTCView> views = new LongSparseArray<>();
 
-    private static Constructor<?> VIEW_CONSTRUCTOR;
-
-    static {
-        try {
-            Class<?> clazz = Class.forName("cn.rongcloud.rtc.wrapper.platform.flutter.RCRTCIWFlutterView");
-            VIEW_CONSTRUCTOR = clazz.getDeclaredConstructor(String.class);
-            VIEW_CONSTRUCTOR.setAccessible(true);
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 }

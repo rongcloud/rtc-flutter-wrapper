@@ -29,14 +29,21 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
     _roomId = ModalRoute.of(context)?.settings.arguments as String;
 
     Utils.engine?.setStatsListener(this);
+    Utils.onRemoveUserAudio = (id) {
+      _remoteUserAudioStateSetter?.call(() {
+        _remoteUserAudioState.remove(id);
+      });
+    };
   }
 
   @override
   void dispose() {
     _remoteAudioStatsStateSetter = null;
     _remoteVideoStatsStateSetter = null;
+    _remoteUserAudioStateSetter = null;
     _remoteAudioStats = null;
     _remoteVideoStats = null;
+    _remoteUserAudioState.clear();
     super.dispose();
   }
 
@@ -191,6 +198,36 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
               _remoteVideoStatsStateSetter = setter;
               return RemoteVideoStatsTable(_remoteVideoStats);
             }),
+            StatefulBuilder(builder: (context, setter) {
+              _remoteUserAudioStateSetter = setter;
+              return Expanded(
+                child: ListView.separated(
+                  itemCount: _remoteUserAudioState.keys.length,
+                  separatorBuilder: (context, index) {
+                    return Divider(
+                      height: 5.dp,
+                      color: Colors.transparent,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    String userId = _remoteUserAudioState.keys.elementAt(index);
+                    int volume = _remoteUserAudioState[userId] ?? 0;
+                    return Row(
+                      children: [
+                        Spacer(),
+                        userId.toText(),
+                        VerticalDivider(
+                          width: 10.dp,
+                          color: Colors.transparent,
+                        ),
+                        '$volume'.toText(),
+                        Spacer(),
+                      ],
+                    );
+                  },
+                ),
+              );
+            }),
           ],
         ),
       ),
@@ -265,24 +302,38 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
   void onLocalVideoStats(RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {
+  void onRemoteAudioStats(String roomId, String userId, RCRTCRemoteAudioStats stats) {}
+
+  @override
+  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {}
+
+  @override
+  void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {
     _remoteAudioStatsStateSetter?.call(() {
       _remoteAudioStats = stats;
     });
   }
 
   @override
-  void onRemoteVideoStats(String roomId, String userId, RCRTCRemoteVideoStats stats) {
+  void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {
     _remoteVideoStatsStateSetter?.call(() {
       _remoteVideoStats = stats;
     });
   }
 
   @override
-  void onLiveMixAudioStats(RCRTCRemoteAudioStats stats) {}
+  void onLiveMixMemberAudioStats(String userId, int volume) {
+    _remoteUserAudioStateSetter?.call(() {
+      _remoteUserAudioState[userId] = volume;
+    });
+  }
 
   @override
-  void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
+  void onLiveMixMemberCustomAudioStats(String userId, String tag, int volume) {
+    _remoteUserAudioStateSetter?.call(() {
+      _remoteUserAudioState['$userId@$tag'] = volume;
+    });
+  }
 
   @override
   void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
@@ -304,7 +355,9 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
 
   StateSetter? _remoteAudioStatsStateSetter;
   StateSetter? _remoteVideoStatsStateSetter;
+  StateSetter? _remoteUserAudioStateSetter;
 
   RCRTCRemoteAudioStats? _remoteAudioStats;
   RCRTCRemoteVideoStats? _remoteVideoStats;
+  Map<String, int> _remoteUserAudioState = {};
 }

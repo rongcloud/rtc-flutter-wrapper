@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 
-import cn.rongcloud.rtc.core.EglBase;
 import cn.rongcloud.rtc.wrapper.RCRTCIWEngine;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCamera;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalAudioStats;
@@ -1264,9 +1263,11 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (id != null);
             String tag = call.argument("tag");
             assert (tag != null);
+            Integer type = call.argument("type");
+            assert (type != null);
             Boolean mute = call.argument("mute");
             assert (mute != null);
-            code = engine.muteRemoteCustomStream(id, tag, mute);
+            code = engine.muteRemoteCustomStream(id, tag, ArgumentAdapter.toMediaType(type), mute);
         }
         MainThreadPoster.success(result, code);
     }
@@ -1312,7 +1313,11 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (id != null);
             String tag = call.argument("tag");
             assert (tag != null);
-            code = engine.subscribeCustomStream(id, tag);
+            Integer type = call.argument("type");
+            assert (type != null);
+            Boolean tiny = call.argument("tiny");
+            assert (tiny != null);
+            code = engine.subscribeCustomStream(id, tag, ArgumentAdapter.toMediaType(type), tiny);
         }
         MainThreadPoster.success(result, code);
     }
@@ -1324,7 +1329,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (id != null);
             String tag = call.argument("tag");
             assert (tag != null);
-            code = engine.unsubscribeCustomStream(id, tag);
+            Integer type = call.argument("type");
+            assert (type != null);
+            code = engine.unsubscribeCustomStream(id, tag, ArgumentAdapter.toMediaType(type));
         }
         MainThreadPoster.success(result, code);
     }
@@ -1395,18 +1402,6 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         MainThreadPoster.success(result, code);
     }
     
-    EglBase.Context getEglBaseContext() {
-        if (engine != null) {
-            try {
-                Object object = GET_EGL_BASE_CONTEXT_METHOD.invoke(engine);
-                if (object instanceof EglBase.Context) return (EglBase.Context) object;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
     private static class SingletonHolder {
         @SuppressLint("StaticFieldLeak")
         private static final RCRTCEngineWrapper instance = new RCRTCEngineWrapper();
@@ -1961,20 +1956,6 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamPublished(String roomId, String userId, String tag) {
-            final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("rid", roomId);
-            arguments.put("uid", userId);
-            arguments.put("tag", tag);
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onRemoteCustomStreamPublished", arguments);
-                }
-            });
-        }
-
-        @Override
         public void onCustomStreamPublishFinished(String tag) {
             final String argument = tag;
             MainThreadPoster.post(new Runnable() {
@@ -1986,11 +1967,27 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamUnpublished(String roomId, String userId, String tag) {
+        public void onRemoteCustomStreamPublished(String roomId, String userId, String tag, RCRTCIWMediaType type) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("rid", roomId);
             arguments.put("uid", userId);
             arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteCustomStreamPublished", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteCustomStreamUnpublished(String roomId, String userId, String tag, RCRTCIWMediaType type) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
@@ -2000,11 +1997,12 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamStateChanged(String roomId, String userId, String tag, boolean disabled) {
+        public void onRemoteCustomStreamStateChanged(String roomId, String userId, String tag, RCRTCIWMediaType type, boolean disabled) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("rid", roomId);
             arguments.put("uid", userId);
             arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
             arguments.put("disabled", disabled);
             MainThreadPoster.post(new Runnable() {
                 @Override
@@ -2015,11 +2013,12 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onRemoteCustomStreamFirstFrame(String roomId, String userId, String tag) {
+        public void onRemoteCustomStreamFirstFrame(String roomId, String userId, String tag, RCRTCIWMediaType type) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("rid", roomId);
             arguments.put("uid", userId);
             arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
@@ -2029,10 +2028,11 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onCustomStreamSubscribed(String userId, String tag, int code, String message) {
+        public void onCustomStreamSubscribed(String userId, String tag, RCRTCIWMediaType type, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("id", userId);
             arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {
@@ -2044,10 +2044,11 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onCustomStreamUnsubscribed(String userId, String tag, int code, String message) {
+        public void onCustomStreamUnsubscribed(String userId, String tag, RCRTCIWMediaType type, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("id", userId);
             arguments.put("tag", tag);
+            arguments.put("type", type.ordinal());
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {
@@ -2283,6 +2284,33 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
+        public void onLiveMixMemberAudioStats(String userId, int volume) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("volume", volume);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onLiveMixMemberAudioStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixMemberCustomAudioStats(String userId, String tag, int volume) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("id", userId);
+            arguments.put("tag", tag);
+            arguments.put("volume", volume);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onLiveMixMemberCustomAudioStats", arguments);
+                }
+            });
+        }
+
+        @Override
         public void onLocalCustomAudioStats(String tag, RCRTCIWLocalAudioStats stats) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("tag", tag);
@@ -2345,7 +2373,6 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
 
     private RCRTCIWEngine engine = null;
 
-    private static Method GET_EGL_BASE_CONTEXT_METHOD;
     private static Method SET_LOCAL_VIEW_METHOD;
     private static Method SET_REMOTE_VIEW_METHOD;
     private static Method SET_LIVE_MIX_VIEW_METHOD;
@@ -2355,18 +2382,16 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     static {
         try {
             Class<?> clazz = Class.forName("cn.rongcloud.rtc.wrapper.RCRTCIWEngineImpl");
-            GET_EGL_BASE_CONTEXT_METHOD = clazz.getDeclaredMethod("getEglBaseContext");
-            GET_EGL_BASE_CONTEXT_METHOD.setAccessible(true);
-            Class<?> viewClazz = Class.forName("cn.rongcloud.rtc.wrapper.core.IRCRTCIWView");
-            SET_LOCAL_VIEW_METHOD = clazz.getDeclaredMethod("setLocalView", viewClazz);
+            Class<?> viewClazz = Class.forName("cn.rongcloud.rtc.api.stream.view.RCRTCBaseView");
+            SET_LOCAL_VIEW_METHOD = clazz.getDeclaredMethod("setLocalBaseView", viewClazz);
             SET_LOCAL_VIEW_METHOD.setAccessible(true);
-            SET_REMOTE_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteView", String.class, viewClazz);
+            SET_REMOTE_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteBaseView", String.class, viewClazz);
             SET_REMOTE_VIEW_METHOD.setAccessible(true);
-            SET_LIVE_MIX_VIEW_METHOD = clazz.getDeclaredMethod("setLiveMixView", viewClazz);
+            SET_LIVE_MIX_VIEW_METHOD = clazz.getDeclaredMethod("setLiveMixBaseView", viewClazz);
             SET_LIVE_MIX_VIEW_METHOD.setAccessible(true);
-            SET_LOCAL_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setLocalCustomStreamView", String.class, viewClazz);
+            SET_LOCAL_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setLocalCustomStreamBaseView", String.class, viewClazz);
             SET_LOCAL_CUSTOM_VIEW_METHOD.setAccessible(true);
-            SET_REMOTE_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteCustomStreamView", String.class, String.class, viewClazz);
+            SET_REMOTE_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteCustomStreamBaseView", String.class, String.class, viewClazz);
             SET_REMOTE_CUSTOM_VIEW_METHOD.setAccessible(true);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             e.printStackTrace();

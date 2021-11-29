@@ -119,6 +119,12 @@ class MeetingPageModel extends AbstractModel implements Model {
   }
 
   @override
+  Future<bool> changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation) async {
+    int code = await Utils.engine?.setCameraCaptureOrientation(orientation) ?? -1;
+    return code == 0;
+  }
+
+  @override
   Future<bool> changeVideoConfig(RCRTCVideoConfig config) async {
     int code = await Utils.engine?.setVideoConfig(config) ?? -1;
     return code == 0;

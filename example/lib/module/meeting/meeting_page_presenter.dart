@@ -80,6 +80,11 @@ class MeetingPagePresenter extends AbstractPresenter<View, Model> implements Pre
   }
 
   @override
+  Future<bool> changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation) {
+    return model.changeCameraCaptureOrientation(orientation);
+  }
+
+  @override
   Future<bool> changeVideoConfig(RCRTCVideoConfig config) {
     return model.changeVideoConfig(config);
   }

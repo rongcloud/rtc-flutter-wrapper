@@ -51,8 +51,9 @@
                                             binaryMessenger:messenger];
         [channel setStreamHandler:self];
         view = [RCRTCIWFlutterView create];
+        
         RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
-        view.delegate = self;
+        view.textureViewDelegate = self;
         
         rotation = -1;
         width = 0;

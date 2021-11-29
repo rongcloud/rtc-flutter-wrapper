@@ -95,6 +95,13 @@ NS_ASSUME_NONNULL_BEGIN
                                             userId:(NSString *)userId
                                                tag:(NSString *)tag;
 
+/*!
+ 设置远端自定义音频前处理回调
+ */
+- (NSInteger)setRemoteCustomAudioReceivedDelegate:(id<RCRTCIWAudioFrameDelegate> _Nullable)delegate
+                                           userId:(NSString *)userId
+                                              tag:(NSString *)tag;
+
 #pragma mark - 房间
 /*!
  加入房间
@@ -836,12 +843,14 @@ NS_ASSUME_NONNULL_BEGIN
  停止远端用户自定义流数据的接收
  @param userId 远端用户Id
  @param tag 远端自定义流标签
+ @param type 远端自定义流类型
  @param mute YES: 不接收 NO: 接收
  @discussion
  停止远端用户自定义流数据的接收
  */
 - (NSInteger)muteRemoteCustomStream:(NSString *)userId
                                 tag:(NSString *)tag
+                               type:(RCRTCIWMediaType)type
                                mute:(BOOL)mute;
 
 /*!
@@ -870,21 +879,26 @@ NS_ASSUME_NONNULL_BEGIN
  加入房间后, 订阅远端用户发布的自定义流
  @param userId 远端用户UserId
  @param tag 远端自定义流标签
+ @param type 远端自定义流类型
  @discussion
  加入房间后, 订阅远端用户发布的自定义流
  */
 - (NSInteger)subscribeCustomStream:(NSString *)userId
-                               tag:(NSString *)tag;
+                               tag:(NSString *)tag
+                              type:(RCRTCIWMediaType)type
+                              tiny:(BOOL)tiny;
 
 /*!
  加入房间后, 取消订阅远端用户发布的自定义流
  @param userId 远端用户UserId
  @param tag 远端自定义流标签
+ @param type 远端自定义流类型
  @discussion
  加入房间后, 取消订阅远端用户发布的自定义流
  */
 - (NSInteger)unsubscribeCustomStream:(NSString *)userId
-                                 tag:(NSString *)tag;
+                                 tag:(NSString *)tag
+                                type:(RCRTCIWMediaType)type;
 
 #pragma mark - 跨房间连麦
 

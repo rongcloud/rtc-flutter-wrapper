@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:context_holder/context_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
@@ -59,6 +58,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     _localVideoStats.clear();
     _remoteAudioStats.clear();
     _remoteVideoStats.clear();
+    _remoteCustomAudioStats.clear();
     _remoteCustomVideoStats.clear();
 
     _networkStatsStateSetter = null;
@@ -66,6 +66,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     _localVideoStatsStateSetter = null;
     _remoteAudioStatsStateSetters.clear();
     _remoteVideoStatsStateSetters.clear();
+    _remoteCustomAudioStatsStateSetters.clear();
     _remoteCustomVideoStatsStateSetters.clear();
     super.dispose();
   }
@@ -732,7 +733,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                                         children: [
                                           CheckBoxes(
                                             'YUV数据',
-                                            enable: _yuv && !custom.subscribed,
+                                            enable: _yuv && !custom.videoSubscribed,
                                             checked: custom.yuv,
                                             onChanged: (checked) => setState(() {
                                               custom.yuv = checked;
@@ -740,12 +741,32 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                                           ),
                                           Spacer(),
                                           CheckBoxes(
-                                            '订阅',
-                                            checked: custom.subscribed,
-                                            onChanged: (subscribe) => _changeRemoteCustom(user, custom, subscribe),
+                                            '订阅视频',
+                                            enable: custom.videoPublished,
+                                            checked: custom.videoSubscribed,
+                                            onChanged: (subscribe) => _changeRemoteCustomVideo(user, custom, subscribe),
                                           ),
                                         ],
                                       ),
+                                      VerticalDivider(
+                                        width: 2.dp,
+                                        color: Colors.transparent,
+                                      ),
+                                      Row(
+                                        children: [
+                                          CheckBoxes(
+                                            '订阅音频',
+                                            enable: custom.audioPublished,
+                                            checked: custom.audioSubscribed,
+                                            onChanged: (subscribe) => _changeRemoteCustomAudio(user, custom, subscribe),
+                                          ),
+                                          Spacer(),
+                                        ],
+                                      ),
+                                      StatefulBuilder(builder: (context, setter) {
+                                        _remoteCustomAudioStatsStateSetters['${user.id}@${custom.tag}'] = setter;
+                                        return RemoteAudioStatsTable(_remoteCustomAudioStats['${user.id}@${custom.tag}']);
+                                      }),
                                       StatefulBuilder(builder: (context, setter) {
                                         _remoteCustomVideoStatsStateSetters['${user.id}@${custom.tag}'] = setter;
                                         return RemoteVideoStatsTable(_remoteCustomVideoStats['${user.id}@${custom.tag}']);
@@ -1029,11 +1050,11 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Loading.dismiss(context);
   }
 
-  void _changeRemoteCustom(UserState user, CustomState custom, bool subscribe) async {
+  void _changeRemoteCustomVideo(UserState user, CustomState custom, bool subscribe) async {
     Loading.show(context);
-    custom.subscribed = await presenter.changeRemoteCustomStatus(_roomId, user.id, custom.tag, custom.yuv, subscribe);
+    custom.videoSubscribed = await presenter.changeRemoteCustomVideoStatus(_roomId, user.id, custom.tag, custom.yuv, subscribe);
     String key = '${user.id}${custom.tag}';
-    if (custom.subscribed) {
+    if (custom.videoSubscribed) {
       if (_remoteCustoms.containsKey(key)) _remoteCustoms.remove(key);
       RCRTCView view = await RCRTCView.create(mirror: false);
       _remoteCustoms[key] = view;
@@ -1044,6 +1065,13 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
         await Utils.engine?.removeRemoteCustomStreamView(user.id, custom.tag);
       }
     }
+    setState(() {});
+    Loading.dismiss(context);
+  }
+
+  void _changeRemoteCustomAudio(UserState user, CustomState custom, bool subscribe) async {
+    Loading.show(context);
+    custom.audioSubscribed = await presenter.changeRemoteCustomAudioStatus(_roomId, user.id, custom.tag, subscribe);
     setState(() {});
     Loading.dismiss(context);
   }
@@ -1076,9 +1104,9 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
           _remotes[user.id] = view;
         }
         user.customs.forEach((custom) async {
-          if (custom.subscribed) {
+          if (custom.videoSubscribed) {
             RCRTCView view = await RCRTCView.create(mirror: false);
-            Utils.engine?.setRemoteView(user.id, view);
+            Utils.engine?.setRemoteCustomStreamView(user.id, custom.tag, view);
             _remoteCustoms['${user.id}${custom.tag}'] = view;
           }
         });
@@ -1143,8 +1171,8 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   @override
-  void onUserCustomStateChanged(String id, String tag, bool published) async {
-    if (!published) {
+  void onUserCustomStateChanged(String id, String tag, bool audio, bool video) async {
+    if (!video) {
       await Main.getInstance().disableRemoteCustomYuv(id, tag);
       String key = '$id$tag';
       if (_remoteCustoms.containsKey(key)) {
@@ -1256,13 +1284,23 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   void onLiveMixVideoStats(RCRTCRemoteVideoStats stats) {}
 
   @override
+  void onLiveMixMemberAudioStats(String userId, int volume) {}
+
+  @override
+  void onLiveMixMemberCustomAudioStats(String userId, String tag, int volume) {}
+
+  @override
   void onLocalCustomAudioStats(String tag, RCRTCLocalAudioStats stats) {}
 
   @override
   void onLocalCustomVideoStats(String tag, RCRTCLocalVideoStats stats) {}
 
   @override
-  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {}
+  void onRemoteCustomAudioStats(String roomId, String userId, String tag, RCRTCRemoteAudioStats stats) {
+    _remoteCustomAudioStatsStateSetters['$userId@$tag']?.call(() {
+      _remoteCustomAudioStats['$userId@$tag'] = stats;
+    });
+  }
 
   @override
   void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {
@@ -1286,6 +1324,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   StateSetter? _localVideoStatsStateSetter;
   Map<String, StateSetter> _remoteAudioStatsStateSetters = {};
   Map<String, StateSetter> _remoteVideoStatsStateSetters = {};
+  Map<String, StateSetter> _remoteCustomAudioStatsStateSetters = {};
   Map<String, StateSetter> _remoteCustomVideoStatsStateSetters = {};
 
   RCRTCNetworkStats? _networkStats;
@@ -1293,6 +1332,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   Map<bool, RCRTCLocalVideoStats> _localVideoStats = {};
   Map<String, RCRTCRemoteAudioStats> _remoteAudioStats = {};
   Map<String, RCRTCRemoteVideoStats> _remoteVideoStats = {};
+  Map<String, RCRTCRemoteAudioStats> _remoteCustomAudioStats = {};
   Map<String, RCRTCRemoteVideoStats> _remoteCustomVideoStats = {};
 
   LiveMix _liveMix = LiveMix();

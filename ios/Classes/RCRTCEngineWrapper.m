@@ -1094,9 +1094,11 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         NSString *uid = arguments[@"id"];
         NSString *tag = arguments[@"tag"];
+        int type = [arguments[@"type"] intValue];
         bool mute = [arguments[@"mute"] boolValue];
         code = [engine muteRemoteCustomStream:uid
                                           tag:tag
+                                         type:toMediaType(type)
                                          mute:mute];
     }
     dispatch_to_main_queue(^{
@@ -1141,8 +1143,12 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         NSString *uid = arguments[@"id"];
         NSString *tag = arguments[@"tag"];
+        int type = [arguments[@"type"] intValue];
+        bool tiny = [arguments[@"tiy"] boolValue];
         code = [engine subscribeCustomStream:uid
-                                         tag:tag];
+                                         tag:tag
+                                        type:toMediaType(type)
+                                        tiny:tiny];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -1155,8 +1161,10 @@ SingleInstanceM(Instance);
         NSDictionary *arguments = (NSDictionary *)call.arguments;
         NSString *uid = arguments[@"id"];
         NSString *tag = arguments[@"tag"];
+        int type = [arguments[@"type"] intValue];
         code = [engine unsubscribeCustomStream:uid
-                                           tag:tag];
+                                           tag:tag
+                                          type:toMediaType(type)];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -1754,11 +1762,13 @@ SingleInstanceM(Instance);
 
 - (void)onRemoteCustomStreamPublished:(NSString *)roomId
                                userId:(NSString *)userId
-                                  tag:(NSString *)tag {
+                                  tag:(NSString *)tag
+                                 type:(RCRTCIWMediaType)type {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:roomId forKey:@"rid"];
     [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
@@ -1768,11 +1778,13 @@ SingleInstanceM(Instance);
 
 - (void)onRemoteCustomStreamUnpublished:(NSString *)roomId
                                  userId:(NSString *)userId
-                                    tag:(NSString *)tag {
+                                    tag:(NSString *)tag
+                                   type:(RCRTCIWMediaType)type {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:roomId forKey:@"rid"];
     [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
@@ -1783,11 +1795,13 @@ SingleInstanceM(Instance);
 - (void)onRemoteCustomStreamStateChanged:(NSString *)roomId
                                   userId:(NSString *)userId
                                      tag:(NSString *)tag
+                                    type:(RCRTCIWMediaType)type
                                 disabled:(BOOL)disabled {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:roomId forKey:@"rid"];
     [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     [arguments setObject:@(disabled) forKey:@"disabled"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
@@ -1798,11 +1812,13 @@ SingleInstanceM(Instance);
 
 - (void)onRemoteCustomStreamFirstFrame:(NSString *)roomId
                                 userId:(NSString *)userId
-                                   tag:(NSString *)tag {
+                                   tag:(NSString *)tag
+                                  type:(RCRTCIWMediaType)type {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:roomId forKey:@"rid"];
     [arguments setObject:userId forKey:@"uid"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
@@ -1812,11 +1828,13 @@ SingleInstanceM(Instance);
 
 - (void)onCustomStreamSubscribed:(NSString *)userId
                              tag:(NSString *)tag
+                            type:(RCRTCIWMediaType)type
                             code:(NSInteger)code
                          message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:userId forKey:@"id"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:message forKey:@"message"];
     __weak typeof (channel) weak = channel;
@@ -1828,11 +1846,13 @@ SingleInstanceM(Instance);
 
 - (void)onCustomStreamUnsubscribed:(NSString *)userId
                                tag:(NSString *)tag
+                              type:(RCRTCIWMediaType)type
                               code:(NSInteger)code
                            message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:userId forKey:@"id"];
     [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@((int) type) forKey:@"type"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:message forKey:@"message"];
     __weak typeof (channel) weak = channel;
@@ -2058,6 +2078,32 @@ SingleInstanceM(Instance);
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
         [strong invokeMethod:@"stats:onLiveMixVideoStats" arguments:argument];
+    });
+}
+
+- (void)onLiveMixMemberAudioStats:(NSString *)userId
+                           volume:(NSInteger)volume {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:@(volume) forKey:@"volume"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onLiveMixMemberAudioStats" arguments:arguments];
+    });
+}
+
+- (void)onLiveMixMemberCustomAudioStats:(NSString *)userId
+                                    tag:(NSString *)tag
+                                 volume:(NSInteger)volume {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:userId forKey:@"id"];
+    [arguments setObject:tag forKey:@"tag"];
+    [arguments setObject:@(volume) forKey:@"volume"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onLiveMixMemberCustomAudioStats" arguments:arguments];
     });
 }
 

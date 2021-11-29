@@ -264,23 +264,49 @@ class HostPageModel extends AbstractModel implements Model {
   }
 
   @override
-  Future<bool> changeRemoteCustomStatus(String rid, String uid, String tag, bool yuv, bool subscribe) async {
+  Future<bool> changeRemoteCustomVideoStatus(String rid, String uid, String tag, bool yuv, bool subscribe) async {
     Completer<bool> completer = Completer();
     int code = -1;
     if (subscribe) {
-      Utils.engine?.onCustomStreamSubscribed = (String id, String tag, int code, String? message) {
+      Utils.engine?.onCustomStreamSubscribed = (String id, String tag, RCRTCMediaType type, int code, String? message) {
         Utils.engine?.onCustomStreamSubscribed = null;
         completer.complete(code != 0 ? !subscribe : subscribe);
       };
       if (yuv) Main.getInstance().enableRemoteCustomYuv(rid, uid, tag);
-      code = await Utils.engine?.subscribeCustomStream(uid, tag) ?? -1;
+      code = await Utils.engine?.subscribeCustomStream(uid, tag, RCRTCMediaType.video, false) ?? -1;
     } else {
-      Utils.engine?.onCustomStreamUnsubscribed = (String id, String tag, int code, String? message) {
+      Utils.engine?.onCustomStreamUnsubscribed = (String id, String tag, RCRTCMediaType type, int code, String? message) {
         Utils.engine?.onCustomStreamUnsubscribed = null;
         completer.complete(code != 0 ? !subscribe : subscribe);
       };
       Main.getInstance().disableRemoteCustomYuv(uid, tag);
-      code = await Utils.engine?.unsubscribeCustomStream(uid, tag) ?? -1;
+      code = await Utils.engine?.unsubscribeCustomStream(uid, tag, RCRTCMediaType.video) ?? -1;
+    }
+    if (code != 0) {
+      Utils.engine?.onCustomStreamSubscribed = null;
+      Utils.engine?.onCustomStreamUnsubscribed = null;
+      return !subscribe;
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<bool> changeRemoteCustomAudioStatus(String rid, String uid, String tag, bool subscribe) async {
+    Completer<bool> completer = Completer();
+    int code = -1;
+    if (subscribe) {
+      Utils.engine?.onCustomStreamSubscribed = (String id, String tag, RCRTCMediaType type, int code, String? message) {
+        Utils.engine?.onCustomStreamSubscribed = null;
+        completer.complete(code != 0 ? !subscribe : subscribe);
+      };
+      code = await Utils.engine?.subscribeCustomStream(uid, tag, RCRTCMediaType.audio, false) ?? -1;
+    } else {
+      Utils.engine?.onCustomStreamUnsubscribed = (String id, String tag, RCRTCMediaType type, int code, String? message) {
+        Utils.engine?.onCustomStreamUnsubscribed = null;
+        completer.complete(code != 0 ? !subscribe : subscribe);
+      };
+      Main.getInstance().disableRemoteCustomYuv(uid, tag);
+      code = await Utils.engine?.unsubscribeCustomStream(uid, tag, RCRTCMediaType.audio) ?? -1;
     }
     if (code != 0) {
       Utils.engine?.onCustomStreamSubscribed = null;

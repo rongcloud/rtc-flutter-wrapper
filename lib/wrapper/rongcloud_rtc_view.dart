@@ -116,51 +116,19 @@ class _RCRTCViewState extends State<RCRTCView> {
       case 'onSizeChanged':
         _changeSize(json);
         break;
-      case 'onRotationChanged':
-        _changeRotation(json);
-        break;
     }
   }
 
   void _changeSize(Map<dynamic, dynamic> json) {
-    rotation = json['rotation'] ?? 0;
-    if (rotation == 90 || rotation == 270) {
-      height = json['width'];
-      width = json['height'];
-    } else {
-      width = json['width'];
-      height = json['height'];
-    }
+    width = json['width'];
+    height = json['height'];
     if (mounted) setState(() {});
-  }
-
-  void _changeRotation(Map<dynamic, dynamic> json) {
-    int _rotation = json['rotation'] ?? 0;
-    bool _change = false;
-    if (_rotation == 90 || _rotation == 270) {
-      if (rotation != 90 && rotation != 270) _change = true;
-    } else {
-      if (rotation != 0 && rotation != 180) _change = true;
-    }
-    rotation = _rotation;
-    if (_change) {
-      if (rotation == 90 || rotation == 270) {
-        int temp = height;
-        height = width;
-        width = temp;
-      } else {
-        int temp = width;
-        width = height;
-        height = temp;
-      }
-      if (mounted) setState(() {});
-    }
   }
 
   late RCRTCView view;
   late StreamSubscription<dynamic> subscription;
 
-  int width = 0, height = 0, rotation = 0;
+  int width = 0, height = 0;
 
   BoxFit _fit = BoxFit.contain;
   bool _mirror = true;

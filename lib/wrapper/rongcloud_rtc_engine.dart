@@ -653,10 +653,11 @@ class RCRTCEngine {
     return code;
   }
 
-  Future<int> muteRemoteCustomStream(String userId, String tag, bool mute) async {
+  Future<int> muteRemoteCustomStream(String userId, String tag, RCRTCMediaType type, bool mute) async {
     Map<String, dynamic> arguments = {
       'id': userId,
       'tag': tag,
+      'type': type.index,
       'mute': mute,
     };
     int code = await _channel.invokeMethod('muteRemoteCustomStream', arguments) ?? -1;
@@ -682,19 +683,22 @@ class RCRTCEngine {
     return code;
   }
 
-  Future<int> subscribeCustomStream(String userId, String tag) async {
+  Future<int> subscribeCustomStream(String userId, String tag, RCRTCMediaType type, bool tiny) async {
     Map<String, dynamic> arguments = {
       'id': userId,
       'tag': tag,
+      'type': type.index,
+      'tiny': tiny,
     };
     int code = await _channel.invokeMethod('subscribeCustomStream', arguments) ?? -1;
     return code;
   }
 
-  Future<int> unsubscribeCustomStream(String userId, String tag) async {
+  Future<int> unsubscribeCustomStream(String userId, String tag, RCRTCMediaType type) async {
     Map<String, dynamic> arguments = {
       'id': userId,
       'tag': tag,
+      'type': type.index,
     };
     int code = await _channel.invokeMethod('unsubscribeCustomStream', arguments) ?? -1;
     return code;
@@ -1013,45 +1017,51 @@ class RCRTCEngine {
         String rid = arguments['rid'];
         String uid = arguments['uid'];
         String tag = arguments['tag'];
-        onRemoteCustomStreamPublished?.call(rid, uid, tag);
+        int type = arguments['type'];
+        onRemoteCustomStreamPublished?.call(rid, uid, tag, RCRTCMediaType.values[type]);
         break;
       case 'engine:onRemoteCustomStreamUnpublished':
         Map<dynamic, dynamic> arguments = call.arguments;
         String rid = arguments['rid'];
         String uid = arguments['uid'];
         String tag = arguments['tag'];
-        onRemoteCustomStreamUnpublished?.call(rid, uid, tag);
+        int type = arguments['type'];
+        onRemoteCustomStreamUnpublished?.call(rid, uid, tag, RCRTCMediaType.values[type]);
         break;
       case 'engine:onRemoteCustomStreamStateChanged':
         Map<dynamic, dynamic> arguments = call.arguments;
         String rid = arguments['rid'];
         String uid = arguments['uid'];
         String tag = arguments['tag'];
+        int type = arguments['type'];
         bool disabled = arguments['disabled'];
-        onRemoteCustomStreamStateChanged?.call(rid, uid, tag, disabled);
+        onRemoteCustomStreamStateChanged?.call(rid, uid, tag, RCRTCMediaType.values[type], disabled);
         break;
       case 'engine:onRemoteCustomStreamFirstFrame':
         Map<dynamic, dynamic> arguments = call.arguments;
         String rid = arguments['rid'];
         String uid = arguments['uid'];
         String tag = arguments['tag'];
-        onRemoteCustomStreamFirstFrame?.call(rid, uid, tag);
+        int type = arguments['type'];
+        onRemoteCustomStreamFirstFrame?.call(rid, uid, tag, RCRTCMediaType.values[type]);
         break;
       case 'engine:onCustomStreamSubscribed':
         Map<dynamic, dynamic> arguments = call.arguments;
         String id = arguments['id'];
         String tag = arguments['tag'];
+        int type = arguments['type'];
         int code = arguments['code'];
         String? message = arguments['message'];
-        onCustomStreamSubscribed?.call(id, tag, code, message);
+        onCustomStreamSubscribed?.call(id, tag, RCRTCMediaType.values[type], code, message);
         break;
       case 'engine:onCustomStreamUnsubscribed':
         Map<dynamic, dynamic> arguments = call.arguments;
         String id = arguments['id'];
         String tag = arguments['tag'];
+        int type = arguments['type'];
         int code = arguments['code'];
         String? message = arguments['message'];
-        onCustomStreamUnsubscribed?.call(id, tag, code, message);
+        onCustomStreamUnsubscribed?.call(id, tag, RCRTCMediaType.values[type], code, message);
         break;
       case 'engine:onJoinSubRoomRequested':
         Map<dynamic, dynamic> arguments = call.arguments;
@@ -1157,6 +1167,19 @@ class RCRTCEngine {
         Map<dynamic, dynamic> arguments = call.arguments;
         _statsListener?.onLiveMixVideoStats(RCRTCRemoteVideoStats.fromJson(arguments));
         break;
+      case 'stats:onLiveMixMemberAudioStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        int volume = arguments['volume'];
+        _statsListener?.onLiveMixMemberAudioStats(id, volume);
+        break;
+      case 'stats:onLiveMixMemberCustomAudioStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String id = arguments['id'];
+        String tag = arguments['tag'];
+        int volume = arguments['volume'];
+        _statsListener?.onLiveMixMemberCustomAudioStats(id, tag, volume);
+        break;
       case 'stats:onLocalCustomAudioStats':
         Map<dynamic, dynamic> arguments = call.arguments;
         String tag = arguments['tag'];
@@ -1261,15 +1284,15 @@ class RCRTCEngine {
   Function(String tag)? onCustomStreamPublishFinished;
   Function(String tag, int code, String? errMsg)? onCustomStreamUnpublished;
 
-  Function(String roomId, String userId, String tag)? onRemoteCustomStreamPublished;
-  Function(String roomId, String userId, String tag)? onRemoteCustomStreamUnpublished;
+  Function(String roomId, String userId, String tag, RCRTCMediaType type)? onRemoteCustomStreamPublished;
+  Function(String roomId, String userId, String tag, RCRTCMediaType type)? onRemoteCustomStreamUnpublished;
 
-  Function(String roomId, String userId, String tag, bool disabled)? onRemoteCustomStreamStateChanged;
+  Function(String roomId, String userId, String tag, RCRTCMediaType type, bool disabled)? onRemoteCustomStreamStateChanged;
 
-  Function(String roomId, String userId, String tag)? onRemoteCustomStreamFirstFrame;
+  Function(String roomId, String userId, String tag, RCRTCMediaType type)? onRemoteCustomStreamFirstFrame;
 
-  Function(String userId, String tag, int code, String? errMsg)? onCustomStreamSubscribed;
-  Function(String userId, String tag, int code, String? errMsg)? onCustomStreamUnsubscribed;
+  Function(String userId, String tag, RCRTCMediaType type, int code, String? errMsg)? onCustomStreamSubscribed;
+  Function(String userId, String tag, RCRTCMediaType type, int code, String? errMsg)? onCustomStreamUnsubscribed;
 
   Function(String roomId, String userId, int code, String? errMsg)? onJoinSubRoomRequested;
   Function(String roomId, String userId, int code, String? errMsg)? onJoinSubRoomRequestCanceled;

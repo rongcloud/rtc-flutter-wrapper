@@ -37,10 +37,12 @@ class Utils {
       _engine?.onUserOffline = (String roomId, String userId) {
         _users.removeWhere((user) => user.id == userId);
         onUserListChanged?.call();
+        onRemoveUserAudio?.call(userId);
       };
       _engine?.onUserLeft = (String roomId, String userId) {
         _users.removeWhere((user) => user.id == userId);
         onUserListChanged?.call();
+        onRemoveUserAudio?.call(userId);
       };
       _engine?.onRemotePublished = (String roomId, String userId, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
@@ -68,6 +70,7 @@ class Utils {
             user?.audioPublished = false;
             user?.audioSubscribed = false;
             onUserAudioStateChanged?.call(userId, false);
+            onRemoveUserAudio?.call(userId);
             break;
           case RCRTCMediaType.video:
             user?.videoPublished = false;
@@ -81,24 +84,64 @@ class Utils {
             user?.videoSubscribed = false;
             onUserAudioStateChanged?.call(userId, false);
             onUserVideoStateChanged?.call(userId, false);
+            onRemoveUserAudio?.call(userId);
             break;
         }
       };
-      _engine?.onRemoteCustomStreamPublished = (String roomId, String userId, String tag) {
+      _engine?.onRemoteCustomStreamPublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
-        user?.customs.removeWhere((custom) => custom.tag == tag);
-        user?.customs.add(CustomState(tag));
-        onUserCustomStateChanged?.call(userId, tag, true);
+        int index = user?.customs.indexWhere((custom) => custom.tag == tag) ?? -1;
+        CustomState state = index > -1 ? user!.customs[index] : CustomState(tag);
+        switch (type) {
+          case RCRTCMediaType.audio:
+            state.audioPublished = true;
+            break;
+          case RCRTCMediaType.video:
+            state.videoPublished = true;
+            break;
+          case RCRTCMediaType.audio_video:
+            state.audioPublished = true;
+            state.videoPublished = true;
+            break;
+        }
+        if (index < 0) {
+          user?.customs.add(state);
+        }
+        onUserCustomStateChanged?.call(userId, tag, state.audioPublished, state.videoPublished);
       };
-      _engine?.onRemoteCustomStreamUnpublished = (String roomId, String userId, String tag) {
+      _engine?.onRemoteCustomStreamUnpublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
-        user?.customs.removeWhere((custom) => custom.tag == tag);
-        onUserCustomStateChanged?.call(userId, tag, false);
+        int index = user?.customs.indexWhere((custom) => custom.tag == tag) ?? -1;
+        if (index < 0) return;
+        CustomState state = user!.customs[index];
+        switch (type) {
+          case RCRTCMediaType.audio:
+            state.audioPublished = false;
+            state.audioSubscribed = false;
+            onRemoveUserAudio?.call('$userId@$tag');
+            break;
+          case RCRTCMediaType.video:
+            state.videoPublished = false;
+            state.videoSubscribed = false;
+            break;
+          case RCRTCMediaType.audio_video:
+            state.audioPublished = false;
+            state.videoPublished = false;
+            state.audioSubscribed = false;
+            state.videoSubscribed = false;
+            onRemoveUserAudio?.call('$userId@$tag');
+            break;
+        }
+        if (!state.audioPublished && !state.videoPublished) {
+          user.customs.removeAt(index);
+        }
+        onUserCustomStateChanged?.call(userId, tag, state.audioPublished, state.videoPublished);
       };
     } else {
       onUserListChanged = null;
       onUserAudioStateChanged = null;
       onUserVideoStateChanged = null;
+      onUserCustomStateChanged = null;
       _engine?.onUserJoined = null;
       _engine?.onUserOffline = null;
       _engine?.onUserLeft = null;
@@ -161,9 +204,10 @@ class Utils {
   static RCRTCEngine? _engine;
 
   static Function()? onUserListChanged;
+  static Function(String id)? onRemoveUserAudio;
   static Function(String id, bool published)? onUserAudioStateChanged;
   static Function(String id, bool published)? onUserVideoStateChanged;
-  static Function(String id, String tag, bool published)? onUserCustomStateChanged;
+  static Function(String id, String tag, bool audio, bool video)? onUserCustomStateChanged;
 
   static List<UserState> _users = [];
 
