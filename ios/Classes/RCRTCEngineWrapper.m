@@ -139,9 +139,9 @@ SingleInstanceM(Instance);
 
 - (void)create:(FlutterMethodCall *)call result:(FlutterResult)result {
     if (engine == nil) {
-        if (call.arguments != nil) {
-            NSDictionary *arguments = (NSDictionary *)call.arguments;
-            NSDictionary *setup = arguments[@"setup"];
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        id setup = arguments[@"setup"];
+        if (![setup isEqual:[NSNull null]]) {
             engine = [RCRTCIWEngine create:toEngineSetup(setup)];
         } else {
             engine = [RCRTCIWEngine create];
@@ -548,6 +548,19 @@ SingleInstanceM(Instance);
         int type = [arguments[@"type"] intValue];
         bool mute = [arguments[@"mute"] boolValue];
         code = [engine muteRemoteStream:uid type:toMediaType(type) mute:mute];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)muteLiveMixStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        int type = [arguments[@"type"] intValue];
+        bool mute = [arguments[@"mute"] boolValue];
+        code = [engine muteLiveMixStream:toMediaType(type) mute:mute];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -2245,6 +2258,8 @@ SingleInstanceM(Instance);
         [self muteLocalStream:call result:result];
     } else if ([method isEqualToString:@"muteRemoteStream"]) {
         [self muteRemoteStream:call result:result];
+    } else if ([method isEqualToString:@"muteLiveMixStream"]) {
+        [self muteLiveMixStream:call result:result];
     } else if ([method isEqualToString:@"addLiveCdn"]) {
         [self addLiveCdn:call result:result];
     } else if ([method isEqualToString:@"removeLiveCdn"]) {

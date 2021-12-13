@@ -20,6 +20,12 @@
 
 @end
 
+@interface RCRTCVideoTextureView ()
+
+- (void)setSize:(CGSize)size;
+
+@end
+
 #pragma mark *************** [RCRTCView] ***************
 
 @interface RCRTCView() <FlutterTexture, FlutterStreamHandler, RCRTCVideoTextureViewDelegate> {
@@ -76,7 +82,7 @@
 - (void)destroy {
     RongRTCLogI(RongRTCLogFromLib, @"FlutterViewDestroy", RongRTCLogTaskBegin, @"self:%@", [self description]);
     RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self->view;
-    view.delegate = nil;
+    view.textureViewDelegate = nil;
     [self->view destroy];
     [channel setStreamHandler:nil];
     [registry unregisterTexture:tid];
@@ -163,6 +169,12 @@
                 RongRTCLogI(RongRTCLogFromLib, @"FlutterViewFrameSizeChanged", RongRTCLogTaskStatus, @"self:%@ has changed frame size, width:%@, height:%@, rotation:%@.", [self description], @(width), @(height), @(self->rotation));
             }
         });
+    }
+    // TODO 解决底层没调用set size bug
+    RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
+    CVPixelBufferRef pixelBufferRef = [view pixelBufferRef];
+    if (pixelBufferRef == nil) {
+        [view setSize:CGSizeMake(self->width, self->height)];
     }
 }
 

@@ -34,6 +34,24 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
         _remoteUserAudioState.remove(id);
       });
     };
+    Utils.engine?.onRemoteLiveMixUnpublished = (type) {
+      if (mounted) {
+        setState(() {
+          switch (type) {
+            case RCRTCMediaType.video:
+              _muteVideo = false;
+              break;
+            case RCRTCMediaType.audio:
+              _muteAudio = false;
+              break;
+            case RCRTCMediaType.audio_video:
+              _muteAudio = false;
+              _muteVideo = false;
+              break;
+          }
+        });
+      }
+    };
   }
 
   @override
@@ -178,6 +196,31 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
             Row(
               children: [
                 Spacer(),
+                CheckBoxes(
+                  '静音视频',
+                  checked: _muteVideo,
+                  onChanged: (checked) {
+                    _muteVideoStream();
+                  },
+                ),
+                Spacer(),
+                CheckBoxes(
+                  '静音音频',
+                  checked: _muteAudio,
+                  onChanged: (checked) {
+                    _muteAudioStream();
+                  },
+                ),
+                Spacer(),
+              ],
+            ),
+            Divider(
+              height: 5.dp,
+              color: Colors.transparent,
+            ),
+            Row(
+              children: [
+                Spacer(),
                 Button(
                   _speaker ? '扬声器' : '听筒',
                   size: 15.sp,
@@ -262,6 +305,20 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
     }
     presenter.subscribe(_type, _tiny);
     setState(() {});
+  }
+
+  void _muteAudioStream() async {
+    bool result = await presenter.mute(RCRTCMediaType.audio, !_muteAudio);
+    setState(() {
+      _muteAudio = result;
+    });
+  }
+
+  void _muteVideoStream() async {
+    bool result = await presenter.mute(RCRTCMediaType.video, !_muteVideo);
+    setState(() {
+      _muteVideo = result;
+    });
   }
 
   void _changeSpeaker() async {
@@ -360,4 +417,7 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
   RCRTCRemoteAudioStats? _remoteAudioStats;
   RCRTCRemoteVideoStats? _remoteVideoStats;
   Map<String, int> _remoteUserAudioState = {};
+
+  bool _muteAudio = false;
+  bool _muteVideo = false;
 }

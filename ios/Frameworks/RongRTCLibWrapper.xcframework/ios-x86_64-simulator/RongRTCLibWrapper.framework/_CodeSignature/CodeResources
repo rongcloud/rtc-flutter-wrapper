@@ -18,19 +18,19 @@
 		</data>
 		<key>Frameworks/RongRTCLib.framework/Info.plist</key>
 		<data>
-		V0GVsIAFfm5damSKKTBdzgQQlVQ=
+		7Xvhio/AWNB7Ce5b8HKyrnrLuys=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
 		<data>
-		+XYB/2lvCGkYp/aVp5yKtteeK2o=
+		1zBJEbcMgfe1ZhHCJeC29LsjAbE=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
 		<data>
-		GZcPQ0sDbBRQFlfEkR39yoKoAwk=
+		7ErgdtqSuh/W/KsEd5UgVT5HEOY=
 		</data>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
 		<data>
-		t1SD1Sza1jhCYp78wX6+daBcjrc=
+		196lUIX1wVPbM/RPCw7EaAIUhMs=
 		</data>
 		<key>Headers/RCRTCIWAudioFrame.h</key>
 		<data>
@@ -58,7 +58,7 @@
 		</data>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<data>
-		JdNK4stnO/tJNBBpmelr1ZZH4lo=
+		8ZkCSFjRTt1AksFHc650nLDmXjk=
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
@@ -164,44 +164,44 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			V0GVsIAFfm5damSKKTBdzgQQlVQ=
+			7Xvhio/AWNB7Ce5b8HKyrnrLuys=
 			</data>
 			<key>hash2</key>
 			<data>
-			d1+Ugr+09/ZyzSm/3Z5OPXJWxO0LHc/9CXNiLK/Civk=
+			fS9G6WRVFnptXy23qC1fIJcFT5zl6+DPu03TDe4oAck=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			+XYB/2lvCGkYp/aVp5yKtteeK2o=
+			1zBJEbcMgfe1ZhHCJeC29LsjAbE=
 			</data>
 			<key>hash2</key>
 			<data>
-			W4X1VCM+QfpTg1xzxILb4Jz3nz9t4X67VoTE/FTo5n0=
+			X+vACsmPiTnJsVMfAnhWrO6xAZDtqk7Oh8Z3XP5a8+Y=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			GZcPQ0sDbBRQFlfEkR39yoKoAwk=
+			7ErgdtqSuh/W/KsEd5UgVT5HEOY=
 			</data>
 			<key>hash2</key>
 			<data>
-			1l+PABDeJWkqBej4CIj3V5dewRiW19Ts+mnjQVqSUy4=
+			EQjGSvuhST991kEX2VFEnT+5YP1hgHZLPB+nANDXfcw=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			t1SD1Sza1jhCYp78wX6+daBcjrc=
+			196lUIX1wVPbM/RPCw7EaAIUhMs=
 			</data>
 			<key>hash2</key>
 			<data>
-			gCMBb6rmrVo727LKkB1772t2cTv4fHC+OG4Lp7sxcgQ=
+			MsVc6AEZrppzlDTenGbH0+NDl1ltz8zH+y5g8DU/EFk=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWAudioFrame.h</key>
@@ -274,11 +274,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			JdNK4stnO/tJNBBpmelr1ZZH4lo=
+			8ZkCSFjRTt1AksFHc650nLDmXjk=
 			</data>
 			<key>hash2</key>
 			<data>
-			vYZ5yGGWtsUe4flI25lRdcBrKUFZGSNfiZ393ZTnkJQ=
+			U+FtvH4CVaQk2fWMquxpBvldWMLw5EFWXX4N0TyJSSc=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>

@@ -44,6 +44,15 @@ public class RemoteYuvVideoFrameListener implements RCRTCIWOnReadableVideoFrameL
     @Override
     public void onVideoFrame(RCRTCIWVideoFrame frame) {
         try {
+            float zoomWidth = frame.getWidth() / 1280.0f;
+            float zoomHeight = frame.getHeight() / 720.0f;
+            int tagWidth = Math.round(240 * zoomWidth);
+            int tagHeight = Math.round(60 * zoomHeight);;
+            int tagYLength = tagWidth * tagHeight;
+            int tagULength = tagYLength >> 2;
+            int tagVLength = tagULength;
+            byte[] tagData = new byte[tagYLength + tagULength + tagVLength];
+
             if (frame.getType() == RCRTCIWVideoFrame.Type.BUFFER_I420) {
                 final byte[] y = frame.getY();
                 final byte[] u = frame.getU();
@@ -160,12 +169,6 @@ public class RemoteYuvVideoFrameListener implements RCRTCIWOnReadableVideoFrameL
 
     private final String userId;
     private final String tag;
-    private final int tagWidth = 240;
-    private final int tagHeight = 60;
-    private final int tagYLength = tagWidth * tagHeight;
-    private final int tagULength = tagYLength >> 2;
-    private final int tagVLength = tagULength;
-    private final byte[] tagData = new byte[tagYLength + tagULength + tagVLength];
     private FileOutputStream yuvOutputStream;
     private FileOutputStream yuvTagOutputStream;
     private FileWriter timeWriter;

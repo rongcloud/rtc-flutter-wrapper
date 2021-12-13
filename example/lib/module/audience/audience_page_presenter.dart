@@ -35,6 +35,11 @@ class AudiencePagePresenter extends AbstractPresenter<View, Model> implements Pr
   }
 
   @override
+  Future<bool> mute(RCRTCMediaType type, bool mute) {
+    return model.mute(type, mute);
+  }
+
+  @override
   Future<bool> changeSpeaker(bool enable) {
     return model.changeSpeaker(enable);
   }

@@ -18,6 +18,8 @@ abstract class Model implements IModel {
     StateCallback error,
   );
 
+  Future<bool> mute(RCRTCMediaType type, bool mute);
+
   Future<bool> changeSpeaker(bool enable);
 
   Future<int> exit();
@@ -28,6 +30,8 @@ abstract class Presenter implements IPresenter {
     RCRTCMediaType type,
     bool tiny,
   );
+
+  Future<bool> mute(RCRTCMediaType type, bool mute);
 
   Future<bool> changeSpeaker(bool enable);
 

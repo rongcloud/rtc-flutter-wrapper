@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -44,6 +45,11 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     createView();
 
     Utils.engine?.setStatsListener(this);
+    // 测试音乐聊天室模式
+    RCRTCAudioConfig config = RCRTCAudioConfig.create(
+      scenario: RCRTCAudioScenario.music_chatroom,
+    );
+    Utils.engine?.setAudioConfig(config);
   }
 
   void createView() async {
@@ -210,14 +216,16 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
                                   size: 15.sp,
                                   callback: () => _changeSpeaker(),
                                 ),
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    isDense: true,
-                                    value: _config.orientation,
-                                    items: _cameraCaptureOrientations(),
-                                    onChanged: (dynamic orientation) => _changeCameraCaptureOrientation(orientation),
-                                  ),
-                                ),
+                                Platform.isAndroid
+                                    ? Container()
+                                    : DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                          isDense: true,
+                                          value: _config.orientation,
+                                          items: _cameraCaptureOrientations(),
+                                          onChanged: (dynamic orientation) => _changeCameraCaptureOrientation(orientation),
+                                        ),
+                                      ),
                               ],
                             ),
                             Row(
@@ -809,6 +817,7 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
 
   @override
   void onLocalAudioStats(RCRTCLocalAudioStats stats) {
+    print('onLocalAudioStats volume = ${stats.volume}');
     _localAudioStatsStateSetter?.call(() {
       _localAudioStats = stats;
     });

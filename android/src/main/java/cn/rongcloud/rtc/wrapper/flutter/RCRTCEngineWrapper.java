@@ -229,6 +229,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             case "muteRemoteStream":
                 muteRemoteStream(call, result);
                 break;
+            case "muteLiveMixStream":
+                muteLiveMixStream(call, result);
+                break;
             case "addLiveCdn":
                 addLiveCdn(call, result);
                 break;
@@ -771,6 +774,18 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             Boolean mute = call.argument("mute");
             assert (mute != null);
             code = engine.muteRemoteStream(id, ArgumentAdapter.toMediaType(type), mute);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void muteLiveMixStream(@NonNull MethodCall call, @NonNull Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer type = call.argument("type");
+            assert (type != null);
+            Boolean mute = call.argument("mute");
+            assert (mute != null);
+            code = engine.muteLiveMixStream(ArgumentAdapter.toMediaType(type), mute);
         }
         MainThreadPoster.success(result, code);
     }

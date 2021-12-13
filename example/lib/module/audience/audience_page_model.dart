@@ -44,7 +44,16 @@ class AudiencePageModel extends AbstractModel implements Model {
   }
 
   @override
+  Future<bool> mute(RCRTCMediaType type, bool mute) async {
+    int code = await Utils.engine?.muteLiveMixStream(type, mute) ?? -1;
+    if (code != 0) return !mute;
+    return mute;
+  }
+
+  @override
   Future<bool> changeSpeaker(bool enable) async {
+    int code = await Utils.engine?.enableSpeaker(enable) ?? -1;
+    if (code != 0) return !enable;
     return enable;
   }
 

@@ -179,9 +179,12 @@ final class ArgumentAdapter {
         assert (quality != null);
         Integer scenario = (Integer) config.get("scenario");
         assert (scenario != null);
+        Integer recordingVolume = (Integer) config.get("recordingVolume");
+        assert (recordingVolume != null);
         return RCRTCIWAudioConfig.create()
                 .setQuality(toAudioQuality(quality))
-                .setScenario(toAudioScenario(scenario));
+                .setScenario(toAudioScenario(scenario))
+                .setRecordingVolume(recordingVolume);
     }
 
     static RCRTCIWVideoConfig toVideoConfig(@NonNull HashMap<String, Object> config) {

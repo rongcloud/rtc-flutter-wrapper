@@ -18,8 +18,8 @@ const List<String> FPSStrings = [
 
 const List<String> ResolutionStrings = [
   '144x176',
-  '144x256',
   '180x180',
+  '144x256',
   '180x240',
   '180x320',
   '240x240',
@@ -29,8 +29,8 @@ const List<String> ResolutionStrings = [
   '360x640',
   '480x480',
   '480x640',
-  '480x848',
   '480x720',
+  '480x848',
   '720x960',
   '720x1280',
   '1080x1920',

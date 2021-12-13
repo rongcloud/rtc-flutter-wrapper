@@ -79,8 +79,8 @@ extension RCRTCVideoFpsExtension on RCRTCVideoFps {
 
 enum RCRTCVideoResolution {
   resolution_144_176,
-  resolution_144_256,
   resolution_180_180,
+  resolution_144_256,
   resolution_180_240,
   resolution_180_320,
   resolution_240_240,
@@ -90,8 +90,8 @@ enum RCRTCVideoResolution {
   resolution_360_640,
   resolution_480_480,
   resolution_480_640,
-  resolution_480_848,
   resolution_480_720,
+  resolution_480_848,
   resolution_720_960,
   resolution_720_1280,
   resolution_1080_1920,

@@ -5,6 +5,9 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://maven.rongcloud.cn/repository/maven-releases/"
+        }
     }
 
     dependencies {
@@ -16,6 +19,9 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://maven.rongcloud.cn/repository/maven-releases/"
+        }
     }
 }
 

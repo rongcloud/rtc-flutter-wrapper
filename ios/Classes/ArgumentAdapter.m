@@ -122,9 +122,11 @@ RCRTCIWRoomSetup *toRoomSetup(NSDictionary *arguments) {
 RCRTCIWAudioConfig *toAudioConfig(NSDictionary *arguments) {
     int quality = [arguments[@"quality"] intValue];
     int scenario = [arguments[@"scenario"] intValue];
+    int recordingVolume = [arguments[@"recordingVolume"] intValue];
     RCRTCIWAudioConfig *config = [[RCRTCIWAudioConfig alloc] init];
     config.quality = toAudioQuality(quality);
     config.scenario = toAudioScenario(scenario);
+    config.recordingVolume = recordingVolume;
     return config;
 }
 

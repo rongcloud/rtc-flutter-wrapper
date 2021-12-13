@@ -419,6 +419,16 @@ NS_ASSUME_NONNULL_BEGIN
                          type:(RCRTCIWMediaType)type
                          mute:(BOOL)mute;
 
+/*!
+ 停止合流音视频数据的接收
+ @param type 媒体类型
+ @param mute YES: 不接收 NO: 接收
+ @discussion
+ 停止合流音视频数据的接收
+ */
+- (NSInteger)muteLiveMixStream:(RCRTCIWMediaType)type
+                          mute:(BOOL)mute;
+
 
 #pragma mark - 直播旁路推流设置
 /*!

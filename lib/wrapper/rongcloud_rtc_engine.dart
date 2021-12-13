@@ -303,6 +303,15 @@ class RCRTCEngine {
     return code;
   }
 
+  Future<int> muteLiveMixStream(RCRTCMediaType type, bool mute) async {
+    Map<String, dynamic> arguments = {
+      'type': type.index,
+      'mute': mute,
+    };
+    int code = await _channel.invokeMethod('muteLiveMixStream', arguments) ?? -1;
+    return code;
+  }
+
   Future<int> addLiveCdn(String url) async {
     int code = await _channel.invokeMethod('addLiveCdn', url) ?? -1;
     return code;
