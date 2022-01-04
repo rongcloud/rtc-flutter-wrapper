@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.rongcloud.rtc.wrapper.RCRTCIWEngine;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioDeviceType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCamera;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalVideoStats;
@@ -20,6 +21,7 @@ import cn.rongcloud.rtc.wrapper.constants.RCRTCIWMediaType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
+import cn.rongcloud.rtc.wrapper.listener.IRCRTCIWAudioRouteingListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableAudioFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableVideoFrameListener;
@@ -120,6 +122,30 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         int code = -1;
         if (engine != null) {
             code = engine.setRemoteCustomVideoProcessedListener(userId, tag, listener);
+        }
+        return code;
+    }
+
+    public int startAudioRouteing(IRCRTCIWAudioRouteingListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.startAudioRouteing(this.context, listener);
+        }
+        return code;
+    }
+
+    public int resetAudioRouteingState() {
+        int code = -1;
+        if (engine != null) {
+            code = engine.resetAudioRouteingState();
+        }
+        return code;
+    }
+
+    public int stopAudioRouteing() {
+        int code = -1;
+        if (engine != null) {
+            code = engine.stopAudioRouteing();
         }
         return code;
     }

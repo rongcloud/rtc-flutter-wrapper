@@ -44,6 +44,10 @@
 		<data>
 		ulZpVOIOvdr+2GW6N0tnZE48Rlw=
 		</data>
+		<key>Headers/RCRTCIWFlutterView.h</key>
+		<data>
+		vvGM28c80j7ESGmff4GGAoHi9Fg=
+		</data>
 		<key>Headers/RCRTCIWLocalAudioStats.h</key>
 		<data>
 		5oPDpkC3WHBcDplPGbLFDRwS9eE=
@@ -90,7 +94,7 @@
 		</data>
 		<key>Headers/RongRTCLibWrapper.h</key>
 		<data>
-		YlH+RAu5sQONjl+9XDUvBnMwHeg=
+		Tv7hCzzOgnB7mGaWugsG92DGbHw=
 		</data>
 		<key>Info.plist</key>
 		<data>
@@ -211,6 +215,17 @@
 			<key>hash2</key>
 			<data>
 			UoTwq1xy/eUFV9LR7kUrV907Y8magk/C4paZ3vVMD9g=
+			</data>
+		</dict>
+		<key>Headers/RCRTCIWFlutterView.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			vvGM28c80j7ESGmff4GGAoHi9Fg=
+			</data>
+			<key>hash2</key>
+			<data>
+			Ssi+vbifV+uT3kvVhgwTr6eUMaSaTvpEJKJxxu/fgD0=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWLocalAudioStats.h</key>
@@ -338,11 +353,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			YlH+RAu5sQONjl+9XDUvBnMwHeg=
+			Tv7hCzzOgnB7mGaWugsG92DGbHw=
 			</data>
 			<key>hash2</key>
 			<data>
-			UN9u4vgLrJVaQmTOvJDovQGfnQwvs6EZP787iphcJSE=
+			82HXsky80sguWBr3MflwCKwV7PRXrWrs9i4xE0hBfos=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

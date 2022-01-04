@@ -79,7 +79,6 @@
     CFRelease(videoInfo);
     CVPixelBufferUnlockBaseAddress(pixelBuff, 0);
     
-    CFAutorelease(processedSampleBuffer);
     return processedSampleBuffer;
 }
 

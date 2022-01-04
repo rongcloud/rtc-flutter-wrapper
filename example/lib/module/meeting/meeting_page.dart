@@ -44,12 +44,16 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
 
     createView();
 
+    if (Platform.isAndroid) {
+      Main.getInstance().startAudioRouteing();
+    }
+
     Utils.engine?.setStatsListener(this);
     // 测试音乐聊天室模式
-    RCRTCAudioConfig config = RCRTCAudioConfig.create(
-      scenario: RCRTCAudioScenario.music_chatroom,
-    );
-    Utils.engine?.setAudioConfig(config);
+    // RCRTCAudioConfig config = RCRTCAudioConfig.create(
+    //   scenario: RCRTCAudioScenario.music_chatroom,
+    // );
+    // Utils.engine?.setAudioConfig(config);
   }
 
   void createView() async {
@@ -77,6 +81,9 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
     _remoteVideoStatsStateSetters.clear();
 
     Main.getInstance().closeBeauty();
+    if (Platform.isAndroid) {
+      Main.getInstance().stopAudioRouteing();
+    }
     super.dispose();
   }
 
@@ -663,6 +670,10 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
       ));
     });
     return items;
+  }
+
+  void _resetAudioRouteing() async {
+    await Main.getInstance().resetAudioRouteing();
   }
 
   void _changeCameraCaptureOrientation(RCRTCCameraCaptureOrientation orientation) async {

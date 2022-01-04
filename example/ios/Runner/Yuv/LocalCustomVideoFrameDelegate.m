@@ -66,7 +66,7 @@
     size_t height = CVPixelBufferGetHeight(pixelBuffer);
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     long current = (long) ([[NSDate date] timeIntervalSince1970] * 1000);
-    NSString *data = [NSString stringWithFormat:@",%zd,%ld,%ld,%ld", self.frameCount, width, height, current];
+    NSString *data = [NSString stringWithFormat:@",%zd,%ld,%ld,%ld", self.frameCount, current, width, height];
     [self.timeWriter writeData:[data dataUsingEncoding:NSUTF8StringEncoding]];
     return sampleBuffer;
 }

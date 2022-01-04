@@ -119,6 +119,18 @@ class Main {
     return await _channel.invokeMethod('writeReceiveVideoBitrate', arguments);
   }
 
+  Future<void> startAudioRouteing() async {
+    return await _channel.invokeMethod('startAudioRouteing');
+  }
+
+  Future<void> stopAudioRouteing() async {
+    return await _channel.invokeMethod('stopAudioRouteing');
+  }
+
+  Future<void> resetAudioRouteing() async {
+    return await _channel.invokeMethod('resetAudioRouteing');
+  }
+
   static Main? _instance;
 
   static const MethodChannel _channel = MethodChannel('cn.rongcloud.rtc.flutter.demo');

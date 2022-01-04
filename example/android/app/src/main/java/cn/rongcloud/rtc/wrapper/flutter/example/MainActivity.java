@@ -1,6 +1,7 @@
 package cn.rongcloud.rtc.wrapper.flutter.example;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import java.util.HashMap;
 
 import cn.rongcloud.rtc.wrapper.flutter.RCRTCEngineWrapper;
+import cn.rongcloud.rtc.wrapper.flutter.example.audio.AudioRouteingListener;
 import cn.rongcloud.rtc.wrapper.flutter.example.beauty.BeautyVideoOutputFrameListener;
 import cn.rongcloud.rtc.wrapper.flutter.example.utils.UIThreadHandler;
 import cn.rongcloud.rtc.wrapper.flutter.example.yuv.LocalYuvVideoFrameListener;
@@ -24,10 +26,12 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class MainActivity extends FlutterActivity implements MethodChannel.MethodCallHandler {
 
+    private static Context context;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        context = getApplicationContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
@@ -63,6 +67,10 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
     public void cleanUpFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.cleanUpFlutterEngine(flutterEngine);
         release();
+    }
+
+    public static Context getMainContext() {
+        return context;
     }
 
     private void init(BinaryMessenger messenger) {
@@ -112,6 +120,18 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
                 break;
             case "writeReceiveVideoBitrate":
                 writeReceiveVideoBitrate(call);
+                UIThreadHandler.success(result, null);
+                break;
+            case "startAudioRouteing":
+                startAudioRouteing();
+                UIThreadHandler.success(result, null);
+                break;
+            case "stopAudioRouteing":
+                stopAudioRouteing();
+                UIThreadHandler.success(result, null);
+                break;
+            case "resetAudioRouteing":
+                resetAudioRouteing();
                 UIThreadHandler.success(result, null);
                 break;
         }
@@ -206,8 +226,28 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
         }
     }
 
+    private void startAudioRouteing() {
+        if (audioRouteingListener == null) {
+            audioRouteingListener = new AudioRouteingListener();
+        }
+        RCRTCEngineWrapper.getInstance().startAudioRouteing(audioRouteingListener);
+    }
+
+    private void stopAudioRouteing() {
+        RCRTCEngineWrapper.getInstance().stopAudioRouteing();
+        if (audioRouteingListener != null) {
+            audioRouteingListener = null;
+        }
+    }
+
+    private void resetAudioRouteing() {
+        Toast.makeText(getMainContext(),"重置成功",Toast.LENGTH_SHORT).show();
+        RCRTCEngineWrapper.getInstance().resetAudioRouteingState();
+    }
+
     private MethodChannel channel;
     private BeautyVideoOutputFrameListener beautyVideoOutputFrameListener;
+    private AudioRouteingListener audioRouteingListener;
     private LocalYuvVideoFrameListener localYuvVideoFrameListener;
     private final HashMap<String, RemoteYuvVideoFrameListener> remoteYuvVideoFrameListeners = new HashMap<>();
 }

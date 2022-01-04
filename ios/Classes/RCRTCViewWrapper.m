@@ -8,29 +8,26 @@
 #import "RCRTCViewWrapper.h"
 
 #import <RongRTCLib/RongRTCLib.h>
+#import <RongRTCLibWrapper/RCRTCIWFlutterView.h>
 
 #import "MainThreadPoster.h"
 #import "RCRTCLogUtility.h"
 
-@interface RCRTCIWFlutterView
+@interface RCRTCIWFlutterView ()
 
 + (RCRTCIWFlutterView *)create;
 
-- (void)destroy;
-
-@end
-
-@interface RCRTCVideoTextureView ()
-
+- (CVPixelBufferRef)pixelBufferRef;
 - (void)setSize:(CGSize)size;
+- (void)destroy;
 
 @end
 
 #pragma mark *************** [RCRTCView] ***************
 
-@interface RCRTCView() <FlutterTexture, FlutterStreamHandler, RCRTCVideoTextureViewDelegate> {
+@interface RCRTCView() <FlutterTexture, FlutterStreamHandler, RCRTCIWFlutterViewDelegate> {
     NSObject<FlutterTextureRegistry> *registry;
-    NSInteger tid;
+    int64_t tid;
     FlutterEventChannel *channel;
     RCRTCIWFlutterView *view;
     FlutterEventSink sink;
@@ -53,12 +50,10 @@
     if (self) {
         self->registry = registry;
         tid = [registry registerTexture:self];
-        channel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"cn.rongcloud.rtc.flutter/view:%ld", tid]
+        channel = [FlutterEventChannel eventChannelWithName:[NSString stringWithFormat:@"cn.rongcloud.rtc.flutter/view:%lld", tid]
                                             binaryMessenger:messenger];
         [channel setStreamHandler:self];
         view = [RCRTCIWFlutterView create];
-        
-        RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
         view.textureViewDelegate = self;
         
         rotation = -1;
@@ -71,7 +66,7 @@
     return self;
 }
 
-- (NSInteger)textureId {
+- (int64_t)textureId {
     return tid;
 }
 
@@ -81,7 +76,6 @@
 
 - (void)destroy {
     RongRTCLogI(RongRTCLogFromLib, @"FlutterViewDestroy", RongRTCLogTaskBegin, @"self:%@", [self description]);
-    RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self->view;
     view.textureViewDelegate = nil;
     [self->view destroy];
     [channel setStreamHandler:nil];
@@ -94,7 +88,6 @@
     if (!pixelCopyed) {
         RongRTCLogI(RongRTCLogFromLib, @"FlutterViewCopyPixelBuffer", RongRTCLogTaskBegin, @"self:%@ start copy pixel buffer.", [self description]);
     }
-    RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
     CVPixelBufferRef pixelBufferRef = [view pixelBufferRef];
     if (pixelBufferRef != nil) {
         CVBufferRetain(pixelBufferRef);
@@ -171,7 +164,6 @@
         });
     }
     // TODO 解决底层没调用set size bug
-    RCRTCVideoTextureView *view = (RCRTCVideoTextureView *) self.view;
     CVPixelBufferRef pixelBufferRef = [view pixelBufferRef];
     if (pixelBufferRef == nil) {
         [view setSize:CGSizeMake(self->width, self->height)];
@@ -245,12 +237,12 @@ SingleInstanceM(Instance);
 
 - (void)create:(FlutterResult)result {
     RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskBegin, @"");
-    NSInteger code = -1;
+    int64_t code = -1;
     RCRTCView *view = [[RCRTCView alloc] initWithTextureRegistry:registry
                                                        messenger:messenger];
     RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskStatus, @"view:%@", [view description]);
     code = [view textureId];
-    [views setObject:view forKey:[NSNumber numberWithInteger:code]];
+    [views setObject:view forKey:[NSNumber numberWithLongLong:code]];
     dispatch_to_main_queue(^{
         result(@(code));
         RongRTCLogI(RongRTCLogFromLib, @"FlutterViewManagerCallMethodCreate", RongRTCLogTaskResponse, @"view id:%@", @(code));
