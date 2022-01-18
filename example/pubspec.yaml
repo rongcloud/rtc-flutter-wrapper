@@ -16,7 +16,7 @@ dependencies:
   shared_preferences: 2.0.0
   permission_handler: 8.0.0
   flutter_screenutil: 5.0.0
-  wakelock: 0.4.0
+  wakelock: 0.6.0+1
   handy_toast: 0.0.4
   context_holder: 0.0.5
   leak_detector: 1.0.1+3

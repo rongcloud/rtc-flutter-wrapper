@@ -6,4 +6,6 @@
 
 build/
 
-.idea/
+**/.idea/
+
+**/pubspec.lock

@@ -302,14 +302,14 @@ packages:
       name: rongcloud_im_plugin
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "5.1.7"
+    version: "5.1.7+2"
   rongcloud_rtc_wrapper_plugin:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "5.1.5"
+    version: "5.1.5+1"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -468,28 +468,35 @@ packages:
       name: wakelock
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.4.0"
+    version: "0.6.0+1"
   wakelock_macos:
     dependency: transitive
     description:
       name: wakelock_macos
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.0+1"
+    version: "0.4.0"
   wakelock_platform_interface:
     dependency: transitive
     description:
       name: wakelock_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.2.1+1"
+    version: "0.3.0"
   wakelock_web:
     dependency: transitive
     description:
       name: wakelock_web
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.2.0+1"
+    version: "0.4.0"
+  wakelock_windows:
+    dependency: transitive
+    description:
+      name: wakelock_windows
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.0"
   wechat_assets_picker:
     dependency: "direct main"
     description:
