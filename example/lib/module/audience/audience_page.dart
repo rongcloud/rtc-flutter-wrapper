@@ -233,6 +233,21 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
               height: 5.dp,
               color: Colors.transparent,
             ),
+            Row(
+              children: [
+                Spacer(),
+                Button(
+                  'Reset View',
+                  size: 15.sp,
+                  callback: () => _resetView(),
+                ),
+                Spacer(),
+              ],
+            ),
+            Divider(
+              height: 5.dp,
+              color: Colors.transparent,
+            ),
             StatefulBuilder(builder: (context, setter) {
               _remoteAudioStatsStateSetter = setter;
               return RemoteAudioStatsTable(_remoteAudioStats);
@@ -326,6 +341,19 @@ class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, Audien
     setState(() {
       _speaker = result;
     });
+  }
+
+  void _resetView() async {
+    BoxFit? fit = _host?.fit;
+    bool? mirror = _host?.mirror;
+    _host = null;
+    await Utils.engine?.removeLiveMixView();
+    _host = await RCRTCView.create(
+      fit: fit ?? BoxFit.contain,
+      mirror: mirror ?? false,
+    );
+    if (_host != null) await Utils.engine?.setLiveMixView(_host!);
+    setState(() {});
   }
 
   Future<bool> _exit() async {

@@ -712,6 +712,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onSubRoomDisband:(NSString *)roomId
                   userId:(NSString *)userId;
 
+#pragma mark - 角色切换回调
+
+- (void)onLiveRoleSwitched:(RCRTCIWRole)current
+                      code:(NSInteger)code
+                   message:(NSString *)errMsg;
+
+- (void)onRemoteLiveRoleSwitched:(NSString *)roomId
+                          userId:(NSString *)userId
+                            role:(RCRTCIWRole)role;
+
 @end
 
 NS_ASSUME_NONNULL_END

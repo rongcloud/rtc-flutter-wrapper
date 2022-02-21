@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
@@ -37,7 +38,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'RTC Flutter Demo',
+          '测试专用DEMO',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16.sp,
@@ -58,9 +59,86 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
         padding: EdgeInsets.all(20.dp),
         child: Column(
           children: [
+            Row(
+              children: [
+                DropdownButton(
+                  hint: Text('从缓存用户中选择'),
+                  items: _buildUserItems(),
+                  onChanged: (dynamic user) {
+                    _keyInputController.text = user.key;
+                    _navigateInputController.text = user.navigate;
+                    _fileInputController.text = user.file;
+                    _mediaInputController.text = user.media;
+                    _tokenInputController.text = user.token;
+                  },
+                ),
+                Spacer(),
+                Button(
+                  '清空',
+                  callback: () {
+                    presenter.clear();
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+            Divider(
+              height: 15.dp,
+              color: Colors.transparent,
+            ),
             InputBox(
-              hint: 'Input a user name.',
-              controller: _userInputController,
+              hint: 'App Key',
+              controller: _keyInputController,
+              formatter: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z]')),
+              ],
+            ),
+            Divider(
+              height: 15.dp,
+              color: Colors.transparent,
+            ),
+            InputBox(
+              hint: 'Navigate Url',
+              controller: _navigateInputController,
+              formatter: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\w\-\/\/\.:]')),
+              ],
+            ),
+            Divider(
+              height: 15.dp,
+              color: Colors.transparent,
+            ),
+            InputBox(
+              hint: 'File Url',
+              controller: _fileInputController,
+              formatter: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\w\-\/\/\.:]')),
+              ],
+            ),
+            Divider(
+              height: 15.dp,
+              color: Colors.transparent,
+            ),
+            InputBox(
+              hint: 'Media Url',
+              controller: _mediaInputController,
+              formatter: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\w\-\/\/\.:]')),
+              ],
+            ),
+            Divider(
+              height: 15.dp,
+              color: Colors.transparent,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: InputBox(
+                    hint: 'Token',
+                    controller: _tokenInputController,
+                  ),
+                ),
+              ],
             ),
             Divider(
               height: 15.dp,
@@ -73,7 +151,6 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
                   _connected ? '断开链接' : '链接',
                   callback: () => _connected ? _disconnect() : _connect(),
                 ),
-                Spacer(),
               ],
             ),
             _connected
@@ -153,6 +230,17 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
                                   )
                                 : Container(),
                             _role != RCRTCRole.live_audience ? Spacer() : Container(),
+                            _role == RCRTCRole.live_broadcaster
+                                ? CheckBoxes(
+                                    '保存YUV数据',
+                                    checked: _yuv,
+                                    onChanged: (checked) {
+                                      setState(() {
+                                        _yuv = checked;
+                                      });
+                                    },
+                                  )
+                                : Container(),
                           ],
                         ),
                         Divider(
@@ -187,10 +275,10 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
         'Media Server:${GlobalConfig.mediaServer.isEmpty ? '自动获取' : GlobalConfig.mediaServer}\n';
     if (_connected)
       info += '当前使用: \n'
-          'App Key:${DefaultData.user!.key}\n'
-          'Nav Server:${DefaultData.user!.navigate}\n'
-          'File Server:${DefaultData.user!.file}\n'
-          'Media Server:${DefaultData.user!.media!.isEmpty ? '自动获取' : DefaultData.user!.media}\n';
+          'App Key:${DefaultData.user?.key}\n'
+          'Nav Server:${DefaultData.user?.navigate}\n'
+          'File Server:${DefaultData.user?.file}\n'
+          'Media Server:${DefaultData.user?.media?.isEmpty ?? true ? '自动获取' : DefaultData.user?.media}\n';
     showDialog(
       context: context,
       builder: (context) {
@@ -212,6 +300,24 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     );
   }
 
+  List<DropdownMenuItem<User>> _buildUserItems() {
+    List<DropdownMenuItem<User>> items = [];
+    DefaultData.users.forEach((user) {
+      items.add(DropdownMenuItem(
+        value: user,
+        child: Text(
+          '${user.key}-${user.id}',
+          style: TextStyle(
+            fontSize: 10.sp,
+            color: Colors.black,
+            decoration: TextDecoration.none,
+          ),
+        ),
+      ));
+    });
+    return items;
+  }
+
   void _disconnect() {
     presenter.disconnect();
     setState(() {
@@ -222,12 +328,16 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
   void _connect() {
     FocusScope.of(context).requestFocus(FocusNode());
 
-    String name = _userInputController.text;
+    String key = _keyInputController.text;
+    String navigate = _navigateInputController.text;
+    String file = _fileInputController.text;
+    String media = _mediaInputController.text;
+    String token = _tokenInputController.text;
 
-    if (name.isEmpty) return 'User Name Should not be null!'.toast();
+    if (token.isEmpty) return 'Token Should not be null!'.toast();
 
     Loading.show(context);
-    presenter.login(name);
+    presenter.connect(key, navigate, file, media, token);
   }
 
   String _getHint() {
@@ -318,11 +428,11 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     if (info.isEmpty) return '${_getHint()} should not be null!'.toast();
     Loading.show(context);
     RCRTCMediaType type = _role == RCRTCRole.live_broadcaster ? _type : RCRTCMediaType.audio_video;
-    presenter.action(info, type, _role, _config.enableTinyStream, false, _srtp);
+    presenter.action(info, type, _role, _config.enableTinyStream, _yuv, _srtp);
   }
 
   @override
-  void onConnected(String? id) {
+  void onConnected(String id) {
     Loading.dismiss(context);
     'IM Connected.'.toast();
     setState(() {
@@ -370,6 +480,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     Map<String, dynamic> arguments = {
       'id': id,
       'config': _config.toJson(),
+      'yuv': _yuv,
     };
     Navigator.pushNamed(
       context,
@@ -391,14 +502,20 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     '${_getAction()}失败, Code = $code, Info = $info'.toast();
   }
 
-  TextEditingController _userInputController = TextEditingController();
+  TextEditingController _keyInputController = TextEditingController();
+  TextEditingController _navigateInputController = TextEditingController();
+  TextEditingController _fileInputController = TextEditingController();
+  TextEditingController _mediaInputController = TextEditingController();
+  TextEditingController _tokenInputController = TextEditingController();
   TextEditingController _inputController = TextEditingController();
 
   bool _connected = false;
-  RCRTCRole _role = RCRTCRole.meeting_member;
   RCRTCMediaType _type = RCRTCMediaType.audio_video;
+  RCRTCRole _role = RCRTCRole.meeting_member;
 
   Config _config = Config.config();
+
+  bool _yuv = false;
 
   bool _srtp = false;
 }

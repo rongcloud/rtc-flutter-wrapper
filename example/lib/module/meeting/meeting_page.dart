@@ -114,11 +114,14 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
             ),
           ],
         ),
-        body: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: constraints.copyWith(
+                  minHeight: constraints.maxHeight,
+                  maxHeight: double.infinity,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
@@ -388,159 +391,159 @@ class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingP
                       _localVideoStatsStateSetter = setter;
                       return LocalVideoStatsTable(_localVideoStats);
                     }),
-                  ],
-                ),
-              ),
-              Divider(
-                height: 10.dp,
-                color: Colors.black,
-              ),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: Utils.users.length,
-                  separatorBuilder: (context, index) {
-                    return Divider(
-                      height: 5.dp,
-                      color: Colors.transparent,
-                    );
-                  },
-                  itemBuilder: (context, index) {
-                    UserState user = Utils.users[index];
-                    return Row(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 200.dp,
-                          height: 160.dp,
-                          color: Colors.blue,
-                          child: Stack(
-                            children: [
-                              _remotes[user.id] ?? Container(),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    top: 5.dp,
-                                  ),
-                                  child: Text(
-                                    '${user.id}',
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15.sp,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    bottom: 5.dp,
-                                  ),
-                                  child: Offstage(
-                                    offstage: !user.videoPublished,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Radios(
-                                          '订阅大流',
-                                          color: Colors.yellow,
-                                          value: false,
-                                          groupValue: user.tiny,
-                                          onChanged: (dynamic value) {
-                                            setState(() {
-                                              user.tiny = value;
-                                            });
-                                          },
-                                        ),
-                                        VerticalDivider(
-                                          width: 10.dp,
-                                          color: Colors.transparent,
-                                        ),
-                                        Radios(
-                                          '订阅小流',
-                                          color: Colors.yellow,
-                                          value: true,
-                                          groupValue: user.tiny,
-                                          onChanged: (dynamic value) {
-                                            setState(() {
-                                              user.tiny = value;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.dp,
-                                    top: 15.dp,
-                                  ),
-                                  child: BoxFitChooser(
-                                    fit: _remotes[user.id]?.fit ?? BoxFit.contain,
-                                    onSelected: (fit) {
-                                      setState(() {
-                                        _remotes[user.id]?.fit = fit;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          width: 2.dp,
+                    Divider(
+                      height: 10.dp,
+                      color: Colors.black,
+                    ),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: Utils.users.length,
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          height: 5.dp,
                           color: Colors.transparent,
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        UserState user = Utils.users[index];
+                        return Row(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 200.dp,
+                              height: 160.dp,
+                              color: Colors.blue,
+                              child: Stack(
                                 children: [
-                                  CheckBoxes(
-                                    '订阅音频',
-                                    enable: user.audioPublished,
-                                    checked: user.audioSubscribed,
-                                    onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
+                                  _remotes[user.id] ?? Container(),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 5.dp,
+                                      ),
+                                      child: Text(
+                                        '${user.id}',
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                          decoration: TextDecoration.none,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  CheckBoxes(
-                                    '订阅视频',
-                                    enable: user.videoPublished,
-                                    checked: user.videoSubscribed,
-                                    onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
+                                  Align(
+                                    alignment: Alignment.bottomLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        bottom: 5.dp,
+                                      ),
+                                      child: Offstage(
+                                        offstage: !user.videoPublished,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Radios(
+                                              '订阅大流',
+                                              color: Colors.yellow,
+                                              value: false,
+                                              groupValue: user.tiny,
+                                              onChanged: (dynamic value) {
+                                                setState(() {
+                                                  user.tiny = value;
+                                                });
+                                              },
+                                            ),
+                                            VerticalDivider(
+                                              width: 10.dp,
+                                              color: Colors.transparent,
+                                            ),
+                                            Radios(
+                                              '订阅小流',
+                                              color: Colors.yellow,
+                                              value: true,
+                                              groupValue: user.tiny,
+                                              onChanged: (dynamic value) {
+                                                setState(() {
+                                                  user.tiny = value;
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.dp,
+                                        top: 15.dp,
+                                      ),
+                                      child: BoxFitChooser(
+                                        fit: _remotes[user.id]?.fit ?? BoxFit.contain,
+                                        onSelected: (fit) {
+                                          setState(() {
+                                            _remotes[user.id]?.fit = fit;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              StatefulBuilder(builder: (context, setter) {
-                                _remoteAudioStatsStateSetters[user.id] = setter;
-                                return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
-                              }),
-                              StatefulBuilder(builder: (context, setter) {
-                                _remoteVideoStatsStateSetters[user.id] = setter;
-                                return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
-                              }),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                            ),
+                            VerticalDivider(
+                              width: 2.dp,
+                              color: Colors.transparent,
+                            ),
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CheckBoxes(
+                                        '订阅音频',
+                                        enable: user.audioPublished,
+                                        checked: user.audioSubscribed,
+                                        onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
+                                      ),
+                                      CheckBoxes(
+                                        '订阅视频',
+                                        enable: user.videoPublished,
+                                        checked: user.videoSubscribed,
+                                        onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
+                                      ),
+                                    ],
+                                  ),
+                                  StatefulBuilder(builder: (context, setter) {
+                                    _remoteAudioStatsStateSetters[user.id] = setter;
+                                    return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
+                                  }),
+                                  StatefulBuilder(builder: (context, setter) {
+                                    _remoteVideoStatsStateSetters[user.id] = setter;
+                                    return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
+                                  }),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
       onWillPop: _exit,

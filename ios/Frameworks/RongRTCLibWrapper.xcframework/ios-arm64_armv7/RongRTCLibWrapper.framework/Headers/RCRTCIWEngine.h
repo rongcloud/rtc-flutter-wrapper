@@ -932,6 +932,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)leaveSubRoom:(NSString *)roomId
                   disband:(BOOL)disband;
 
+#pragma mark - 角色切换
+
+- (NSInteger)switchLiveRole:(RCRTCIWRole)role;
+
 #pragma mark - Version
 /*!
  获取当前 SDK 编译版本号

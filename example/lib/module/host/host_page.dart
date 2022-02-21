@@ -107,11 +107,14 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
             ),
           ],
         ),
-        body: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: constraints.copyWith(
+                  minHeight: constraints.maxHeight,
+                  maxHeight: double.infinity,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
@@ -524,165 +527,36 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                       _localVideoStatsStateSetter = setter;
                       return LocalVideoStatsTable(_localVideoStats);
                     }),
-                  ],
-                ),
-              ),
-              Divider(
-                height: 10.dp,
-                color: Colors.black,
-              ),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: Utils.users.length,
-                  separatorBuilder: (context, index) {
-                    return Divider(
-                      height: 5.dp,
-                      color: Colors.transparent,
-                    );
-                  },
-                  itemBuilder: (context, index) {
-                    UserState user = Utils.users[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
+                    Divider(
+                      height: 10.dp,
+                      color: Colors.black,
+                    ),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: Utils.users.length,
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          height: 5.dp,
+                          color: Colors.transparent,
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        UserState user = Utils.users[index];
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 200.dp,
-                              height: 160.dp,
-                              color: Colors.blue,
-                              child: Stack(
-                                children: [
-                                  _remotes[user.id] ?? Container(),
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5.dp,
-                                        top: 5.dp,
-                                      ),
-                                      child: Text(
-                                        '${user.id}',
-                                        softWrap: true,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15.sp,
-                                          decoration: TextDecoration.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5.dp,
-                                        bottom: 5.dp,
-                                      ),
-                                      child: Offstage(
-                                        offstage: !user.videoPublished,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            '切大流'.onClick(() {
-                                              _switchToNormalStream(user.id);
-                                            }),
-                                            VerticalDivider(
-                                              width: 10.dp,
-                                              color: Colors.transparent,
-                                            ),
-                                            '切小流'.onClick(() {
-                                              _switchToTinyStream(user.id);
-                                            }),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 5.dp,
-                                        top: 15.dp,
-                                      ),
-                                      child: BoxFitChooser(
-                                        fit: _remotes[user.id]?.fit ?? BoxFit.cover,
-                                        onSelected: (fit) {
-                                          setState(() {
-                                            _remotes[user.id]?.fit = fit;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            VerticalDivider(
-                              width: 2.dp,
-                              color: Colors.transparent,
-                            ),
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CheckBoxes(
-                                        '订阅音频',
-                                        enable: user.audioPublished,
-                                        checked: user.audioSubscribed,
-                                        onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
-                                      ),
-                                      CheckBoxes(
-                                        '订阅视频',
-                                        enable: user.videoPublished,
-                                        checked: user.videoSubscribed,
-                                        onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
-                                      ),
-                                    ],
-                                  ),
-                                  StatefulBuilder(builder: (context, setter) {
-                                    _remoteAudioStatsStateSetters[user.id] = setter;
-                                    return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
-                                  }),
-                                  StatefulBuilder(builder: (context, setter) {
-                                    _remoteVideoStatsStateSetters[user.id] = setter;
-                                    return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
-                                  }),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: user.customs.length,
-                          separatorBuilder: (context, index) {
-                            return Divider(
-                              height: 5.dp,
-                              color: Colors.transparent,
-                            );
-                          },
-                          itemBuilder: (context, index) {
-                            CustomState custom = user.customs[index];
-                            String key = '${user.id}${custom.tag}';
-                            return Row(
+                            Row(
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
                                   width: 200.dp,
                                   height: 160.dp,
-                                  color: Colors.yellow,
+                                  color: Colors.blue,
                                   child: Stack(
                                     children: [
-                                      _remoteCustoms[key] ?? Container(),
+                                      _remotes[user.id] ?? Container(),
                                       Align(
                                         alignment: Alignment.topLeft,
                                         child: Padding(
@@ -691,12 +565,40 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                                             top: 5.dp,
                                           ),
                                           child: Text(
-                                            '${user.customs[index].tag}',
+                                            '${user.id}',
                                             softWrap: true,
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15.sp,
                                               decoration: TextDecoration.none,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: 5.dp,
+                                            bottom: 5.dp,
+                                          ),
+                                          child: Offstage(
+                                            offstage: !user.videoPublished,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                '切大流'.onClick(() {
+                                                  _switchToNormalStream(user.id);
+                                                }),
+                                                VerticalDivider(
+                                                  width: 10.dp,
+                                                  color: Colors.transparent,
+                                                ),
+                                                '切小流'.onClick(() {
+                                                  _switchToTinyStream(user.id);
+                                                }),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -709,10 +611,10 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                                             top: 15.dp,
                                           ),
                                           child: BoxFitChooser(
-                                            fit: _remoteCustoms[key]?.fit ?? BoxFit.cover,
+                                            fit: _remotes[user.id]?.fit ?? BoxFit.cover,
                                             onSelected: (fit) {
                                               setState(() {
-                                                _remoteCustoms[key]?.fit = fit;
+                                                _remotes[user.id]?.fit = fit;
                                               });
                                             },
                                           ),
@@ -732,59 +634,160 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                                       Row(
                                         children: [
                                           CheckBoxes(
-                                            'YUV数据',
-                                            enable: _yuv && !custom.videoSubscribed,
-                                            checked: custom.yuv,
-                                            onChanged: (checked) => setState(() {
-                                              custom.yuv = checked;
-                                            }),
+                                            '订阅音频',
+                                            enable: user.audioPublished,
+                                            checked: user.audioSubscribed,
+                                            onChanged: (subscribe) => _changeRemoteAudio(user, subscribe),
                                           ),
-                                          Spacer(),
                                           CheckBoxes(
                                             '订阅视频',
-                                            enable: custom.videoPublished,
-                                            checked: custom.videoSubscribed,
-                                            onChanged: (subscribe) => _changeRemoteCustomVideo(user, custom, subscribe),
+                                            enable: user.videoPublished,
+                                            checked: user.videoSubscribed,
+                                            onChanged: (subscribe) => _changeRemoteVideo(user, subscribe),
                                           ),
-                                        ],
-                                      ),
-                                      VerticalDivider(
-                                        width: 2.dp,
-                                        color: Colors.transparent,
-                                      ),
-                                      Row(
-                                        children: [
-                                          CheckBoxes(
-                                            '订阅音频',
-                                            enable: custom.audioPublished,
-                                            checked: custom.audioSubscribed,
-                                            onChanged: (subscribe) => _changeRemoteCustomAudio(user, custom, subscribe),
-                                          ),
-                                          Spacer(),
                                         ],
                                       ),
                                       StatefulBuilder(builder: (context, setter) {
-                                        _remoteCustomAudioStatsStateSetters['${user.id}@${custom.tag}'] = setter;
-                                        return RemoteAudioStatsTable(_remoteCustomAudioStats['${user.id}@${custom.tag}']);
+                                        _remoteAudioStatsStateSetters[user.id] = setter;
+                                        return RemoteAudioStatsTable(_remoteAudioStats[user.id]);
                                       }),
                                       StatefulBuilder(builder: (context, setter) {
-                                        _remoteCustomVideoStatsStateSetters['${user.id}@${custom.tag}'] = setter;
-                                        return RemoteVideoStatsTable(_remoteCustomVideoStats['${user.id}@${custom.tag}']);
+                                        _remoteVideoStatsStateSetters[user.id] = setter;
+                                        return RemoteVideoStatsTable(_remoteVideoStats[user.id]);
                                       }),
                                     ],
                                   ),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
+                            ),
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: user.customs.length,
+                              separatorBuilder: (context, index) {
+                                return Divider(
+                                  height: 5.dp,
+                                  color: Colors.transparent,
+                                );
+                              },
+                              itemBuilder: (context, index) {
+                                CustomState custom = user.customs[index];
+                                String key = '${user.id}${custom.tag}';
+                                return Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 200.dp,
+                                      height: 160.dp,
+                                      color: Colors.yellow,
+                                      child: Stack(
+                                        children: [
+                                          _remoteCustoms[key] ?? Container(),
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                left: 5.dp,
+                                                top: 5.dp,
+                                              ),
+                                              child: Text(
+                                                '${user.customs[index].tag}',
+                                                softWrap: true,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15.sp,
+                                                  decoration: TextDecoration.none,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                left: 5.dp,
+                                                top: 15.dp,
+                                              ),
+                                              child: BoxFitChooser(
+                                                fit: _remoteCustoms[key]?.fit ?? BoxFit.cover,
+                                                onSelected: (fit) {
+                                                  setState(() {
+                                                    _remoteCustoms[key]?.fit = fit;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                      width: 2.dp,
+                                      color: Colors.transparent,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              CheckBoxes(
+                                                'YUV数据',
+                                                enable: _yuv && !custom.videoSubscribed,
+                                                checked: custom.yuv,
+                                                onChanged: (checked) => setState(() {
+                                                  custom.yuv = checked;
+                                                }),
+                                              ),
+                                              Spacer(),
+                                              CheckBoxes(
+                                                '订阅视频',
+                                                enable: custom.videoPublished,
+                                                checked: custom.videoSubscribed,
+                                                onChanged: (subscribe) => _changeRemoteCustomVideo(user, custom, subscribe),
+                                              ),
+                                            ],
+                                          ),
+                                          VerticalDivider(
+                                            width: 2.dp,
+                                            color: Colors.transparent,
+                                          ),
+                                          Row(
+                                            children: [
+                                              CheckBoxes(
+                                                '订阅音频',
+                                                enable: custom.audioPublished,
+                                                checked: custom.audioSubscribed,
+                                                onChanged: (subscribe) => _changeRemoteCustomAudio(user, custom, subscribe),
+                                              ),
+                                              Spacer(),
+                                            ],
+                                          ),
+                                          StatefulBuilder(builder: (context, setter) {
+                                            _remoteCustomAudioStatsStateSetters['${user.id}@${custom.tag}'] = setter;
+                                            return RemoteAudioStatsTable(_remoteCustomAudioStats['${user.id}@${custom.tag}']);
+                                          }),
+                                          StatefulBuilder(builder: (context, setter) {
+                                            _remoteCustomVideoStatsStateSetters['${user.id}@${custom.tag}'] = setter;
+                                            return RemoteVideoStatsTable(_remoteCustomVideoStats['${user.id}@${custom.tag}']);
+                                          }),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
       onWillPop: _exit,

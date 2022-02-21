@@ -20,19 +20,12 @@ abstract class Model implements IModel {
 
   void clear();
 
-  Future<Result> token(String key);
-
   void connect(
     String key,
     String navigate,
     String file,
     String media,
     String token,
-    StateCallback callback,
-  );
-
-  void login(
-    String name,
     StateCallback callback,
   );
 
@@ -52,18 +45,12 @@ abstract class Model implements IModel {
 abstract class Presenter implements IPresenter {
   void clear();
 
-  Future<Result> token(String key);
-
   void connect(
     String key,
     String navigate,
     String file,
     String media,
     String token,
-  );
-
-  void login(
-    String name,
   );
 
   void disconnect();

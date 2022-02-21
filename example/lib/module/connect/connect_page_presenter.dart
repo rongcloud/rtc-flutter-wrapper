@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
-import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/model.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presenter.dart';
 
@@ -25,11 +24,6 @@ class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Pre
   }
 
   @override
-  Future<Result> token(String key) {
-    return model.token(key);
-  }
-
-  @override
   void connect(
     String key,
     String navigate,
@@ -43,19 +37,6 @@ class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Pre
       file,
       media,
       token,
-      (code, info) {
-        if (code != 0)
-          view.onConnectError(code, info);
-        else
-          view.onConnected(info);
-      },
-    );
-  }
-
-  @override
-  void login(String name) {
-    model.login(
-      name,
       (code, info) {
         if (code != 0)
           view.onConnectError(code, info);
