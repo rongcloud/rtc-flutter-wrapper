@@ -137,9 +137,9 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion
  本地用户开关摄像头操作回调
  */
-- (void)onEnableCamera:(BOOL)enable
-                  code:(NSInteger)code
-               message:(NSString *)errMsg;
+- (void)onCameraEnabled:(BOOL)enable
+                   code:(NSInteger)code
+                message:(NSString *)errMsg;
 
 /*!
  本地用户切换前后置摄像头操作回调
@@ -149,9 +149,9 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion
  本地用户切换前后置摄像头操作回调
  */
-- (void)onSwitchCamera:(RCRTCIWCamera)camera
-                  code:(NSInteger)code
-               message:(NSString *)errMsg;
+- (void)onCameraSwitched:(RCRTCIWCamera)camera
+                    code:(NSInteger)code
+                 message:(NSString *)errMsg;
 
 #pragma mark - 本地会议用户或直播主播用户收到远端用户第一帧回调
 /*!
@@ -721,6 +721,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onRemoteLiveRoleSwitched:(NSString *)roomId
                           userId:(NSString *)userId
                             role:(RCRTCIWRole)role;
+
+#pragma mark - 内置 cdn 回调
+
+- (void)onLiveMixInnerCdnStreamEnabled:(BOOL)enabled
+                                  code:(NSInteger)code
+                               message:(NSString *)errMsg;
+
+- (void)onRemoteLiveMixInnerCdnStreamPublished;
+
+- (void)onRemoteLiveMixInnerCdnStreamUnpublished;
+
+- (void)onLiveMixInnerCdnStreamSubscribed:(NSInteger)code
+                                  message:(NSString *)errMsg;
+
+- (void)onLiveMixInnerCdnStreamUnsubscribed:(NSInteger)code
+                                    message:(NSString *)errMsg;
 
 @end
 

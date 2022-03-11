@@ -830,19 +830,19 @@ class RCRTCEngine {
         String? message = arguments['message'];
         onLiveMixUnsubscribed?.call(RCRTCMediaType.values[type], code, message);
         break;
-      case 'engine:onEnableCamera':
+      case 'engine:onCameraEnabled':
         Map<dynamic, dynamic> arguments = call.arguments;
         bool enable = arguments['enable'];
         int code = arguments['code'];
         String? message = arguments['message'];
-        onEnableCamera?.call(enable, code, message);
+        onCameraEnabled?.call(enable, code, message);
         break;
-      case 'engine:onSwitchCamera':
+      case 'engine:onCameraSwitched':
         Map<dynamic, dynamic> arguments = call.arguments;
         int camera = arguments['camera'];
         int code = arguments['code'];
         String? message = arguments['message'];
-        onSwitchCamera?.call(RCRTCCamera.values[camera], code, message);
+        onCameraSwitched?.call(RCRTCCamera.values[camera], code, message);
         break;
       case 'engine:onLiveCdnAdded':
         Map<dynamic, dynamic> arguments = call.arguments;
@@ -1092,9 +1092,10 @@ class RCRTCEngine {
         Map<dynamic, dynamic> arguments = call.arguments;
         String rid = arguments['rid'];
         String uid = arguments['uid'];
+        bool agree = arguments['agree'];
         int code = arguments['code'];
         String? message = arguments['message'];
-        onJoinSubRoomRequestResponded?.call(rid, uid, code, message);
+        onJoinSubRoomRequestResponded?.call(rid, uid, agree, code, message);
         break;
       case 'engine:onSubRoomJoined':
         Map<dynamic, dynamic> arguments = call.arguments;
@@ -1241,8 +1242,8 @@ class RCRTCEngine {
   Function(RCRTCMediaType type, int code, String? errMsg)? onLiveMixSubscribed;
   Function(RCRTCMediaType type, int code, String? errMsg)? onLiveMixUnsubscribed;
 
-  Function(bool enable, int code, String? errMsg)? onEnableCamera;
-  Function(RCRTCCamera camera, int code, String? errMsg)? onSwitchCamera;
+  Function(bool enable, int code, String? errMsg)? onCameraEnabled;
+  Function(RCRTCCamera camera, int code, String? errMsg)? onCameraSwitched;
 
   Function(String url, int code, String? errMsg)? onLiveCdnAdded;
   Function(String url, int code, String? errMsg)? onLiveCdnRemoved;
@@ -1305,7 +1306,7 @@ class RCRTCEngine {
 
   Function(String roomId, String userId, int code, String? errMsg)? onJoinSubRoomRequested;
   Function(String roomId, String userId, int code, String? errMsg)? onJoinSubRoomRequestCanceled;
-  Function(String roomId, String userId, int code, String? errMsg)? onJoinSubRoomRequestResponded;
+  Function(String roomId, String userId, bool agree, int code, String? errMsg)? onJoinSubRoomRequestResponded;
 
   Function(String roomId, int code, String? errMsg)? onSubRoomJoined;
   Function(String roomId, int code, String? errMsg)? onSubRoomLeft;

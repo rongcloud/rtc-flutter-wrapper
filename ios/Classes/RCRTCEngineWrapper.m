@@ -1391,7 +1391,7 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onEnableCamera:(BOOL)enable code:(NSInteger)code message:(NSString *)errMsg {
+- (void)onCameraEnabled:(BOOL)enable code:(NSInteger)code message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:@(enable) forKey:@"enable"];
     [arguments setObject:@(code) forKey:@"code"];
@@ -1399,11 +1399,11 @@ SingleInstanceM(Instance);
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onEnableCamera" arguments:arguments];
+        [strong invokeMethod:@"engine:onCameraEnabled" arguments:arguments];
     });
 }
 
-- (void)onSwitchCamera:(RCRTCIWCamera)camera code:(NSInteger)code message:(NSString *)errMsg {
+- (void)onCameraSwitched:(RCRTCIWCamera)camera code:(NSInteger)code message:(NSString *)errMsg {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:@((int) camera + 1) forKey:@"camera"];
     [arguments setObject:@(code) forKey:@"code"];
@@ -1411,7 +1411,7 @@ SingleInstanceM(Instance);
     __weak typeof (channel) weak = channel;
     dispatch_to_main_queue(^{
         typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onSwitchCamera" arguments:arguments];
+        [strong invokeMethod:@"engine:onCameraSwitched" arguments:arguments];
     });
 }
 
@@ -1909,11 +1909,13 @@ SingleInstanceM(Instance);
 
 - (void)onJoinSubRoomRequestResponded:(NSString *)roomId
                                userId:(NSString *)userId
+                                agree:(BOOL)agree
                                  code:(NSInteger)code
                               message:(NSString *)message {
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setObject:roomId forKey:@"rid"];
     [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(agree) forKey:@"agree"];
     [arguments setObject:@(code) forKey:@"code"];
     [arguments setObject:message forKey:@"message"];
     __weak typeof (channel) weak = channel;

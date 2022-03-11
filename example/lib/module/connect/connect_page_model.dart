@@ -23,6 +23,28 @@ class ConnectPageModel extends AbstractModel implements Model {
   }
 
   @override
+  Future<Result> token(String key) {
+    if (key.isEmpty) key = GlobalConfig.appKey;
+    int current = DateTime.now().millisecondsSinceEpoch;
+    String id = '${GlobalConfig.prefix}$current';
+    // String id = 'SameUser';
+    Completer<Result> completer = Completer();
+    Http.post(
+      GlobalConfig.host + '/token/$id',
+      {'key': key},
+      (error, data) {
+        String? token = data['token'];
+        completer.complete(Result(0, token));
+      },
+      (error) {
+        completer.complete(Result(-1, 'Get token error.'));
+      },
+      tag,
+    );
+    return completer.future;
+  }
+
+  @override
   void connect(
     String key,
     String navigate,

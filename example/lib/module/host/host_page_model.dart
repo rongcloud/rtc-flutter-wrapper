@@ -37,13 +37,13 @@ class HostPageModel extends AbstractModel implements Model {
       }
     }
     Completer<bool> completer = Completer();
-    Utils.engine?.onEnableCamera = (bool enable, int code, String? message) {
-      Utils.engine?.onEnableCamera = null;
+    Utils.engine?.onCameraEnabled = (bool enable, int code, String? message) {
+      Utils.engine?.onCameraEnabled = null;
       completer.complete(enable);
     };
     int code = await Utils.engine?.enableCamera(open) ?? -1;
     if (code != 0) {
-      Utils.engine?.onEnableCamera = null;
+      Utils.engine?.onCameraEnabled = null;
       return !open;
     }
     return completer.future;
@@ -102,13 +102,13 @@ class HostPageModel extends AbstractModel implements Model {
   @override
   Future<bool> changeFrontCamera(bool front) async {
     Completer<bool> completer = Completer();
-    Utils.engine?.onSwitchCamera = (RCRTCCamera camera, int code, String? message) {
-      Utils.engine?.onSwitchCamera = null;
+    Utils.engine?.onCameraSwitched = (RCRTCCamera camera, int code, String? message) {
+      Utils.engine?.onCameraSwitched = null;
       completer.complete(camera == RCRTCCamera.front);
     };
     int code = await Utils.engine?.switchCamera() ?? -1;
     if (code != 0) {
-      Utils.engine?.onSwitchCamera = null;
+      Utils.engine?.onCameraSwitched = null;
       return !front;
     }
     return completer.future;
@@ -319,7 +319,7 @@ class HostPageModel extends AbstractModel implements Model {
   @override
   Future<int> responseJoinSubRoom(String rid, String uid, bool agree) async {
     Completer<int> completer = Completer();
-    Utils.engine?.onJoinSubRoomRequestResponded = (roomId, userId, code, message) {
+    Utils.engine?.onJoinSubRoomRequestResponded = (roomId, userId, agree, code, message) {
       Utils.engine?.onJoinSubRoomRequestResponded = null;
       completer.complete(code);
     };

@@ -334,6 +334,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     String media = _mediaInputController.text;
     String token = _tokenInputController.text;
 
+    if (key.isEmpty) return 'Key Should not be null!'.toast();
     if (token.isEmpty) return 'Token Should not be null!'.toast();
 
     Loading.show(context);

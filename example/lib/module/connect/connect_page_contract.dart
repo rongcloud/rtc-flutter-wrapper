@@ -20,6 +20,8 @@ abstract class Model implements IModel {
 
   void clear();
 
+  Future<Result> token(String key);
+
   void connect(
     String key,
     String navigate,
@@ -44,6 +46,8 @@ abstract class Model implements IModel {
 
 abstract class Presenter implements IPresenter {
   void clear();
+
+  Future<Result> token(String key);
 
   void connect(
     String key,

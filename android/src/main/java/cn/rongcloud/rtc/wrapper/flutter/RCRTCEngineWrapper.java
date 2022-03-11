@@ -1590,7 +1590,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onEnableCamera(boolean enable, int code, String message) {
+        public void onCameraEnabled(boolean enable, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("enable", enable);
             arguments.put("code", code);
@@ -1598,13 +1598,13 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
-                    channel.invokeMethod("engine:onEnableCamera", arguments);
+                    channel.invokeMethod("engine:onCameraEnabled", arguments);
                 }
             });
         }
 
         @Override
-        public void onSwitchCamera(RCRTCIWCamera camera, int code, String message) {
+        public void onCameraSwitched(RCRTCIWCamera camera, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("camera", camera.ordinal());
             arguments.put("code", code);
@@ -1612,7 +1612,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             MainThreadPoster.post(new Runnable() {
                 @Override
                 public void run() {
-                    channel.invokeMethod("engine:onSwitchCamera", arguments);
+                    channel.invokeMethod("engine:onCameraSwitched", arguments);
                 }
             });
         }
@@ -2131,10 +2131,11 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
 
         @Override
-        public void onJoinSubRoomRequestResponded(String roomId, String userId, int code, String message) {
+        public void onJoinSubRoomRequestResponded(String roomId, String userId, boolean agree, int code, String message) {
             final HashMap<String, Object> arguments = new HashMap<>();
             arguments.put("rid", roomId);
             arguments.put("uid", userId);
+            arguments.put("agree", agree);
             arguments.put("code", code);
             arguments.put("message", message);
             MainThreadPoster.post(new Runnable() {

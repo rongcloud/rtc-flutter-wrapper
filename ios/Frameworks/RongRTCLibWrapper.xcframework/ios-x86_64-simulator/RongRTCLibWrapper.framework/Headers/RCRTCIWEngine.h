@@ -936,6 +936,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSInteger)switchLiveRole:(RCRTCIWRole)role;
 
+#pragma mark - 内置 cdn
+
+- (NSInteger)enableLiveMixInnerCdnStream:(BOOL)enable;
+
+- (NSInteger)subscribeLiveMixInnerCdnStream;
+
+- (NSInteger)unsubscribeLiveMixInnerCdnStream;
+
+- (NSInteger)setLiveMixInnerCdnStreamView:(RCRTCIWView *)view;
+
+- (NSInteger)removeLiveMixInnerCdnStreamView;
+
 #pragma mark - Version
 /*!
  获取当前 SDK 编译版本号

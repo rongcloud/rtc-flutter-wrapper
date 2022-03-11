@@ -1,8 +1,6 @@
 class GlobalConfig {
   static const String appKey = '';
 
-  static const String host = '';
-
   static const String appVersion = '0.1';
 
   static const String appTitle = 'TEST DEMO';
@@ -13,4 +11,6 @@ class GlobalConfig {
   static const String fileServer = 'up.qbox.me';
 
   static const String mediaServer = '';
+
+  static const String host = '';
 }
