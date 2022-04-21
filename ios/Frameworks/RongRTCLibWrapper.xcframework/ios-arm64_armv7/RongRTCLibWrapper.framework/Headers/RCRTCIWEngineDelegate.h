@@ -622,6 +622,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onJoinSubRoomRequestResponded:(NSString *)roomId
                                userId:(NSString *)userId
+                                agree:(BOOL)agree
                                  code:(NSInteger)code
                               message:(NSString *)errMsg;
 

@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'Flutter'
 
-  s.dependency 'RongCloudIM/IMLibCore', '5.1.8'
+  s.dependency 'RongCloudIM/IMLibCore', '5.2.1'
   s.dependency 'RongCloudRTC/RongRTCLib', rtc_sdk_version
 
   s.platform = :ios, '8.0'
