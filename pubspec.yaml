@@ -1,6 +1,6 @@
 name: rongcloud_rtc_wrapper_plugin
 description: Rongcloud rtc interface wrapper for flutter.
-version: 5.1.5+4
+version: 5.1.5+5
 homepage: https://www.rongcloud.cn/
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  rongcloud_im_plugin: 5.1.8+2
+  rongcloud_im_plugin: 5.1.8+4
 
 dev_dependencies:
   flutter_test:
