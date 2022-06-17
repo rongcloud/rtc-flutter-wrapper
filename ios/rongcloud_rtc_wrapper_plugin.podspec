@@ -26,11 +26,11 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Classes/**/*.h'
   s.static_framework = true
 
-  s.vendored_frameworks = 'Frameworks/*.xcframework'
+  s.vendored_frameworks = ['Frameworks/*.xcframework','Frameworks/*.framework']
 
   s.dependency 'Flutter'
 
-  s.dependency 'RongCloudIM/IMLibCore', '5.2.1'
+  s.dependency 'RongCloudIM/IMLibCore', '5.2.3'
   s.dependency 'RongCloudRTC/RongRTCLib', rtc_sdk_version
 
   s.platform = :ios, '8.0'

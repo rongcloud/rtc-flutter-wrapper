@@ -51,6 +51,6 @@ dependencies {
     def rtc_sdk_version = configProperties.getProperty("android_rtc_sdk_version")
     assert rtc_sdk_version != null, "You need to config android_rtc_sdk_version in version.config!!"
 
-    implementation 'cn.rongcloud.sdk:im_libcore:5.2.1.3'
+    implementation 'cn.rongcloud.sdk:im_libcore:5.2.3.2'
     implementation 'cn.rongcloud.sdk:rtc_lib:' + rtc_sdk_version
 }
