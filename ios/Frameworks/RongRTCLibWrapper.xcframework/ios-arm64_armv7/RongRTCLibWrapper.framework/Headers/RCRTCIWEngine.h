@@ -419,6 +419,14 @@ NS_ASSUME_NONNULL_BEGIN
                          mute:(BOOL)mute;
 
 /*!
+ 停止所有远端用户音频数据的渲染
+ @param mute YES: 不渲染 NO: 渲染
+ @discussion
+ 停止所有远端用户音频数据的渲染
+ */
+- (NSInteger)muteAllRemoteAudioStreams:(BOOL)mute;
+
+/*!
  停止合流音视频数据的接收
  @param type 媒体类型
  @param mute YES: 不接收 NO: 接收

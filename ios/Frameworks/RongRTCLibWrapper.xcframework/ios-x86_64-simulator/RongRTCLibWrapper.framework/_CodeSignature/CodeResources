@@ -6,27 +6,27 @@
 	<dict>
 		<key>Frameworks/RongIMLibCore.framework/Info.plist</key>
 		<data>
-		glteaDWZxbfKTkrRx9KhdG2zjxM=
+		LDdWITGM8E6PCmZF0H8fngC1CIY=
 		</data>
 		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
 		<data>
-		r/P0PdkbckDGbHsGrpPOKKSX/CE=
+		LUAZCTWDeLHOtyewdCM1ie5ykZE=
 		</data>
 		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
 		<data>
-		RXOWf7UmVs7IF5RANYdyQ6NR8yE=
+		T/px/KxIXFprE/TMO+GOJkYSclc=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/Info.plist</key>
 		<data>
-		7Xvhio/AWNB7Ce5b8HKyrnrLuys=
+		HKQTmNA83ETaD6c+GdVzKUGEaxc=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
 		<data>
-		1zBJEbcMgfe1ZhHCJeC29LsjAbE=
+		ozsFDZO8UXT96zo7U6ESM5tOhW4=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
 		<data>
-		7ErgdtqSuh/W/KsEd5UgVT5HEOY=
+		X/gX6AsRkMDHa+J4PGu0THhCH28=
 		</data>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
 		<data>
@@ -58,7 +58,7 @@
 		</data>
 		<key>Headers/RCRTCIWEngine.h</key>
 		<data>
-		sigOnsA55pQ/04jeLsxjT2WMMbE=
+		1tCxvtD8SRQxrhGxNPyMvZ73xyE=
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
@@ -122,7 +122,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		La+GUi+jKnbYXeF8mz7PWFbSKYA=
+		gh1h+GTK6uw6U1q2st3F+4RJ1yU=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -135,66 +135,66 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			glteaDWZxbfKTkrRx9KhdG2zjxM=
+			LDdWITGM8E6PCmZF0H8fngC1CIY=
 			</data>
 			<key>hash2</key>
 			<data>
-			+eKn2JK1HxxhTs91R0Wk7QDTIGjabmDlVIARHyAsGTM=
+			gcKciC2HAzNAFR70TPpvWARGtPkZT7p3DMVyxfR5pFY=
 			</data>
 		</dict>
 		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			r/P0PdkbckDGbHsGrpPOKKSX/CE=
+			LUAZCTWDeLHOtyewdCM1ie5ykZE=
 			</data>
 			<key>hash2</key>
 			<data>
-			p9lOaOqhiRiIGEVHR9oApXiQ3ONNNMnFEyqbtaWr7Yk=
+			9WjuNrK5JLMjzxzJia0a4jKm9+NT5oiVi0WsOoccNBM=
 			</data>
 		</dict>
 		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			RXOWf7UmVs7IF5RANYdyQ6NR8yE=
+			T/px/KxIXFprE/TMO+GOJkYSclc=
 			</data>
 			<key>hash2</key>
 			<data>
-			75O8QMQ3z3DhwQV1tB7GTfB9N9XCWU3JCWbBVmYbJxM=
+			b/BLN5FDaOT0/Hu7HMVy6Klo2gBGaQd7vyeQ/E1RjHY=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			7Xvhio/AWNB7Ce5b8HKyrnrLuys=
+			HKQTmNA83ETaD6c+GdVzKUGEaxc=
 			</data>
 			<key>hash2</key>
 			<data>
-			fS9G6WRVFnptXy23qC1fIJcFT5zl6+DPu03TDe4oAck=
+			WkupufpnYnUrq8KA2AoRuFQGyqDkJcMijnECHE7oqFc=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			1zBJEbcMgfe1ZhHCJeC29LsjAbE=
+			ozsFDZO8UXT96zo7U6ESM5tOhW4=
 			</data>
 			<key>hash2</key>
 			<data>
-			X+vACsmPiTnJsVMfAnhWrO6xAZDtqk7Oh8Z3XP5a8+Y=
+			MK82zzlHWhQRp7e0thtg7PiVRC9Vt9YOxlBbEpbMUIY=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			7ErgdtqSuh/W/KsEd5UgVT5HEOY=
+			X/gX6AsRkMDHa+J4PGu0THhCH28=
 			</data>
 			<key>hash2</key>
 			<data>
-			EQjGSvuhST991kEX2VFEnT+5YP1hgHZLPB+nANDXfcw=
+			46L0999G5OfF1nvfFZjU4LBLN6s3/+yAmjSZfRVuzMc=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
@@ -278,11 +278,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			sigOnsA55pQ/04jeLsxjT2WMMbE=
+			1tCxvtD8SRQxrhGxNPyMvZ73xyE=
 			</data>
 			<key>hash2</key>
 			<data>
-			XLZTqmH7n0qMcIHKaMRO32u0ZNuRyR80Dx0ItM3Vpbc=
+			tcnfhkGEVe+hFXhR9LOwlU4LOqZd0hUBqXZwnZBz1VQ=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
