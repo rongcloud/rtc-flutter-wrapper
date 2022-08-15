@@ -10,7 +10,7 @@
 		</data>
 		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
 		<data>
-		8HT4BKTfeo8TGmXSyxilsP5lGRg=
+		/OHCuELml26vP1VlwsAl5f/OqYU=
 		</data>
 		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
 		<data>
-		gNd6ObTJWzLjij24B9I024wcVs8=
+		qxjOy0bsX5+9TMqu4rCZ7fY9ZKM=
 		</data>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
 		<data>
@@ -122,7 +122,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		4/QDoTEE5rsR9ZNXJcbf0XXb+TU=
+		0qlV8j1kxeMKXkqXfrnJ4DlIJ3A=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -146,11 +146,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			8HT4BKTfeo8TGmXSyxilsP5lGRg=
+			/OHCuELml26vP1VlwsAl5f/OqYU=
 			</data>
 			<key>hash2</key>
 			<data>
-			2IFoiZZYRoJScxSf2r/Xm1cr9gr5sSGCcurtXOkOkeg=
+			S7y+Y5JmOM48cntuoms96a/Oej0gWWSYOoFUwjLYweU=
 			</data>
 		</dict>
 		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
@@ -179,11 +179,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			gNd6ObTJWzLjij24B9I024wcVs8=
+			qxjOy0bsX5+9TMqu4rCZ7fY9ZKM=
 			</data>
 			<key>hash2</key>
 			<data>
-			WmxqgbKUVm+CTvngNrUXF5D++G4nxmdxYM4js4XkJk0=
+			FtqROhyrUHZjpa7jXyR79d0u5LLDyhSkGu7/H1nhUtg=
 			</data>
 		</dict>
 		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>

@@ -677,18 +677,18 @@ FOUNDATION_EXTERN NSString *const RongRTCLogRoomIdNotValidatyTag;
 /// #define RongRTCLogI( A,t,T, k, ...) [[RCFwLog getInstance] write:RC_Level_I type:RC_Type_RTC tag:TAG(A,t,T) keys:k, ##__VA_ARGS__]
 /// #define RongRTCLogD( A,t,T, k, ...) [[RCFwLog getInstance] write:RC_Level_D type:RC_Type_RTC tag:TAG(A,t,T) keys:k, ##__VA_ARGS__]
 
-#define RongRTCLogD(CALLER, TAG, FLAG, FMT, ...) RCIWRTCLog(RC_Level_D, CALLER, TAG, FLAG, FMT, ##__VA_ARGS__);
-#define RongRTCLogI(CALLER, TAG, FLAG, FMT, ...) RCIWRTCLog(RC_Level_I, CALLER, TAG, FLAG, FMT, ##__VA_ARGS__);
+#define RongRTCLogD(CALLER, TAG, FLAG, FMT, ...) RCIWRTCLog(RCIW_Level_D, CALLER, TAG, FLAG, FMT, ##__VA_ARGS__);
+#define RongRTCLogI(CALLER, TAG, FLAG, FMT, ...) RCIWRTCLog(RCIW_Level_I, CALLER, TAG, FLAG, FMT, ##__VA_ARGS__);
 #define RongRTCLogW(CALLER, TAG, ERROR, FMT, ...) \
-    RCIWRTCLog(RC_Level_W, CALLER, TAG, ERROR, FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_W, CALLER, TAG, ERROR, FMT, ##__VA_ARGS__);
 #define RongRTCLogE(CALLER, TAG, ERROR, FMT, ...) \
-    RCIWRTCLog(RC_Level_E, FINALTAG(CALLER, TAG, ERROR), FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_E, FINALTAG(CALLER, TAG, ERROR), FMT, ##__VA_ARGS__);
 
 #define RongRTCLogAE(TAG, FMT, ...) \
-    RCIWRTCLog(RC_Level_E, RongRTCLogFromAPP, TAG, RongRTCLogTaskError, FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_E, RongRTCLogFromAPP, TAG, RongRTCLogTaskError, FMT, ##__VA_ARGS__);
 #define RongRTCLogAR(TAG, FMT, ...) \
-    RCIWRTCLog(RC_Level_I, RongRTCLogFromAPP, TAG, RongRTCLogTaskResponse, FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_I, RongRTCLogFromAPP, TAG, RongRTCLogTaskResponse, FMT, ##__VA_ARGS__);
 #define RongRTCLogLE(TAG, FMT, ...) \
-    RCIWRTCLog(RC_Level_E, RongRTCLogFromLib, TAG, RongRTCLogTaskError, FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_E, RongRTCLogFromLib, TAG, RongRTCLogTaskError, FMT, ##__VA_ARGS__);
 #define RongRTCLogLR(TAG, FMT, ...) \
-    RCIWRTCLog(RC_Level_I, RongRTCLogFromLib, TAG, RongRTCLogTaskResponse, FMT, ##__VA_ARGS__);
+    RCIWRTCLog(RCIW_Level_I, RongRTCLogFromLib, TAG, RongRTCLogTaskResponse, FMT, ##__VA_ARGS__);
