@@ -6,8 +6,9 @@ class GlobalConfig {
 
   static const String prefix = 'ftd_';
 
-  static const String navServer = '';
+  static const String navServer = 'https://nav-ucqa.rongcloud.net';
   static const String fileServer = '';
+
   static const String mediaServer = '';
 
   static const String host = '';

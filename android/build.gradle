@@ -53,4 +53,5 @@ dependencies {
 
     implementation 'cn.rongcloud.sdk:im_libcore:5.2.5'
     implementation 'cn.rongcloud.sdk:rtc_lib:' + rtc_sdk_version
+    implementation 'cn.rongcloud.sdk:player:' + rtc_sdk_version // CDN 扩展库
 }
