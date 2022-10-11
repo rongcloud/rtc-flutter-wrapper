@@ -48,4 +48,24 @@ class AudiencePagePresenter extends AbstractPresenter<View, Model> implements Pr
   Future<int> exit() {
     return model.exit();
   }
+
+  @override
+  void subscribeInnerCDN() {
+    model.subscribeInnerCDN((info) {
+      view.onConnected();
+    }, (code, info) {
+      view.onConnectError(code, info);
+    });
+  }
+
+  @override
+  Future<int> setLocalLiveMixInnerCdnVideoResolution(RCRTCVideoResolution resolution) {
+    return model.setLocalLiveMixInnerCdnVideoResolution(resolution);
+  }
+
+  @override
+  Future<int> setLocalLiveMixInnerCdnVideoFps(RCRTCVideoFps fps) {
+    return model.setLocalLiveMixInnerCdnVideoFps(fps);
+  }
+
 }

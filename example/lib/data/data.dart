@@ -257,3 +257,8 @@ class DefaultData {
   static User? _user;
   static List<User> _users = [];
 }
+
+class SeiConfig {
+  bool enable = false;
+  String seiText = '';
+}

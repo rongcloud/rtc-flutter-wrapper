@@ -37,3 +37,4 @@ FOUNDATION_EXPORT const unsigned char RongRTCLibWrapperVersionString[];
 #import <RongRTCLibWrapper/RCRTCIWVideoSetup.h>
 #import <RongRTCLibWrapper/RCRTCIWView.h>
 #import <RongRTCLibWrapper/RCRTCIWFlutterView.h>
+#import <RongRTCLibWrapper/RCRTCIWNetworkProbeDelegate.h>

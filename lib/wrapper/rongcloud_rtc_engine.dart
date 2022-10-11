@@ -13,6 +13,7 @@ import 'rongcloud_rtc_custom_layout.dart';
 import 'rongcloud_rtc_listeners.dart';
 import 'rongcloud_rtc_setups.dart';
 import 'rongcloud_rtc_stats.dart';
+import 'rongcloud_rtc_rect.dart';
 
 part 'rongcloud_rtc_view.dart';
 
@@ -549,7 +550,7 @@ class RCRTCEngine {
   }
 
   Future<int> adjustAudioMixingPlaybackVolume(int volume) async {
-    int code = await _channel.invokeMethod('adjustAudioMixingVolume', volume) ?? -1;
+    int code = await _channel.invokeMethod('adjustAudioMixingPlaybackVolume', volume) ?? -1;
     return code;
   }
 
@@ -757,6 +758,113 @@ class RCRTCEngine {
       'disband': disband,
     };
     int code = await _channel.invokeMethod('leaveSubRoom', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> switchLiveRole(RCRTCRole role) async {
+    int code = await _channel.invokeMethod('switchLiveRole', role.index) ?? -1;
+    return code;
+  }
+
+  Future<int> enableSei(bool enable) async {
+    int code = await _channel.invokeMethod('enableSei', enable) ?? -1;
+    return code;
+  }
+
+  Future<int> sendSei(String sei) async {
+    int code = await _channel.invokeMethod('sendSei', sei) ?? -1;
+    return code;
+  }
+
+  Future<int> enableLiveMixInnerCdnStream(bool enable) async {
+    Map<String, dynamic> arguments = {
+      'enable': enable,
+    };
+    int code = await _channel.invokeMethod('enableLiveMixInnerCdnStream', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> subscribeLiveMixInnerCdnStream() async {
+    int code = await _channel.invokeMethod('subscribeLiveMixInnerCdnStream') ?? -1;
+    return code;
+  }
+
+  Future<int> unsubscribeLiveMixInnerCdnStream() async {
+    int code = await _channel.invokeMethod('unsubscribeLiveMixInnerCdnStream') ?? -1;
+    return code;
+  }
+
+  Future<int> muteLiveMixInnerCdnStream(bool mute) async {
+    Map<String, dynamic> arguments = {
+      'mute': mute,
+    };
+    int code = await _channel.invokeMethod('muteLiveMixInnerCdnStream', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> setLiveMixInnerCdnStreamView(RCRTCView view) async {
+    Map<String, dynamic> arguments = {
+      'view': view._id,
+    };
+    int code = await _channel.invokeMethod('setLiveMixInnerCdnStreamView', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> removeLiveMixInnerCdnStreamView() async {
+    int code = await _channel.invokeMethod('removeLiveMixInnerCdnStreamView') ?? -1;
+    return code;
+  }
+
+  Future<int> setLocalLiveMixInnerCdnVideoResolution(int width, int height) async {
+    Map<String, dynamic> arguments = {
+      'width': width,
+      'height': height,
+    };
+    int code = await _channel.invokeMethod('setLocalLiveMixInnerCdnVideoResolution', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> setLocalLiveMixInnerCdnVideoFps(RCRTCVideoFps fps) async {
+    Map<String, dynamic> arguments = {
+      'fps': fps.index,
+    };
+    int code = await _channel.invokeMethod('setLocalLiveMixInnerCdnVideoFps', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> startNetworkProbe(RCRTCNetworkProbeListener listener) async {
+    _networkProbeListener = listener;
+    int code = await _channel.invokeMethod('startNetworkProbe') ?? -1;
+    return code;
+  }
+
+  Future<int> stopNetworkProbe() async {
+    int code = await _channel.invokeMethod('stopNetworkProbe') ?? -1;
+    return code;
+  }
+
+  Future<int> startEchoTest(int timeInterval) async {
+    int code = await _channel.invokeMethod('startEchoTest', timeInterval) ?? -1;
+    return code;
+  }
+
+  Future<int> stopEchoTest() async {
+    int code = await _channel.invokeMethod('stopEchoTest') ?? -1;
+    return code;
+  }
+
+  Future<int> setWatermark(String imagePath, Point<double> position, double zoom) async {
+    Map<String, dynamic> arguments = {
+      'imagePath': imagePath,
+      'position': {'x': position.x, 'y': position.y},
+      'zoom': zoom,
+    };
+    int code = await _channel.invokeMethod('setWatermark', arguments) ?? -1;
+    return code;
+  }
+
+  Future<int> removeWatermark() async {
+    int code = await _channel.invokeMethod('removeWatermark') ?? -1;
     return code;
   }
 
@@ -997,12 +1105,12 @@ class RCRTCEngine {
         int argument = call.arguments;
         onRemoteLiveMixFirstFrame?.call(RCRTCMediaType.values[argument]);
         break;
-      // case 'engine:onMessageReceived':
-      //   Map<dynamic, dynamic> arguments = call.arguments;
-      //   String id = arguments['id'];
-      //   Message? message = MessageFactory.instance?.string2Message(arguments['message']);
-      //   if (message != null) onMessageReceived?.call(id, message);
-      //   break;
+    // case 'engine:onMessageReceived':
+    //   Map<dynamic, dynamic> arguments = call.arguments;
+    //   String id = arguments['id'];
+    //   Message? message = MessageFactory.instance?.string2Message(arguments['message']);
+    //   if (message != null) onMessageReceived?.call(id, message);
+    //   break;
       case 'engine:onCustomStreamPublished':
         Map<dynamic, dynamic> arguments = call.arguments;
         String tag = arguments['tag'];
@@ -1143,6 +1251,99 @@ class RCRTCEngine {
         String uid = arguments['uid'];
         onSubRoomDisband?.call(rid, uid);
         break;
+      case 'engine:onLiveRoleSwitched':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int role = arguments['role'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLiveRoleSwitched?.call(RCRTCRole.values[role], code, message);
+        break;
+      case 'engine:onRemoteLiveRoleSwitched':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String rid = arguments['rid'];
+        String uid = arguments['uid'];
+        int role = arguments['role'];
+        onRemoteLiveRoleSwitched?.call(rid, uid, RCRTCRole.values[role]);
+        break;
+      case 'engine:onSeiEnabled':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        bool enable = arguments['enable'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onSeiEnabled?.call(enable, code, message);
+        break;
+      case 'engine:onSeiReceived':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        String rid = arguments['rid'];
+        String uid = arguments['uid'];
+        String sei = arguments['sei'];
+        onSeiReceived?.call(rid, uid, sei);
+        break;
+      case 'engine:onLiveMixSeiReceived':
+        String sei = call.arguments;
+        onLiveMixSeiReceived?.call(sei);
+        break;
+      case 'engine:onLiveMixInnerCdnStreamEnabled':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        bool enable = arguments['enable'];
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLiveMixInnerCdnStreamEnabled?.call(enable, code, message);
+        break;
+      case 'engine:onLiveMixInnerCdnStreamSubscribed':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLiveMixInnerCdnStreamSubscribed?.call(code, message);
+        break;
+      case 'engine:onLiveMixInnerCdnStreamUnsubscribed':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLiveMixInnerCdnStreamUnsubscribed?.call(code, message);
+        break;
+      case 'engine:onRemoteLiveMixInnerCdnStreamPublished':
+        onRemoteLiveMixInnerCdnStreamPublished?.call();
+        break;
+      case 'engine:onRemoteLiveMixInnerCdnStreamUnpublished':
+        onRemoteLiveMixInnerCdnStreamUnpublished?.call();
+        break;
+      case 'engine:onLocalLiveMixInnerCdnVideoResolutionSet':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLocalLiveMixInnerCdnVideoResolutionSet?.call(code, message);
+        break;
+      case 'engine:onLocalLiveMixInnerCdnVideoFpsSet':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onLocalLiveMixInnerCdnVideoFpsSet?.call(code, message);
+        break;
+      case 'engine:onWatermarkSet':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onWatermarkSet?.call(code, message);
+        break;
+      case 'engine:onWatermarkRemoved':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onWatermarkRemoved?.call(code, message);
+        break;
+      case 'engine:onNetworkProbeStarted':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onNetworkProbeStarted?.call(code, message);
+        break;
+      case 'engine:onNetworkProbeStopped':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        onNetworkProbeStopped?.call(code, message);
+        break;
       case 'stats:onNetworkStats':
         Map<dynamic, dynamic> arguments = call.arguments;
         _statsListener?.onNetworkStats(RCRTCNetworkStats.fromJson(arguments));
@@ -1218,6 +1419,21 @@ class RCRTCEngine {
         Map<dynamic, dynamic> stats = arguments['stats'];
         _statsListener?.onRemoteCustomVideoStats(rid, uid, tag, RCRTCRemoteVideoStats.fromJson(stats));
         break;
+      case 'stats:onNetworkProbeUpLinkStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        _networkProbeListener?.onNetworkProbeUpLinkStats(RCRTCNetworkProbeStats.fromJson(arguments));
+        break;
+      case 'stats:onNetworkProbeDownLinkStats':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        _networkProbeListener?.onNetworkProbeDownLinkStats(RCRTCNetworkProbeStats.fromJson(arguments));
+        break;
+      case 'stats:onNetworkProbeFinished':
+        Map<dynamic, dynamic> arguments = call.arguments;
+        int code = arguments['code'];
+        String? message = arguments['message'];
+        _networkProbeListener?.onNetworkProbeFinished(code, message);
+        _networkProbeListener = null;
+        break;
     }
   }
 
@@ -1226,6 +1442,8 @@ class RCRTCEngine {
   final MethodChannel _channel;
 
   RCRTCStatsListener? _statsListener;
+
+  RCRTCNetworkProbeListener? _networkProbeListener;
 
   Function(int code, String? errMsg)? onError;
   Function(String? roomId, String? errMsg)? onKicked;
@@ -1317,4 +1535,33 @@ class RCRTCEngine {
 
   Function(String roomId)? onSubRoomBanded;
   Function(String roomId, String userId)? onSubRoomDisband;
+
+  Function(RCRTCRole role, int code, String? errMsg)? onLiveRoleSwitched;
+  Function(String roomId, String userId, RCRTCRole role)? onRemoteLiveRoleSwitched;
+
+  Function(bool enable, int code, String? errMsg)? onSeiEnabled;
+  Function(String roomId, String userId, String sei)? onSeiReceived;
+  Function(String sei)? onLiveMixSeiReceived;
+
+  Function(bool enable, int code, String? errMsg)? onLiveMixInnerCdnStreamEnabled;
+
+  Function(int code, String? errMsg)? onLiveMixInnerCdnStreamSubscribed;
+
+  Function(int code, String? errMsg)? onLiveMixInnerCdnStreamUnsubscribed;
+
+  Function()? onRemoteLiveMixInnerCdnStreamPublished;
+
+  Function()? onRemoteLiveMixInnerCdnStreamUnpublished;
+
+  Function(int code, String? errMsg)? onLocalLiveMixInnerCdnVideoResolutionSet;
+
+  Function(int code, String? errMsg)? onLocalLiveMixInnerCdnVideoFpsSet;
+
+  Function(int code, String? errMsg)? onWatermarkSet;
+
+  Function(int code, String? errMsg)? onWatermarkRemoved;
+
+  Function(int code, String? errMsg)? onNetworkProbeStarted;
+
+  Function(int code, String? errMsg)? onNetworkProbeStopped;
 }

@@ -725,19 +725,122 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - 内置 cdn 回调
 
-- (void)onLiveMixInnerCdnStreamEnabled:(BOOL)enabled
+/**
+ 开启内置CDN推流回调
+ @param enable 开启/关闭
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onLiveMixInnerCdnStreamEnabled:(BOOL)enable
                                   code:(NSInteger)code
-                               message:(NSString *)errMsg;
+                                errMsg:(NSString *)errMsg;
 
+/**
+ 远端发布内置CDN流
+ */
 - (void)onRemoteLiveMixInnerCdnStreamPublished;
 
+/**
+ 远端取消发布内置CDN流
+ */
 - (void)onRemoteLiveMixInnerCdnStreamUnpublished;
 
+/**
+ 订阅内置CDN流回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
 - (void)onLiveMixInnerCdnStreamSubscribed:(NSInteger)code
-                                  message:(NSString *)errMsg;
-
+                                  errMsg:(NSString *)errMsg;
+/**
+ 取消订阅内置CDN流回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
 - (void)onLiveMixInnerCdnStreamUnsubscribed:(NSInteger)code
-                                    message:(NSString *)errMsg;
+                                     errMsg:(NSString *)errMsg;
+/**
+ 设置内置CDN流分辨率回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onLocalLiveMixInnerCdnVideoResolutionSet:(NSInteger)code
+                                          errMsg:(NSString *)errMsg;
+/**
+ 设置内置CDN流帧率回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onLocalLiveMixInnerCdnVideoFpsSet:(NSInteger)code
+                                   errMsg:(NSString *)errMsg;
+
+/**
+ 设置水印回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onWatermarkSet:(NSInteger)code
+                errMsg:(NSString *)errMsg;
+
+/**
+ 删除水印回调
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onWatermarkRemoved:(NSInteger)code
+                    errMsg:(NSString *)errMsg;
+
+/**
+ 网络探测开始
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onNetworkProbeStarted:(NSInteger)code
+                       errMsg:(NSString *)errMsg;
+
+/**
+ 网络探测停止
+ @param code        错误码
+ @param errMsg   错误消息
+ */
+- (void)onNetworkProbeStopped:(NSInteger)code
+                       errMsg:(NSString *)errMsg;
+
+#pragma mark - SEI 回调
+
+/*!
+ 本地用户开关 SEI 操作回调
+ @param enable 是否开启
+ @param code 错误码
+ @param errMsg 错误消息
+ @discussion
+ 本地用户开关摄像头操作回调
+ */
+- (void)onSeiEnabled:(BOOL)enable
+                code:(NSInteger)code
+              errMsg:(NSString *)errMsg;
+
+/*!
+ 接收到远端用户发送的 SEI 通知
+ @param roomId 房间 id
+ @param userId 用户 id
+ @param sei SEI 数据
+ @discussion
+ 接收到远端用户发送的 SEI 通知
+ */
+- (void)onSeiReceived:(NSString *)roomId
+               userId:(NSString *)userId
+                  sei:(NSString *)sei;
+
+/*!
+ 观众接收到合流 SEI 通知
+ 
+ @param sei SEI 数据
+ @discussion 观众角色订阅直播合流后，该回调会接收以下两种类型的数据。
+ 1.MCU server 会主动通过该接口回调主播合流布局的信息 {"mcuRoomState":"xxx"}
+ 2.如果远端主播有发送 SEI，可以通过此回调接收数据。
+ */
+- (void)onLiveMixSeiReceived:(NSString *)sei;
 
 @end
 

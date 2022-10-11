@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
@@ -326,6 +327,20 @@ class HostPageModel extends AbstractModel implements Model {
     int code = await Utils.engine?.responseJoinSubRoomRequest(rid, uid, agree) ?? -1;
     if (code != 0) {
       Utils.engine?.onJoinSubRoomRequestResponded = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  Future<int> enableInnerCDN(bool enable) async {
+    Completer<int> completer = Completer();
+    Utils.engine?.onLiveMixInnerCdnStreamEnabled = (bool enable, int code, String? errMsg) {
+      Utils.engine?.onLiveMixInnerCdnStreamEnabled = null;
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.enableLiveMixInnerCdnStream(enable) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onLiveMixInnerCdnStreamEnabled = null;
       return code;
     }
     return completer.future;

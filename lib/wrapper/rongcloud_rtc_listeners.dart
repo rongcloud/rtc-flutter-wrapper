@@ -31,3 +31,9 @@ abstract class RCRTCStatsListener {
 
   void onRemoteCustomVideoStats(String roomId, String userId, String tag, RCRTCRemoteVideoStats stats) {}
 }
+
+abstract class RCRTCNetworkProbeListener {
+  void onNetworkProbeUpLinkStats(RCRTCNetworkProbeStats stats) {}
+  void onNetworkProbeDownLinkStats(RCRTCNetworkProbeStats stats) {}
+  void onNetworkProbeFinished(int code, String? errMsg) {}
+}

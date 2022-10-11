@@ -14,6 +14,11 @@ enum RCRTCRole {
   live_audience,
 }
 
+enum RCRTCJoinType {
+  kick,
+  refuse,
+}
+
 enum RCRTCAudioCodecType {
   pcmu,
   opus,
@@ -38,6 +43,7 @@ enum RCRTCVideoCodecType {
 }
 
 enum RCRTCAudioQuality {
+  gaming,
   speech,
   music,
   music_high,
@@ -47,6 +53,7 @@ enum RCRTCAudioScenario {
   normal,
   music_chatroom,
   music_classroom,
+  gaming_chatroom,
 }
 
 enum RCRTCVideoFps {
@@ -255,4 +262,13 @@ enum RCRTCAudioMixingMode {
   none,
   mix,
   replace,
+}
+
+enum RCRTCNetworkQualityLevel {
+  quality_excellent,
+  quality_good,
+  quality_poor,
+  quality_bad,
+  quality_very_bad,
+  quality_down,
 }

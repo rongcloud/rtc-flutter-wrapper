@@ -1,7 +1,12 @@
 package cn.rongcloud.rtc.wrapper.flutter;
 
+import static cn.rongcloud.rtc.wrapper.constants.RCRTCIWErrorCode.PARAM_ERROR;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
@@ -13,29 +18,32 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.rongcloud.rtc.wrapper.RCRTCIWEngine;
-import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioDeviceType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCamera;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalVideoStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWMediaType;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkProbeStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRole;
 import cn.rongcloud.rtc.wrapper.listener.IRCRTCIWAudioRouteingListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWListener;
+import cn.rongcloud.rtc.wrapper.listener.RCRTCIWNetworkProbeListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableAudioFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableVideoFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableAudioFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableVideoFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWStatusListener;
+import cn.rongcloud.rtc.wrapper.utils.RCWrapperLog;
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterAssets;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.rong.flutter.imlib.MessageFactory;
 import io.rong.imlib.model.Message;
+import io.rong.message.utils.BitmapUtil;
 
 /**
  * @author panmingda
@@ -78,7 +86,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         return code;
     }
 
-    public int setRemoteAudioReceivedListener(String userId, RCRTCIWOnReadableAudioFrameListener listener) {
+    public int setRemoteAudioReceivedListener(String userId, RCRTCIWOnWritableAudioFrameListener listener) {
         int code = -1;
         if (engine != null) {
             code = engine.setRemoteAudioReceivedListener(userId, listener);
@@ -419,6 +427,56 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 break;
             case "leaveSubRoom":
                 leaveSubRoom(call, result);
+                break;
+            case "switchLiveRole":
+                switchLiveRole(call, result);
+                break;
+            case "enableSei":
+                enableSei(call, result);
+                break;
+            case "sendSei":
+                sendSei(call, result);
+            case "enableLiveMixInnerCdnStream":
+                enableLiveMixInnerCdnStream(call, result);
+                break;
+            case "subscribeLiveMixInnerCdnStream":
+                subscribeLiveMixInnerCdnStream(result);
+                break;
+            case "unsubscribeLiveMixInnerCdnStream":
+                unsubscribeLiveMixInnerCdnStream(result);
+                break;
+            case "muteLiveMixInnerCdnStream":
+                muteLiveMixInnerCdnStream(call, result);
+                break;
+            case "setLiveMixInnerCdnStreamView":
+                setLiveMixInnerCdnStreamView(call, result);
+                break;
+            case "removeLiveMixInnerCdnStreamView":
+                removeLiveMixInnerCdnStreamView(result);
+                break;
+            case "setLocalLiveMixInnerCdnVideoResolution":
+                setLocalLiveMixInnerCdnVideoResolution(call, result);
+                break;
+            case "setLocalLiveMixInnerCdnVideoFps":
+                setLocalLiveMixInnerCdnVideoFps(call, result);
+                break;
+            case "startNetworkProbe":
+                startNetworkProbe(result);
+                break;
+            case "stopNetworkProbe":
+                stopNetworkProbe(result);
+                break;
+            case "setWatermark":
+                setWatermark(call, result);
+                break;
+            case "removeWatermark":
+                removeWatermark(result);
+                break;
+            case "startEchoTest":
+                startEchoTest(call, result);
+                break;
+            case "stopEchoTest":
+                stopEchoTest(result);
                 break;
             default:
                 MainThreadPoster.notImplemented(result);
@@ -1442,7 +1500,185 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
         MainThreadPoster.success(result, code);
     }
-    
+
+    private void switchLiveRole(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer role = (Integer) call.arguments;
+            code = engine.switchLiveRole(ArgumentAdapter.toRole(role));
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void enableSei(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            boolean enable = (boolean) call.arguments;
+            code = engine.enableSei(enable);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void sendSei(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String sei = (String) call.arguments;
+            assert (sei != null);
+            code = engine.sendSei(sei);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void enableLiveMixInnerCdnStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Boolean enable = call.argument("enable");
+            assert (enable != null);
+            code = engine.enableLiveMixInnerCdnStream(enable);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void subscribeLiveMixInnerCdnStream(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.subscribeLiveMixInnerCdnStream();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void unsubscribeLiveMixInnerCdnStream(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.unsubscribeLiveMixInnerCdnStream();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void muteLiveMixInnerCdnStream(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Boolean mute = call.argument("mute");
+            assert (mute != null);
+            code = engine.muteLiveMixInnerCdnStream(mute);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setLiveMixInnerCdnStreamView(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer view = call.argument("view");
+            assert (view != null);
+            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
+            assert (origin != null);
+            try {
+                Integer ret = (Integer) SET_LIVE_MIX_INNER_CDN_VIEW_METHOD.invoke(engine, origin.view);
+                assert (ret != null);
+                code = ret;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void removeLiveMixInnerCdnStreamView(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.removeLiveMixInnerCdnStreamView();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setLocalLiveMixInnerCdnVideoResolution(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer width = call.argument("width");
+            assert (width != null);
+            Integer height = call.argument("height");
+            assert (height != null);
+            code = engine.setLocalLiveMixInnerCdnVideoResolution(width, height);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setLocalLiveMixInnerCdnVideoFps(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            Integer fps = call.argument("fps");
+            assert (fps != null);
+            code = engine.setLocalLiveMixInnerCdnVideoFps(ArgumentAdapter.toVideoFps(fps));
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void startNetworkProbe(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.startNetworkProbe(new NetworkProbeListenerImpl());
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void stopNetworkProbe(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.stopNetworkProbe();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void setWatermark(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            String imagePath = call.argument("imagePath");
+            assert (imagePath != null);
+            HashMap<String, Double> position = call.argument("position");
+            assert (position != null);
+            Double zoom = call.argument("zoom");
+            assert (zoom != null);
+            if (!imagePath.startsWith("file://")) {
+                imagePath = "file://" + imagePath;
+            }
+            Bitmap imageBitMap = BitmapUtil.getFactoryBitmap(context, Uri.parse(imagePath));
+            if (imageBitMap == null) {
+                RCWrapperLog.logE("setWatermark", "imageBitMap is null");
+                code = PARAM_ERROR.getCode();
+            } else {
+                PointF point = ArgumentAdapter.toPointF(position);
+                code = engine.setWatermark(imageBitMap, point, zoom.floatValue());
+                if (!imageBitMap.isRecycled()) imageBitMap.recycle();
+            }
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void removeWatermark(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.removeWatermark();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void startEchoTest(MethodCall call, Result result) {
+        int code = -1;
+        if (engine != null) {
+            int timeInterval = (int) call.arguments;
+            code = engine.startEchoTest(timeInterval);
+        }
+        MainThreadPoster.success(result, code);
+    }
+
+    private void stopEchoTest(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.stopEchoTest();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
     private static class SingletonHolder {
         @SuppressLint("StaticFieldLeak")
         private static final RCRTCEngineWrapper instance = new RCRTCEngineWrapper();
@@ -1957,15 +2193,15 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
 
         @Override
         public void onMessageReceived(String roomId, Message message) {
-            final HashMap<String, Object> arguments = new HashMap<>();
-            arguments.put("id", roomId);
-            arguments.put("message", MessageFactory.getInstance().message2String(message));
-            MainThreadPoster.post(new Runnable() {
-                @Override
-                public void run() {
-                    channel.invokeMethod("engine:onMessageReceived", arguments);
-                }
-            });
+//            final HashMap<String, Object> arguments = new HashMap<>();
+//            arguments.put("id", roomId);
+//            arguments.put("message", MessageFactory.getInstance().message2String(message));
+//            MainThreadPoster.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    channel.invokeMethod("engine:onMessageReceived", arguments);
+//                }
+//            });
         }
 
         @Override
@@ -2239,6 +2475,210 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 }
             });
         }
+
+        @Override
+        public void onLiveRoleSwitched(RCRTCIWRole current, int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("role", current.ordinal());
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveRoleSwitched", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteLiveRoleSwitched(String roomId, String userId, RCRTCIWRole role) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("role", role.ordinal());
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteLiveRoleSwitched", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onSeiEnabled(boolean enable, int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("enable", enable);
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSeiEnabled", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onSeiReceived(String roomId, String userId, String sei) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("rid", roomId);
+            arguments.put("uid", userId);
+            arguments.put("sei", sei);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onSeiReceived", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixSeiReceived(final String sei) {
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveMixSeiReceived", sei);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixInnerCdnStreamEnabled(boolean enable, int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("enable", enable);
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveMixInnerCdnStreamEnabled", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixInnerCdnStreamSubscribed(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveMixInnerCdnStreamSubscribed", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLiveMixInnerCdnStreamUnsubscribed(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLiveMixInnerCdnStreamUnsubscribed", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteLiveMixInnerCdnStreamPublished() {
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteLiveMixInnerCdnStreamPublished", null);
+                }
+            });
+        }
+
+        @Override
+        public void onRemoteLiveMixInnerCdnStreamUnpublished() {
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onRemoteLiveMixInnerCdnStreamUnpublished", null);
+                }
+            });
+        }
+
+        @Override
+        public void onLocalLiveMixInnerCdnVideoResolutionSet(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLocalLiveMixInnerCdnVideoResolutionSet", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onLocalLiveMixInnerCdnVideoFpsSet(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onLocalLiveMixInnerCdnVideoFpsSet", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onWatermarkSet(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onWatermarkSet", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onWatermarkRemoved(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onWatermarkRemoved", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onNetworkProbeStarted(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onNetworkProbeStarted", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onNetworkProbeStopped(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("engine:onNetworkProbeStopped", arguments);
+                }
+            });
+        }
     }
 
     private class StatsListenerImpl extends RCRTCIWStatusListener {
@@ -2409,6 +2849,43 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
     }
 
+    private class NetworkProbeListenerImpl extends RCRTCIWNetworkProbeListener {
+        @Override
+        public void onNetworkProbeUpLinkStats(RCRTCIWNetworkProbeStats stats) {
+            final HashMap<String, Object> arguments = ArgumentAdapter.fromNetworkProbeStats(stats);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onNetworkProbeUpLinkStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onNetworkProbeDownLinkStats(RCRTCIWNetworkProbeStats stats) {
+            final HashMap<String, Object> arguments = ArgumentAdapter.fromNetworkProbeStats(stats);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onNetworkProbeDownLinkStats", arguments);
+                }
+            });
+        }
+
+        @Override
+        public void onNetworkProbeFinished(int code, String errMsg) {
+            final HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("code", code);
+            arguments.put("message", errMsg);
+            MainThreadPoster.post(new Runnable() {
+                @Override
+                public void run() {
+                    channel.invokeMethod("stats:onNetworkProbeFinished", arguments);
+                }
+            });
+        }
+    }
+
     private Context context;
     private FlutterAssets assets;
     private MethodChannel channel;
@@ -2420,6 +2897,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     private static Method SET_LIVE_MIX_VIEW_METHOD;
     private static Method SET_LOCAL_CUSTOM_VIEW_METHOD;
     private static Method SET_REMOTE_CUSTOM_VIEW_METHOD;
+    private static Method SET_LIVE_MIX_INNER_CDN_VIEW_METHOD;
 
     static {
         try {
@@ -2435,6 +2913,8 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             SET_LOCAL_CUSTOM_VIEW_METHOD.setAccessible(true);
             SET_REMOTE_CUSTOM_VIEW_METHOD = clazz.getDeclaredMethod("setRemoteCustomStreamBaseView", String.class, String.class, viewClazz);
             SET_REMOTE_CUSTOM_VIEW_METHOD.setAccessible(true);
+            SET_LIVE_MIX_INNER_CDN_VIEW_METHOD = clazz.getDeclaredMethod("setLiveMixInnerCdnStreamBaseView", viewClazz);
+            SET_LIVE_MIX_INNER_CDN_VIEW_METHOD.setAccessible(true);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             e.printStackTrace();
         }

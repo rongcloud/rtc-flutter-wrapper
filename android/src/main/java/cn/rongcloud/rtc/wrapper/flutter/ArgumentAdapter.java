@@ -1,5 +1,7 @@
 package cn.rongcloud.rtc.wrapper.flutter;
 
+import android.graphics.PointF;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -14,11 +16,13 @@ import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioQuality;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioScenario;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCamera;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCameraCaptureOrientation;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWJoinType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLiveMixLayoutMode;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLiveMixRenderMode;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalVideoStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWMediaType;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkProbeStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWNetworkStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
@@ -93,6 +97,10 @@ final class ArgumentAdapter {
         return RCRTCIWStreamType.values()[type];
     }
 
+    static RCRTCIWJoinType toJoinType(@NonNull Integer type) {
+        return RCRTCIWJoinType.values()[type];
+    }
+
     static RCRTCIWAudioSetup toAudioSetup(@NonNull HashMap<String, Object> setup) {
         Integer codec = (Integer) setup.get("codec");
         assert (codec != null);
@@ -164,13 +172,16 @@ final class ArgumentAdapter {
     }
 
     static RCRTCIWRoomSetup toRoomSetup(@NonNull HashMap<String, Object> setup) {
-        Integer type = (Integer) setup.get("type");
-        assert (type != null);
+        Integer mediaType = (Integer) setup.get("mediaType");
+        assert (mediaType != null);
         Integer role = (Integer) setup.get("role");
         assert (role != null);
+        Integer joinType = (Integer) setup.get("joinType");
+        assert (joinType != null);
         RCRTCIWRoomSetup.Builder builder = RCRTCIWRoomSetup.Builder.create()
-                .withMediaType(toMediaType(type))
-                .withRole(toRole(role));
+                .withMediaType(toMediaType(mediaType))
+                .withRole(toRole(role))
+                .withJoinType(toJoinType(joinType));
         return builder.build();
     }
 
@@ -231,6 +242,14 @@ final class ArgumentAdapter {
         return new RCRTCIWCustomLayout(toStreamType(type), id, tag != null ? (String) tag : null, x, y, width, height);
     }
 
+    static PointF toPointF(@NonNull HashMap<String, Double> rect) {
+        Double x = (Double) rect.get("x");
+        assert (x != null);
+        Double y = (Double) rect.get("y");
+        assert (y != null);
+        return new PointF(x.floatValue(), y.floatValue());
+    }
+
     static HashMap<String, Object> fromNetworkStats(@NonNull RCRTCIWNetworkStats stats) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("type", stats.getType().ordinal());
@@ -287,4 +306,13 @@ final class ArgumentAdapter {
         map.put("rtt", stats.getRtt());
         return map;
     }
+
+    static HashMap<String, Object> fromNetworkProbeStats(@NonNull RCRTCIWNetworkProbeStats stats) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("qualityLevel", stats.getQualityLevel().ordinal());
+        map.put("rtt", stats.getRtt());
+        map.put("packetLostRate", stats.getPacketLostRate());
+        return map;
+    }
+
 }

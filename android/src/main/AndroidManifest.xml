@@ -7,4 +7,5 @@
             android:value="cn.rongcloud.rtc.wrapper.flutter.Version" />
     </application>
 
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 </manifest>

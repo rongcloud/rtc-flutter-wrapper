@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:context_holder/context_holder.dart';
 import 'package:dio/dio.dart';
@@ -7,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:handy_toast/handy_toast.dart';
-import 'package:rongcloud_im_plugin/rongcloud_im_plugin.dart';
+import 'package:rongcloud_im_wrapper_plugin/rongcloud_im_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/constants.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
@@ -16,6 +18,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/extension.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/global_config.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 List<DropdownMenuItem<RCRTCVideoResolution>> videoResolutionItems() {
   List<DropdownMenuItem<RCRTCVideoResolution>> items = [];
@@ -1047,7 +1050,7 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                   Colors.yellow,
                 ],
                 onMainColorChange: (color) {
-                  Utils.engine?.setLiveMixBackgroundColor(color![900]!);
+                  Utils.engine?.setLiveMixBackgroundColor(color![500]!);
                   Navigator.pop(context);
                 },
               ),
@@ -2066,12 +2069,12 @@ class MessagePanel extends StatefulWidget {
 
 class _MessagePanelState extends State<MessagePanel> {
   _MessagePanelState(this.widget) {
-    RongIMClient.onMessageReceived = (message, left) {
+    Utils.imEngine?.onMessageReceived = (RCIMIWMessage? message, int? left, bool? offline, bool? hasPackage,) {
       _received(message);
     };
   }
 
-  void _received(Message? message) {
+  void _received(RCIMIWMessage? message) {
     if (message == null) return;
     setState(() {
       _messages.add(message);
@@ -2080,7 +2083,7 @@ class _MessagePanelState extends State<MessagePanel> {
 
   @override
   void dispose() {
-    RongIMClient.onMessageReceived = null;
+    Utils.imEngine?.onMessageReceived = null;
     _leave(false);
     super.dispose();
   }
@@ -2116,7 +2119,8 @@ class _MessagePanelState extends State<MessagePanel> {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(horizontal: 10.dp),
               itemBuilder: (context, index) {
-                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${_messages[index].content?.conversationDigest()}'.toText();
+                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${(_messages[index] as RCIMIWTextMessage).text}'
+                    .toText();
               },
               separatorBuilder: (context, index) {
                 return Divider(
@@ -2162,7 +2166,7 @@ class _MessagePanelState extends State<MessagePanel> {
     setState(() {
       _joined = true;
     });
-    RongIMClient.joinChatRoom(widget.id, -1);
+    Utils.imEngine?.joinChatRoom(widget.id, -1, true);
   }
 
   void _leave([bool set = true]) {
@@ -2171,18 +2175,37 @@ class _MessagePanelState extends State<MessagePanel> {
       setState(() {
         _joined = false;
       });
-    RongIMClient.quitChatRoom(widget.id);
+    Utils.imEngine?.leaveChatRoom(widget.id);
   }
 
   void _send() async {
     if (!_joined) return '请先加入房间'.toast();
-    TextMessage message = TextMessage();
-    message.content = '我是${widget.host ? '主播' : '观众'}';
-    _received(await RongIMClient.sendMessage(RCConversationType.ChatRoom, widget.id, message));
+    String content = '我是${widget.host ? '主播' : '观众'}';
+    RCIMIWTextMessage? message = await Utils.imEngine?.createTextMessage(RCIMIWConversationType.chatroom, widget.id, '', content);
+    int result = await _sendMessage(message);
+    if (result != 0) {
+      '发消息接口调用失败'.toast();
+    }
+  }
+
+  Future<int> _sendMessage(RCIMIWTextMessage? textMessage) async {
+    if (textMessage == null) {
+      return -1;
+    }
+    Completer<int> completer = new Completer();
+    Utils.imEngine?.onMessageAttached = (RCIMIWMessage? message) {
+      completer.complete(0);
+      _received(message as RCIMIWTextMessage);
+    };
+    int code = await Utils.imEngine?.sendMessage(textMessage) ?? -1;
+    if (code != 0) {
+      return code;
+    }
+    return completer.future;
   }
 
   final MessagePanel widget;
-  final List<Message> _messages = [];
+  final List<RCIMIWMessage> _messages = [];
   bool _joined = false;
 }
 
@@ -2500,7 +2523,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
               children: [
                 Spacer(),
                 '播放'.onClick(
-                  () {
+                      () {
                     widget.engine.startAudioMixingFromAssets(
                       path: 'assets/audio/music_$index.mp3',
                       mode: mode,
@@ -2508,7 +2531,8 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
                       loop: count,
                     );
                     widget.engine.adjustAudioMixingVolume(volume);
-                    widget.engine.adjustAudioMixingPlaybackVolume(playbackVolume);
+                    widget.engine.adjustAudioMixingPlaybackVolume(
+                        playbackVolume);
                     widget.engine.adjustAudioMixingPublishVolume(publishVolume);
                   },
                   color: Colors.black,
@@ -2517,7 +2541,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
                   width: 20.dp,
                 ),
                 '停止'.onClick(
-                  () {
+                      () {
                     widget.engine.stopAudioMixing();
                   },
                   color: Colors.black,
@@ -2563,3 +2587,729 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
   bool playback = true;
   int count = 1;
 }
+
+
+class EchoTest extends StatefulWidget {
+  const EchoTest();
+
+  @override
+  State<EchoTest> createState() => _EchoTestState();
+}
+
+class _EchoTestState extends State<EchoTest> {
+
+  @override
+  void initState() {
+    _createEngine();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _destroy();
+    super.dispose();
+  }
+
+  _destroy() async {
+    if (_periodicTimer?.isActive ?? false) {
+      _periodicTimer!.cancel();
+      _periodicTimer = null;
+    }
+    await _engine?.stopEchoTest();
+    _engine?.destroy();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('麦克风&扬声器检测'),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(20.dp),
+        child: Column(
+          children: [
+            SizedBox( height: 15.dp,),
+            Row(
+              children: [
+                Text('时间',
+                  style: TextStyle(fontSize: 18.sp),
+                ),
+                SizedBox(width: 15.dp,),
+                Expanded(
+                  child: InputBox(
+                    type: TextInputType.number,
+                    size: 18.sp,
+                    hint: '请输入时间（范围：2s~10s）',
+                    controller: _timeInputController,
+                    formatter: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox( height: 15.dp,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Button(_start ? '结束检测' :'开始检测', callback:_start ? _stopTest : _startTest,),
+              ],
+            ),
+            SizedBox(height: 15.dp,),
+
+            _start && _displayCountdown > 0 ? Column(
+              children: [
+                Text(
+                  '$_displayCountdown',
+                  style: TextStyle(
+                    fontSize: 40.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  '${_countdown > _timeInputController.text.toInt ? '现在应该能听到刚才的声音' : '请说一些话'}',
+                  softWrap: true,
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ) : Container(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _createEngine() async {
+    _engine = await RCRTCEngine.create();
+  }
+
+  void _startTest() async {
+    if (_timeInputController.text.length == 0) {
+      '请输入时间'.toast();
+      return;
+    }
+    setState(() {
+      _start = true;
+    });
+    FocusScope.of(context).requestFocus(FocusNode());
+    Loading.show(context);
+    int inputTime = _timeInputController.text.toInt;
+    if (inputTime < 2) {
+      inputTime = 2;
+      _timeInputController.text = '2';
+    } else if (inputTime > 10) {
+      inputTime = 10;
+      _timeInputController.text = '10';
+    }
+    int code = await _engine?.startEchoTest(inputTime) ?? -1;
+    Loading.dismiss(context);
+    if (code == 0) {
+      '已开始'.toast();
+    }
+    _periodicTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        setState(() {
+          _countdown += 1;
+          if (_countdown > inputTime*2) {
+            _countdown = 0;
+            _periodicTimer!.cancel();
+            _periodicTimer = null;
+            return;
+          }
+          if (_countdown > inputTime) {
+            _displayCountdown -= 1;
+          } else {
+            _displayCountdown += 1;
+          }
+        });
+      },
+    );
+  }
+
+  Future<void> _stopTest() async {
+    if (_periodicTimer?.isActive ?? false) {
+      _periodicTimer!.cancel();
+      _periodicTimer = null;
+    }
+    setState(() {
+      _start = false;
+      _countdown = 0;
+      _displayCountdown = 0;
+    });
+    Loading.show(context);
+    int code = await _engine?.stopEchoTest() ?? -1;
+    Loading.dismiss(context);
+    if (code == 0) {
+      '已停止'.toast();
+    }
+  }
+
+  RCRTCEngine? _engine;
+  int _countdown = 0;
+  int _displayCountdown = 0;
+  bool _start = false;
+  Timer? _periodicTimer;
+  TextEditingController _timeInputController = TextEditingController();
+}
+
+class Watermark extends StatefulWidget {
+  const Watermark({required this.engine});
+
+  @override
+  State<Watermark> createState() => _WatermarkState();
+
+  final RCRTCEngine engine;
+}
+
+class _WatermarkState extends State<Watermark> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('设置水印'),),
+      body: Padding(
+        padding: EdgeInsets.all(15.dp),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40.dp,
+                  child: Text('x:'),
+                ),
+                Slider(value: _x, min: 0.0, max: 1.0, onChanged: _xChanged),
+                Text('${_x.toStringAsFixed(1)}'),
+              ],
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 40.dp,
+                  child: Text('y:'),
+                ),
+                Slider(value: _y, min: 0.0, max: 1.0, onChanged: _yChanged),
+                Text('${_y.toStringAsFixed(1)}'),
+              ],
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 40.dp,
+                  child: Text('zoom:'),
+                ),
+                Slider(value: _zoom, min: 0.0, max: 1.0, onChanged: _zoomChanged),
+                Text('${_zoom.toStringAsFixed(1)}'),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Button('设置水印', callback: _setWatermarkAction,),
+              ],
+            ),
+            SizedBox(height: 10.dp,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Button('删除水印', callback: _removeWatermarkAction,),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _xChanged(double value) {
+    setState(() {
+      _x = value;
+    });
+  }
+
+  void _yChanged(double value) {
+    setState(() {
+      _y = value;
+    });
+  }
+
+  void _zoomChanged(double value) {
+    setState(() {
+      _zoom = value;
+    });
+  }
+
+  void _setWatermarkAction() async {
+    AssetPickerConfig config = const AssetPickerConfig(maxAssets: 1, requestType: RequestType.image);
+    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, pickerConfig: config);
+    File? file = await assets?.first.originFile;
+    Loading.show(context);
+    int result = await _setWatermark(file?.absolute.path ?? '', Point(_x, _y), _zoom);
+    Loading.dismiss(context);
+    if (result == 0) {
+      '设置水印成功'.toast();
+    } else {
+      '设置水印失败'.toast();
+    }
+    Navigator.pop(context);
+  }
+
+  void _removeWatermarkAction() async {
+    Loading.show(context);
+    int result = await _removeWaterMark();
+    Loading.dismiss(context);
+    if (result == 0) {
+      '移除水印成功'.toast();
+    } else {
+      '移除水印失败'.toast();
+    }
+    Navigator.pop(context);
+  }
+
+  Future<int> _setWatermark(String imagePath, Point<double> position, double zoom) async {
+    Completer<int> completer = Completer();
+    widget.engine.onWatermarkSet = (int code, String? message) async {
+      widget.engine.onWatermarkSet = null;
+      completer.complete(code);
+    };
+    int code = await widget.engine.setWatermark(imagePath, position, zoom);
+    if (code != 0) {
+      widget.engine.onWatermarkSet = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  Future<int> _removeWaterMark() async {
+    Completer<int> completer = Completer();
+    widget.engine.onWatermarkRemoved = (int code, String? message) async {
+      widget.engine.onWatermarkRemoved = null;
+      completer.complete(code);
+    };
+    int code = await widget.engine.removeWatermark();
+    if (code != 0) {
+      widget.engine.onWatermarkRemoved = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  double _x = 0.2;
+  double _y = 0.2;
+  double _zoom = 0.2;
+}
+
+class NetworkProbe extends StatefulWidget {
+  const NetworkProbe();
+
+  @override
+  State<NetworkProbe> createState() => _NetworkProbeState();
+}
+
+class _NetworkProbeState extends State<NetworkProbe> implements RCRTCNetworkProbeListener {
+
+  @override
+  void initState() {
+    _createEngine();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _destroy();
+    super.dispose();
+  }
+
+  _destroy() async {
+    await _stopNetworkProbe();
+    _engine?.destroy();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('网络探测'),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(15.dp),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _started ? Button('主动结束', callback: _stop,) : Button('开启探测', callback: _start,)
+              ],
+            ),
+            SizedBox(height: 15.dp,),
+            _upLinkStats != null && _downLinkStats != null ? Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              border: TableBorder.all(
+                color: Colors.grey,
+                width: 1,
+                style: BorderStyle.solid,
+              ),
+              children: [
+                TableRow(
+                  children: [
+                    Text(
+                      '上行',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '质量:\n${_getQualityName(_upLinkStats!)}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '往返:\n${_upLinkStats?.rtt}ms',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '丢包率:\n${_upLinkStats?.packetLostRate}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    Text(
+                      '下行',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '质量:\n${_getQualityName(_downLinkStats!)}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '往返:\n${_downLinkStats?.rtt}ms',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Text(
+                      '丢包率:\n${_downLinkStats?.packetLostRate}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        color: Colors.black,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ) : Container(),
+          ],
+        ),
+      )
+    );
+  }
+
+  void _createEngine() async {
+    _engine = await RCRTCEngine.create();
+  }
+
+  _start() async {
+    Loading.show(context);
+    int result = await _startNetworkProbe();
+    Loading.dismiss(context);
+    if (result == 0) {
+      setState(() {
+        _started = true;
+      });
+      '开启成功'.toast();
+    } else {
+      '开启失败: $result'.toast();
+    }
+  }
+
+  _stop() async {
+    Loading.show(context);
+    int result = await _stopNetworkProbe();
+    Loading.dismiss(context);
+    if (result == 0) {
+      setState(() {
+        _started = false;
+      });
+      '停止成功'.toast();
+    } else {
+      '停止失败: $result'.toast();
+    }
+  }
+
+  Future<int> _startNetworkProbe() async {
+    Completer<int> completer = new Completer();
+    _engine?.onNetworkProbeStarted = (int code, String? errMsg) {
+      _engine?.onNetworkProbeStarted = null;
+      completer.complete(code);
+    };
+    int code = await _engine?.startNetworkProbe(this) ?? -1;
+    if (code != 0) {
+      _engine?.onNetworkProbeStarted = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  Future<int> _stopNetworkProbe() async {
+    Completer<int> completer = new Completer();
+    _engine?.onNetworkProbeStopped = (int code, String? errMsg) {
+      _engine?.onNetworkProbeStopped = null;
+      completer.complete(code);
+    };
+    int code = await _engine?.stopNetworkProbe() ?? -1;
+    if (code != 0) {
+      _engine?.onNetworkProbeStopped = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  @override
+  void onNetworkProbeUpLinkStats(RCRTCNetworkProbeStats stats) {
+    setState(() {
+      _upLinkStats = stats;
+    });
+  }
+
+  @override
+  void onNetworkProbeDownLinkStats(RCRTCNetworkProbeStats stats) {
+    setState(() {
+      _downLinkStats = stats;
+    });
+  }
+
+  @override
+  void onNetworkProbeFinished(int code, String? errMsg) {
+    setState(() {
+      _started = false;
+    });
+  }
+
+  String _getQualityName(RCRTCNetworkProbeStats stats) {
+    return stats.qualityLevel.name.replaceAll('quality_', '');
+  }
+
+  RCRTCEngine? _engine;
+  bool _started = false;
+  RCRTCNetworkProbeStats? _upLinkStats;
+  RCRTCNetworkProbeStats? _downLinkStats;
+}
+
+class Sei extends StatefulWidget {
+  const Sei(this.engine, this.config);
+
+  @override
+  State<Sei> createState() => _SeiState();
+
+  final SeiConfig config;
+  final RCRTCEngine engine;
+}
+
+class _SeiState extends State<Sei> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.engine.onSeiReceived = (String roomId, String userId, String sei) {
+      setState(() {
+        _receivedSeiText = 'roomId:$roomId, userId:$userId, sei:$sei';
+      });
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('SEI 功能配置'),),
+      body: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus &&
+              currentFocus.focusedChild != null) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.all(10.dp),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text('开启 SEI 功能',
+                    style: TextStyle(fontSize: 18.sp),
+                  ),
+                  SizedBox(width: 15.dp,),
+                  Switch(value: widget.config.enable, onChanged: _enableSeiAction)
+                ],
+              ),
+              SizedBox(height: 10.dp,),
+              Row(
+                children: [
+                  Text('发送的内容',
+                    style: TextStyle(fontSize: 18.sp),
+                  ),
+                  SizedBox(width: 15.dp,),
+                  Expanded(
+                    child: InputBox(
+                      type: TextInputType.text,
+                      size: 18.sp,
+                      hint: '发送 sei 的内容',
+                      controller: _textInputController,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.dp,),
+              Row(
+                children: [
+                  Text('发送的次数',
+                    style: TextStyle(fontSize: 18.sp),
+                  ),
+                  SizedBox(width: 15.dp,),
+                  Expanded(
+                    child: InputBox(
+                      type: TextInputType.number,
+                      size: 18.sp,
+                      hint: '发送 sei 的次数（2s 发一次）',
+                      controller: _countInputController,
+                      formatter: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.dp,),
+              Button(_sent ? '取消发送' : '发送', callback: _sent ? _cancelSend : _sendSei,),
+              SizedBox(height: 50.dp,),
+              Text('其他主播发送的 SEI 内容', style: TextStyle(fontSize: 19.sp, fontWeight: FontWeight.w500),),
+              SizedBox(
+                height: 20.dp,
+              ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    Text(
+                      _receivedSeiText,
+                      style: TextStyle(fontSize: 18.sp),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _enableSeiAction(bool enable) async {
+    int result = await _enableSei(enable);
+    if (result != 0) {
+      'sei 开关失败'.toast();
+    } else {
+      setState(() {
+        widget.config.enable = enable;
+      });
+    }
+
+  }
+
+  Future<int> _enableSei(bool enable) async {
+    Completer<int> completer = new Completer();
+    widget.engine.onSeiEnabled = (bool enable, int code, String? errMsg) {
+      widget.engine.onSeiEnabled = null;
+      completer.complete(code);
+    };
+    int code = await widget.engine.enableSei(enable);
+    if (code != 0) {
+      widget.engine.onSeiEnabled = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  _sendSei() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    String text = _textInputController.text;
+    int count = _countInputController.text.toInt;
+    if (text.isEmpty || count <= 0) {
+      '请填写正确的内容和次数'.toast();
+      return;
+    }
+    widget.config.seiText = text;
+    setState(() {
+      _sent = true;
+    });
+    const period = const Duration(seconds: 2);
+    Timer.periodic(period, (timer) async {
+      _sendSeiTimer = timer;
+      count--;
+      int sendSeiCode = await Utils.engine?.sendSei(text) ?? -1;
+      print('sendSeiCode: $sendSeiCode');
+      if (count <= 0) {
+        timer.cancel();
+        _sendSeiTimer = null;
+        setState(() {
+          _sent = false;
+        });
+      }
+    });
+  }
+
+  _cancelSend() {
+    setState(() {
+      _sent = false;
+    });
+    _sendSeiTimer?.cancel();
+    _sendSeiTimer = null;
+  }
+
+  TextEditingController _textInputController = TextEditingController();
+  TextEditingController _countInputController = TextEditingController();
+
+  Timer? _sendSeiTimer;
+  bool _sent = false;
+  String _receivedSeiText = '';
+}
+
+
+
+

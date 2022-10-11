@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/constants.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/model.dart';
@@ -71,6 +72,53 @@ class AudiencePageModel extends AbstractModel implements Model {
       Utils.engine?.onRoomLeft = null;
       await Utils.engine?.destroy();
       Utils.engine = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  @override
+  void subscribeInnerCDN(Callback success, StateCallback error,) async {
+    Utils.engine?.onLiveMixInnerCdnStreamSubscribed = (int code, String? errMsg) {
+      Utils.engine?.onLiveMixInnerCdnStreamSubscribed = null;
+      if (code == 0) {
+        success('onLiveMixInnerCdnStreamSubscribed success.');
+      } else {
+        error(code, 'onLiveMixInnerCdnStreamSubscribed error $code.');
+      }
+    };
+    int code = await Utils.engine?.subscribeLiveMixInnerCdnStream() ?? -1;
+    if (code != 0) {
+      Utils.engine?.onLiveMixSubscribed = null;
+      error(code, 'onLiveMixInnerCdnStreamSubscribed error $code.');
+    }
+  }
+
+  @override
+  Future<int> setLocalLiveMixInnerCdnVideoResolution(RCRTCVideoResolution resolution) async {
+    Completer<int> completer = Completer();
+    Utils.engine?.onLocalLiveMixInnerCdnVideoResolutionSet = (int code, String? errMsg) {
+      Utils.engine?.onLocalLiveMixInnerCdnVideoResolutionSet = null;
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.setLocalLiveMixInnerCdnVideoResolution(resolution.width, resolution.height) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onLocalLiveMixInnerCdnVideoResolutionSet = null;
+      return code;
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<int> setLocalLiveMixInnerCdnVideoFps(RCRTCVideoFps fps) async {
+    Completer<int> completer = Completer();
+    Utils.engine?.onLocalLiveMixInnerCdnVideoFpsSet = (int code, String? errMsg) {
+      Utils.engine?.onLocalLiveMixInnerCdnVideoFpsSet = null;
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.setLocalLiveMixInnerCdnVideoFps(fps) ?? -1;
+    if (code != 0) {
+      Utils.engine?.onLocalLiveMixInnerCdnVideoFpsSet = null;
       return code;
     }
     return completer.future;

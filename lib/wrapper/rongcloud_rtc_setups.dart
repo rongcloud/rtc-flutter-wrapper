@@ -93,15 +93,18 @@ class RCRTCVideoSetup {
 
 class RCRTCRoomSetup {
   RCRTCRoomSetup.create({
-    required this.type,
+    required this.mediaType,
     required this.role,
+    this.joinType = RCRTCJoinType.kick,
   });
 
   Map<String, dynamic> toJson() => {
-        'type': type.index,
+        'mediaType': mediaType.index,
         'role': role.index,
+        'joinType': joinType.index,
       };
 
-  final RCRTCMediaType type;
+  final RCRTCMediaType mediaType;
   final RCRTCRole role;
+  final RCRTCJoinType joinType;
 }

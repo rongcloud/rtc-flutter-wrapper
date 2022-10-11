@@ -23,6 +23,12 @@ abstract class Model implements IModel {
   Future<bool> changeSpeaker(bool enable);
 
   Future<int> exit();
+
+  void subscribeInnerCDN(Callback success, StateCallback error,);
+
+  Future<int> setLocalLiveMixInnerCdnVideoResolution(RCRTCVideoResolution resolution);
+
+  Future<int> setLocalLiveMixInnerCdnVideoFps(RCRTCVideoFps fps);
 }
 
 abstract class Presenter implements IPresenter {
@@ -36,4 +42,10 @@ abstract class Presenter implements IPresenter {
   Future<bool> changeSpeaker(bool enable);
 
   Future<int> exit();
+
+  void subscribeInnerCDN();
+
+  Future<int> setLocalLiveMixInnerCdnVideoResolution(RCRTCVideoResolution resolution);
+
+  Future<int> setLocalLiveMixInnerCdnVideoFps(RCRTCVideoFps fps);
 }

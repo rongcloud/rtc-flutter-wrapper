@@ -52,6 +52,10 @@ RCRTCIWRole toRole(int role) {
     return (RCRTCIWRole) role;
 }
 
+RCRTCIWJoinType toJoinType(int joinType) {
+    return (RCRTCIWJoinType) joinType;
+}
+
 RCRTCIWAudioQuality toAudioQuality(int quality) {
     switch (quality) {
         case 1:
@@ -111,11 +115,13 @@ RCRTCIWEngineSetup *toEngineSetup(NSDictionary *arguments) {
 }
 
 RCRTCIWRoomSetup *toRoomSetup(NSDictionary *arguments) {
-    int type = [arguments[@"type"] intValue];
+    int mediaType = [arguments[@"mediaType"] intValue];
     int role = [arguments[@"role"] intValue];
+    int joinType = [arguments[@"joinType"] intValue];
     RCRTCIWRoomSetup *setup = [[RCRTCIWRoomSetup alloc] init];
-    setup.type = toMediaType(type);
+    setup.mediaType = toMediaType(mediaType);
     setup.role = toRole(role);
+    setup.joinType = toJoinType(joinType);
     return setup;
 }
 
@@ -172,6 +178,12 @@ NSArray<RCRTCIWCustomLayout *> *toLiveMixCustomLayouts(NSArray<NSDictionary *> *
         [layouts addObject:toLiveMixCustomLayout(argument)];
     }
     return layouts;
+}
+
+CGPoint toCGPoint(NSDictionary *arguments) {
+    CGFloat x = [arguments[@"x"] floatValue];
+    CGFloat y = [arguments[@"y"] floatValue];
+    return CGPointMake(x, y);
 }
 
 NSDictionary *fromNetworkStats(RCRTCIWNetworkStats *stats) {
@@ -235,5 +247,13 @@ NSDictionary *fromRemoteVideoStats(RCRTCIWRemoteVideoStats *stats) {
     [dictionary setObject:@(stats.height) forKey:@"height"];
     [dictionary setObject:@(stats.packageLostRate) forKey:@"packageLostRate"];
     [dictionary setObject:@(stats.rtt) forKey:@"rtt"];
+    return dictionary;
+}
+
+NSDictionary *fromNetworkProbeStats(RCRTCIWNetworkProbeStats *stats) {
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    [dictionary setObject:@((int) stats.qualityLevel) forKey:@"qualityLevel"];
+    [dictionary setObject:@(stats.rtt) forKey:@"rtt"];
+    [dictionary setObject:@(stats.packetLostRate) forKey:@"packetLostRate"];
     return dictionary;
 }

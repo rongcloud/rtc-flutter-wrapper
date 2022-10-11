@@ -22,6 +22,7 @@ typedef NS_ENUM(NSInteger, RCRTCWrapperCode) {
     RCRTCWrapperCodeNotSupportYet = -19,                   // 暂不支持
     RCRTCWrapperCodeCustomFileOpenError = -20,             // 自定义视频文件打开失败
     RCRTCWrapperCodeCurrentUserNotInLive = -21,            // 当前用户不在直播房间
+    RCRTCWrapperCodeOperateWaterMarkError = -22,           // 添加或删除水印失败
 };
 
 

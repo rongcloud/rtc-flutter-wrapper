@@ -46,7 +46,7 @@ class RCRTCViewWrapper implements MethodCallHandler {
         channel.setMethodCallHandler(null);
     }
 
-    RCRTCView getView(long id) {
+    public RCRTCView getView(long id) {
         return views.get(id);
     }
 

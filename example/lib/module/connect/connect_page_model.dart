@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:rongcloud_im_plugin/rongcloud_im_plugin.dart';
+// import 'package:rongcloud_im_plugin/rongcloud_im_plugin.dart';
+import 'package:rongcloud_im_wrapper_plugin/rongcloud_im_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/constants.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
@@ -52,23 +53,26 @@ class ConnectPageModel extends AbstractModel implements Model {
     String media,
     String token,
     StateCallback callback,
-  ) {
+  ) async {
     if (key.isEmpty) key = GlobalConfig.appKey;
     if (navigate.isEmpty) navigate = GlobalConfig.navServer;
     if (file.isEmpty) file = GlobalConfig.fileServer;
     if (media.isEmpty) media = GlobalConfig.mediaServer;
 
-    RongIMClient.setServerInfo(navigate, file);
-    RongIMClient.init(key);
+    RCIMIWEngineOptions options = RCIMIWEngineOptions.create();
+    options.naviServer = navigate;
+    options.fileServer = file;
+
+    Utils.imEngine = await RCIMIWEngine.create(key, options);
 
     if (media.isNotEmpty) {
       _media = media;
     }
 
-    RongIMClient.connect(token, (code, id) {
-      if (code == RCErrorCode.Success) {
+    Utils.imEngine?.onConnected = (int? code, String? userId,) {
+      if (code == 0) {
         User user = User.create(
-          id!,
+          userId!,
           key,
           navigate,
           file,
@@ -77,13 +81,15 @@ class ConnectPageModel extends AbstractModel implements Model {
         );
         DefaultData.user = user;
       }
-      callback(code, id);
-    });
+      callback(code, userId);
+    };
+    await Utils.imEngine?.connect(token, 10);
   }
 
   @override
   void disconnect() {
-    RongIMClient.disconnect(false);
+    Utils.imEngine?.disconnect(false);
+    Utils.imEngine?.destroy();
   }
 
   @override
@@ -107,7 +113,19 @@ class ConnectPageModel extends AbstractModel implements Model {
     );
     Utils.engine = await RCRTCEngine.create(engineSetup);
 
-    RCRTCRoomSetup setup = RCRTCRoomSetup.create(type: type, role: role);
+    // RCRTCAudioConfig audioConfig = RCRTCAudioConfig.create(
+    //     scenario: RCRTCAudioScenario.music_chatroom
+    // );
+    // await Utils.engine?.setAudioConfig(audioConfig);
+
+    // ------
+    await _enableCamera(true);
+
+    await _enableCamera(false);
+    // ------
+
+
+    RCRTCRoomSetup setup = RCRTCRoomSetup.create(mediaType: type, role: role);
     Utils.engine?.onRoomJoined = (int code, String? message) {
       Utils.engine?.onRoomJoined = null;
       callback(code, code == 0 ? id : '$message');
@@ -118,6 +136,20 @@ class ConnectPageModel extends AbstractModel implements Model {
       callback(ret, 'Join room error $ret');
     }
   }
+
+  _enableCamera(bool enable) async {
+    Completer<int> completer = new Completer();
+    Utils.engine?.onCameraEnabled = (bool enable, int code, String? errMsg) {
+      print('enable = $enable');
+      completer.complete(code);
+    };
+    int code = await Utils.engine?.enableCamera(enable) ?? -1;
+    if (code != 0) {
+      return code;
+    }
+    return completer.future;
+  }
+
 
   String? _media;
 }

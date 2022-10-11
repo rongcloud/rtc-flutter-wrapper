@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
@@ -178,5 +180,10 @@ class HostPagePresenter extends AbstractPresenter<View, Model> implements Presen
       view.onExitWithError(code);
     else
       view.onExit();
+  }
+
+  @override
+  Future<int> enableInnerCDN(bool enable) {
+    return model.enableInnerCDN(enable);
   }
 }

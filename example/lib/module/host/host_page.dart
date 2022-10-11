@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
 import 'package:path/path.dart' as Path;
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
@@ -11,6 +11,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dar
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/extension.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/main.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/router/router.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/widgets/ui.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -46,6 +47,10 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     _customConfig = RCRTCVideoConfig.create();
 
     Utils.engine?.setStatsListener(this);
+
+    Utils.engine?.onSeiReceived = (String roomId, String userId, String sei) {
+      print('onSeiReceived: $roomId, $userId, $sei');
+    };
   }
 
   @override
@@ -68,6 +73,10 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     _remoteVideoStatsStateSetters.clear();
     _remoteCustomAudioStatsStateSetters.clear();
     _remoteCustomVideoStatsStateSetters.clear();
+
+    _sendSeiTimer?.cancel();
+    _sendSeiTimer = null;
+
     super.dispose();
   }
 
@@ -75,37 +84,79 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   Widget buildWidget(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text(
-            '$_roomId',
+            '主播房间：$_roomId',
             style: TextStyle(fontSize: 15.sp),
           ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.link,
+          leading: BackButton(),
+        ),
+        endDrawer: Drawer(
+          child: ListView(
+            children: [
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('跨房间连麦'),
+                trailing: Icon(Icons.link),
+                onTap: () => _showBandOption(context),
               ),
-              onPressed: () => _showBandOption(context),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.alt_route,
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('第三方CDN'),
+                trailing: Icon(Icons.alt_route),
+                onTap: _published ? () => _showCDNInfo(context) : null,
               ),
-              onPressed: _published ? () => _showCDNInfo(context) : null,
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.picture_in_picture,
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Row(
+                  children: [
+                    Text('融云内置CDN'),
+                    Switch(value: _enableInnerCDN, onChanged: _changeEnableInnerCDN)
+                  ],
+                ),
+                trailing: Icon(Icons.alt_route),
+                onTap: null,
               ),
-              onPressed: _published ? () => _showMixInfo(context) : null,
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.message,
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('合流设置'),
+                trailing: Icon(Icons.picture_in_picture),
+                onTap: _published ? () => _showMixInfo(context) : null,
               ),
-              onPressed: () => _showMessagePanel(context),
-            ),
-          ],
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('设置水印'),
+                trailing: Icon(Icons.image),
+                onTap: () => _setWatermark(context),
+              ),
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('Sei 功能'),
+                trailing: Icon(Icons.closed_caption),
+                onTap: () => _showSeiConfig(context),
+              ),
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('切换为观众'),
+                trailing: Icon(Icons.groups),
+                onTap: () => _switchToAudienceRole(context),
+              ),
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('聊天室'),
+                trailing: Icon(Icons.message),
+                onTap: () => _showMessagePanel(context),
+              ),
+            ],
+          ),
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -819,7 +870,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
         return CDNConfig(
           id: id!,
           engine: Utils.engine!,
-          cdnList: _cdnList,
+          cdnList: _cdnList
         );
       },
     );
@@ -845,7 +896,49 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     );
   }
 
+  void _setWatermark(BuildContext context) async {
+    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Watermark(engine: Utils.engine!);
+      },
+    );
+  }
+
+  void _showSeiConfig(BuildContext context) {
+    Navigator.pop(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Sei(Utils.engine!, _seiConfig);
+        }
+    );
+  }
+
+  void _switchToAudienceRole(BuildContext context) async {
+    Loading.show(context);
+    Utils.engine?.onLiveRoleSwitched = (RCRTCRole role, int code, String? errMsg) {
+      Loading.dismiss(context);
+      if (code != 0) {
+        '切换为观众失败：$code - $errMsg'.toast();
+        return;
+      }
+      Navigator.pushReplacementNamed(
+        context,
+        RouterManager.AUDIENCE,
+        arguments: _roomId,
+      );
+    };
+    int code = await Utils.engine?.switchLiveRole(RCRTCRole.live_audience) ?? -1;
+    if (code != 0) {
+      Loading.dismiss(context);
+      '切换失败'.toast();
+    }
+  }
+
   void _showMessagePanel(BuildContext context) {
+    Navigator.pop(context);
     showDialog(
       context: context,
       builder: (context) {
@@ -885,7 +978,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Loading.show(context);
     int result = await presenter.changeAudio(publish);
     if (result != 0) {
-      '${publish ? 'Publish' : 'Unpublish'} Audio Stream Error'.toast();
+      '${publish ? 'Publish' : 'Unpublish'} Audio Stream Error - $result'.toast();
       publish = !publish;
     }
     setState(() {
@@ -899,7 +992,7 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Loading.show(context);
     int result = await presenter.changeVideo(publish);
     if (result != 0) {
-      '${publish ? 'Publish' : 'Unpublish'} Video Stream Error'.toast();
+      '${publish ? 'Publish' : 'Unpublish'} Video Stream Error - $result'.toast();
       publish = !publish;
     }
     setState(() {
@@ -955,7 +1048,8 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   void _selectMovie(BuildContext context) async {
-    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, maxAssets: 1, requestType: RequestType.video);
+    AssetPickerConfig config = const AssetPickerConfig(maxAssets: 1, requestType: RequestType.video);
+    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, pickerConfig: config);
     File? file = await assets?.first.originFile;
     setState(() {
       _customPath = file?.absolute.path;
@@ -1086,6 +1180,23 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     await Utils.engine?.setStatsListener(null);
     presenter.exit();
     return Future.value(false);
+  }
+
+  void _changeEnableInnerCDN(bool enable) async {
+    if (!_published) {
+      '请先发布视频资源'.toast();
+      return;
+    }
+    Loading.show(context);
+    int result = await presenter.enableInnerCDN(enable);
+    Loading.dismiss(context);
+    if (result == 0) {
+      setState(() {
+        _enableInnerCDN = enable;
+      });
+    } else {
+      '开关内置CDN error $result'.toast();
+    }
   }
 
   @override
@@ -1314,6 +1425,8 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
     Main.getInstance().writeReceiveVideoBitrate(userId, tag, '${stats.bitrate}');
   }
 
+  final GlobalKey<_HostPageState> _scaffoldKey = new GlobalKey<_HostPageState>();
+
   late String _roomId;
   late Config _config;
   late RCRTCVideoConfig _tinyConfig;
@@ -1348,4 +1461,10 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   Map<String, RCRTCView?> _remoteCustoms = {};
 
   bool _yuv = false;
+
+  Timer? _sendSeiTimer;
+
+  bool _enableInnerCDN = false;
+
+  SeiConfig _seiConfig = SeiConfig();
 }

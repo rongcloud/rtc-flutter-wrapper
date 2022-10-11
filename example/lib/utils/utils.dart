@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:handy_toast/handy_toast.dart';
+import 'package:rongcloud_im_wrapper_plugin/rongcloud_im_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
@@ -13,38 +14,46 @@ class Utils {
     return '$current'.padLeft(6, '0');
   }
 
+  static set imEngine(RCIMIWEngine? engine) {
+    _imEngine = engine;
+  }
+
+  static RCIMIWEngine? get imEngine {
+    return _imEngine;
+  }
+
   static set engine(RCRTCEngine? engine) {
-    _engine = engine;
+    _rtcEngine = engine;
     _onSetEngine();
   }
 
   static void _onSetEngine() {
-    if (_engine != null) {
-      _engine?.onSubRoomBanded = (String roomId) {
+    if (_rtcEngine != null) {
+      _rtcEngine?.onSubRoomBanded = (String roomId) {
         if (_bandedSubRooms.indexOf(roomId) < 0) {
           _bandedSubRooms.add(roomId);
         }
       };
-      _engine?.onSubRoomDisband = (String roomId, String userId) {
+      _rtcEngine?.onSubRoomDisband = (String roomId, String userId) {
         _joinedSubRooms.remove(roomId);
         _bandedSubRooms.remove(roomId);
       };
-      _engine?.onUserJoined = (String roomId, String userId) {
+      _rtcEngine?.onUserJoined = (String roomId, String userId) {
         _users.removeWhere((user) => user.id == userId);
         _users.add(UserState(roomId, userId));
         onUserListChanged?.call();
       };
-      _engine?.onUserOffline = (String roomId, String userId) {
+      _rtcEngine?.onUserOffline = (String roomId, String userId) {
         _users.removeWhere((user) => user.id == userId);
         onUserListChanged?.call();
         onRemoveUserAudio?.call(userId);
       };
-      _engine?.onUserLeft = (String roomId, String userId) {
+      _rtcEngine?.onUserLeft = (String roomId, String userId) {
         _users.removeWhere((user) => user.id == userId);
         onUserListChanged?.call();
         onRemoveUserAudio?.call(userId);
       };
-      _engine?.onRemotePublished = (String roomId, String userId, RCRTCMediaType type) {
+      _rtcEngine?.onRemotePublished = (String roomId, String userId, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
         switch (type) {
           case RCRTCMediaType.audio:
@@ -63,7 +72,7 @@ class Utils {
             break;
         }
       };
-      _engine?.onRemoteUnpublished = (String roomId, String userId, RCRTCMediaType type) {
+      _rtcEngine?.onRemoteUnpublished = (String roomId, String userId, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
         switch (type) {
           case RCRTCMediaType.audio:
@@ -88,7 +97,7 @@ class Utils {
             break;
         }
       };
-      _engine?.onRemoteCustomStreamPublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
+      _rtcEngine?.onRemoteCustomStreamPublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
         int index = user?.customs.indexWhere((custom) => custom.tag == tag) ?? -1;
         CustomState state = index > -1 ? user!.customs[index] : CustomState(tag);
@@ -109,7 +118,7 @@ class Utils {
         }
         onUserCustomStateChanged?.call(userId, tag, state.audioPublished, state.videoPublished);
       };
-      _engine?.onRemoteCustomStreamUnpublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
+      _rtcEngine?.onRemoteCustomStreamUnpublished = (String roomId, String userId, String tag, RCRTCMediaType type) {
         UserState? user = _users.firstWhereOrNull((user) => user.id == userId);
         int index = user?.customs.indexWhere((custom) => custom.tag == tag) ?? -1;
         if (index < 0) return;
@@ -137,18 +146,27 @@ class Utils {
         }
         onUserCustomStateChanged?.call(userId, tag, state.audioPublished, state.videoPublished);
       };
+      _rtcEngine?.onRemoteLiveRoleSwitched = (String roomId, String userId, RCRTCRole role) {
+        _users.removeWhere((user) => user.id == userId);
+        onUserListChanged?.call();
+        onRemoveUserAudio?.call(userId);
+      };
+      _rtcEngine?.onRemoteLiveMixInnerCdnStreamPublished = () {
+        print('utils - onRemoteLiveMixInnerCdnStreamPublished');
+      };
     } else {
       onUserListChanged = null;
       onUserAudioStateChanged = null;
       onUserVideoStateChanged = null;
       onUserCustomStateChanged = null;
-      _engine?.onUserJoined = null;
-      _engine?.onUserOffline = null;
-      _engine?.onUserLeft = null;
-      _engine?.onRemotePublished = null;
-      _engine?.onRemoteUnpublished = null;
-      _engine?.onRemoteCustomStreamPublished = null;
-      _engine?.onRemoteCustomStreamUnpublished = null;
+      _rtcEngine?.onUserJoined = null;
+      _rtcEngine?.onUserOffline = null;
+      _rtcEngine?.onUserLeft = null;
+      _rtcEngine?.onRemotePublished = null;
+      _rtcEngine?.onRemoteUnpublished = null;
+      _rtcEngine?.onRemoteCustomStreamPublished = null;
+      _rtcEngine?.onRemoteCustomStreamUnpublished = null;
+      _rtcEngine?.onRemoteLiveRoleSwitched = null;
       _users.clear();
       _bandedSubRooms.clear();
       _joinedSubRooms.clear();
@@ -157,8 +175,8 @@ class Utils {
 
   static void joinSubRoom(BuildContext context, String roomId) async {
     Loading.show(context);
-    _engine?.onSubRoomJoined = (roomId, code, message) {
-      _engine?.onSubRoomJoined = null;
+    _rtcEngine?.onSubRoomJoined = (roomId, code, message) {
+      _rtcEngine?.onSubRoomJoined = null;
       Loading.dismiss(context);
       if (code != 0) {
         '加入$roomId子房间失败, code:$code, message:$message'.toast();
@@ -167,9 +185,9 @@ class Utils {
         '加入$roomId子房间成功'.toast();
       }
     };
-    int code = await _engine?.joinSubRoom(roomId) ?? -1;
+    int code = await _rtcEngine?.joinSubRoom(roomId) ?? -1;
     if (code != 0) {
-      _engine?.onSubRoomJoined = null;
+      _rtcEngine?.onSubRoomJoined = null;
       Loading.dismiss(context);
       '加入$roomId子房间失败, code:$code'.toast();
     }
@@ -183,7 +201,7 @@ class Utils {
   }
 
   static RCRTCEngine? get engine {
-    return _engine;
+    return _rtcEngine;
   }
 
   static List<UserState> get users => _users;
@@ -201,7 +219,8 @@ class Utils {
 
   static Random _random = Random.secure();
 
-  static RCRTCEngine? _engine;
+  static RCIMIWEngine? _imEngine;
+  static RCRTCEngine? _rtcEngine;
 
   static Function()? onUserListChanged;
   static Function(String id)? onRemoveUserAudio;

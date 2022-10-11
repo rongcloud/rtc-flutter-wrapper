@@ -42,6 +42,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong) RCRTCIWVideoSetup *videoSetup;
 
+/**
+ 默认 YES：Debug模式下检测IMSDK和RTCSDK版本号是否一致
+ */
+@property (nonatomic, assign) BOOL enableVersionMatch;
+
 @end
 
 NS_ASSUME_NONNULL_END

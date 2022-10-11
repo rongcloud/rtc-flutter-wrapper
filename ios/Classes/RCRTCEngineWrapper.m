@@ -21,13 +21,14 @@
 - (NSInteger)setLiveMixViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view;
 - (NSInteger)setLocalCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view tag:(NSString *)tag;
 - (NSInteger)setRemoteCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view userId:(NSString *)userId tag:(NSString *)tag;
+- (NSInteger)setLiveMixInnerCdnStreamViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view;
 @end
 
 @interface RCFlutterMessageFactory
 + (NSString *)message2String:(RCMessage *)message;
 @end
 
-@interface RCRTCEngineWrapper() <RCRTCIWEngineDelegate, RCRTCIWStatsDelegate> {
+@interface RCRTCEngineWrapper() <RCRTCIWEngineDelegate, RCRTCIWStatsDelegate, RCRTCIWNetworkProbeDelegate> {
     NSObject<FlutterPluginRegistrar> *registrar;
     FlutterMethodChannel *channel;
     RCRTCIWEngine *engine;
@@ -1263,6 +1264,206 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)switchLiveRole:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        int role = [call.arguments intValue];
+        code = [engine switchLiveRole:toRole(role)];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)enableSei:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        bool enable = [call.arguments boolValue];
+        code = [engine enableSei:enable];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)sendSei:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSString *sei = (NSString *)call.arguments;
+        code = [engine sendSei:sei];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+#pragma mark - 内置 cdn
+
+- (void)enableLiveMixInnerCdnStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        BOOL enable = [arguments[@"enable"] boolValue];
+        code = [engine enableLiveMixInnerCdnStream:enable];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)subscribeLiveMixInnerCdnStream:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine subscribeLiveMixInnerCdnStream];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)unsubscribeLiveMixInnerCdnStream:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine unsubscribeLiveMixInnerCdnStream];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)muteLiveMixInnerCdnStream:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        BOOL mute = [arguments[@"mute"] boolValue];
+        code = [engine muteLiveMixInnerCdnStream:mute];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setLiveMixInnerCdnStreamView:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSInteger view = [arguments[@"view"] integerValue];
+        RCRTCView *origin = [[RCRTCViewWrapper sharedInstance] getView:view];
+        code = [engine setLiveMixInnerCdnStreamViewDelegate:(NSObject<RCRTCIWViewDelegate> *) [origin view]];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)removeLiveMixInnerCdnStreamView:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine removeLiveMixInnerCdnStreamView];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setLocalLiveMixInnerCdnVideoResolution:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSInteger width = [arguments[@"width"] integerValue];
+        NSInteger height = [arguments[@"height"] integerValue];
+        code = [engine setLocalLiveMixInnerCdnVideoResolution:width height:height];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)setLocalLiveMixInnerCdnVideoFps:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        int fps = [arguments[@"fps"] intValue];
+        code = [engine setLocalLiveMixInnerCdnVideoFps:toVideoFps(fps)];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)startNetworkProbe:(FlutterResult)result  {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine startNetworkProbe:self];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)stopNetworkProbe:(FlutterResult)result  {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine stopNetworkProbe];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+#pragma mark - 水印
+
+- (void)setWatermark:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSDictionary *arguments = (NSDictionary *)call.arguments;
+        NSString *imagePath = arguments[@"imagePath"];
+        NSDictionary *position = arguments[@"position"];
+        CGPoint point = toCGPoint(position);
+        CGFloat zoom = [arguments[@"zoom"] floatValue];
+        if ([imagePath containsString:@"file://"]) {
+            imagePath = [imagePath stringByReplacingOccurrencesOfString:@"file://" withString:@""];
+        }
+        UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+        code = [engine setWatermark:image position:point zoom:zoom];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)removeWatermark:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine removeWatermark];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)startEchoTest:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        NSInteger timeInterval = [call.arguments integerValue];
+        code = [engine startEchoTest:timeInterval];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+- (void)stopEchoTest:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine stopEchoTest];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
+
+
 #pragma mark *************** [C] ***************
 
 - (void)onError:(NSInteger)code message:(NSString *)errMsg {
@@ -1727,14 +1928,14 @@ SingleInstanceM(Instance);
 
 - (void)onMessageReceived:(NSString *)roomId
                   message:(RCMessage *)message {
-    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    [arguments setObject:roomId forKey:@"id"];
-    [arguments setObject:[RCFlutterMessageFactory message2String:message] forKey:@"message"];
-    __weak typeof (channel) weak = channel;
-    dispatch_to_main_queue(^{
-        typeof (weak) strong = weak;
-        [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:arguments];
-    });
+    // NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    // [arguments setObject:roomId forKey:@"id"];
+    // [arguments setObject:[RCFlutterMessageFactory message2String:message] forKey:@"message"];
+    // __weak typeof (channel) weak = channel;
+    // dispatch_to_main_queue(^{
+    //    typeof (weak) strong = weak;
+    //    [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:arguments];
+    // });
 }
 
 - (void)onCustomStreamPublished:(NSString *)tag
@@ -2023,6 +2224,178 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)onLiveRoleSwitched:(RCRTCIWRole)current code:(NSInteger)code message:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(current) forKey:@"role"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveRoleSwitched" arguments:arguments];
+    });
+}
+
+- (void)onRemoteLiveRoleSwitched:(NSString *)roomId userId:(NSString *)userId role:(RCRTCIWRole)role {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:@(role) forKey:@"role"];
+    __weak __typeof(channel) weak = channel;
+    dispatch_to_main_queue(^{
+        __strong __typeof(weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteLiveRoleSwitched" arguments:arguments];
+    });
+}
+
+- (void)onLiveMixInnerCdnStreamEnabled:(BOOL)enable code:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(enable) forKey:@"enable"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveMixInnerCdnStreamEnabled" arguments:arguments];
+    });
+}
+
+- (void)onRemoteLiveMixInnerCdnStreamPublished {
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteLiveMixInnerCdnStreamPublished" arguments:nil];
+    });
+}
+
+- (void)onRemoteLiveMixInnerCdnStreamUnpublished {
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onRemoteLiveMixInnerCdnStreamUnpublished" arguments:nil];
+    });
+}
+
+- (void)onLiveMixInnerCdnStreamSubscribed:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveMixInnerCdnStreamSubscribed" arguments:arguments];
+    });
+}
+
+- (void)onLiveMixInnerCdnStreamUnsubscribed:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveMixInnerCdnStreamUnsubscribed" arguments:arguments];
+    });
+}
+
+- (void)onLocalLiveMixInnerCdnVideoResolutionSet:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLocalLiveMixInnerCdnVideoResolutionSet" arguments:arguments];
+    });
+}
+
+- (void)onLocalLiveMixInnerCdnVideoFpsSet:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLocalLiveMixInnerCdnVideoFpsSet" arguments:arguments];
+    });
+}
+
+- (void)onWatermarkSet:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onWatermarkSet" arguments:arguments];
+    });
+}
+
+- (void)onWatermarkRemoved:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onWatermarkRemoved" arguments:arguments];
+    });
+}
+
+- (void)onNetworkProbeStarted:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onNetworkProbeStarted" arguments:arguments];
+    });
+}
+
+- (void)onNetworkProbeStopped:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onNetworkProbeStopped" arguments:arguments];
+    });
+}
+
+- (void)onSeiEnabled:(BOOL)enable code:(NSInteger)code errMsg:(NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(enable) forKey:@"enable"];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSeiEnabled" arguments:arguments];
+    });
+}
+
+- (void)onSeiReceived:(NSString *)roomId userId:(NSString *)userId sei:(NSString *)sei{
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:roomId forKey:@"rid"];
+    [arguments setObject:userId forKey:@"uid"];
+    [arguments setObject:sei forKey:@"sei"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onSeiReceived" arguments:arguments];
+    });
+}
+
+- (void)onLiveMixSeiReceived:(NSString *)sei {
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"engine:onLiveMixSeiReceived" arguments:sei];
+    });
+}
+
 - (void)onNetworkStats:(RCRTCIWNetworkStats *)stats {
     NSDictionary *argument = fromNetworkStats(stats);
     __weak typeof (channel) weak = channel;
@@ -2177,6 +2550,37 @@ SingleInstanceM(Instance);
         [strong invokeMethod:@"stats:onRemoteCustomVideoStats" arguments:arguments];
     });
 }
+
+- (void)onNetworkProbeFinished:(NSInteger)code errMsg:(nonnull NSString *)errMsg {
+    NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+    [arguments setObject:@(code) forKey:@"code"];
+    [arguments setObject:errMsg forKey:@"message"];
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onNetworkProbeFinished" arguments:arguments];
+    });
+}
+
+- (void)onNetworkProbeDownLinkStats:(RCRTCIWNetworkProbeStats *)stats {
+    NSDictionary *argument = fromNetworkProbeStats(stats);
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onNetworkProbeDownLinkStats" arguments:argument];
+    });
+}
+
+
+- (void)onNetworkProbeUpLinkStats:(RCRTCIWNetworkProbeStats *)stats {
+    NSDictionary *argument = fromNetworkProbeStats(stats);
+    __weak typeof (channel) weak = channel;
+    dispatch_to_main_queue(^{
+        typeof (weak) strong = weak;
+        [strong invokeMethod:@"stats:onNetworkProbeUpLinkStats" arguments:argument];
+    });
+}
+
 
 #pragma mark *************** [F] ***************
 
@@ -2370,7 +2774,41 @@ SingleInstanceM(Instance);
         [self joinSubRoom:call result:result];
     } else if ([method isEqualToString:@"leaveSubRoom"]) {
         [self leaveSubRoom:call result:result];
-    } else {
+    } else if ([method isEqualToString:@"switchLiveRole"]) {
+        [self switchLiveRole:call result:result];
+    } else if ([method isEqualToString:@"enableSei"]) {
+        [self enableSei:call result:result];
+    } else if ([method isEqualToString:@"sendSei"]) {
+        [self sendSei:call result:result];
+    } else if ([method isEqualToString:@"enableLiveMixInnerCdnStream"]) {
+        [self enableLiveMixInnerCdnStream:call result:result];
+    } else if ([method isEqualToString:@"subscribeLiveMixInnerCdnStream"]) {
+        [self subscribeLiveMixInnerCdnStream:result];
+    } else if ([method isEqualToString:@"unsubscribeLiveMixInnerCdnStream"]) {
+        [self unsubscribeLiveMixInnerCdnStream:result];
+    } else if ([method isEqualToString:@"muteLiveMixInnerCdnStream"]) {
+        [self muteLiveMixInnerCdnStream:call result:result];
+    } else if ([method isEqualToString:@"setLiveMixInnerCdnStreamView"]) {
+        [self setLiveMixInnerCdnStreamView:call result:result];
+    } else if ([method isEqualToString:@"removeLiveMixInnerCdnStreamView"]) {
+        [self removeLiveMixInnerCdnStreamView:result];
+    } else if ([method isEqualToString:@"setLocalLiveMixInnerCdnVideoResolution"]) {
+        [self setLocalLiveMixInnerCdnVideoResolution:call result:result];
+    } else if ([method isEqualToString:@"setLocalLiveMixInnerCdnVideoFps"]) {
+        [self setLocalLiveMixInnerCdnVideoFps:call result:result];
+    } else if ([method isEqualToString:@"startNetworkProbe"]) {
+        [self startNetworkProbe:result];
+    } else if ([method isEqualToString:@"stopNetworkProbe"]) {
+        [self stopNetworkProbe:result];
+    } else if ([method isEqualToString:@"setWatermark"]) {
+        [self setWatermark:call result:result];
+    } else if ([method isEqualToString:@"removeWatermark"]) {
+        [self removeWatermark:result];
+    } else if ([method isEqualToString:@"startEchoTest"]) {
+        [self startEchoTest:call result:result];
+    } else if ([method isEqualToString:@"stopEchoTest"]) {
+        [self stopEchoTest:result];
+    }  else {
         dispatch_to_main_queue(^{
             result(FlutterMethodNotImplemented);
         });

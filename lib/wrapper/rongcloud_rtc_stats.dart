@@ -88,3 +88,14 @@ class RCRTCRemoteVideoStats {
   final double packageLostRate;
   final int rtt;
 }
+
+class RCRTCNetworkProbeStats {
+  RCRTCNetworkProbeStats.fromJson(Map<dynamic, dynamic> json)
+      : qualityLevel = RCRTCNetworkQualityLevel.values[json['qualityLevel']],
+        rtt = json['rtt'], 
+        packetLostRate = json['packetLostRate'];
+  
+  final RCRTCNetworkQualityLevel qualityLevel;
+  final int rtt;
+  final double packetLostRate;
+}

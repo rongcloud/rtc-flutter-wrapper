@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:rongcloud_rtc_wrapper_plugin/rongcloud_rtc_wrapper_plugin.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/model.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presenter.dart';
@@ -67,6 +69,9 @@ abstract class Model implements IModel {
   Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
 
   Future<int> exit();
+
+  Future<int> enableInnerCDN(bool enable);
+
 }
 
 abstract class Presenter implements IPresenter {
@@ -107,4 +112,7 @@ abstract class Presenter implements IPresenter {
   Future<int> responseJoinSubRoom(String rid, String uid, bool agree);
 
   void exit();
+
+  Future<int> enableInnerCDN(bool enable);
+
 }

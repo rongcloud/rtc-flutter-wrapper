@@ -48,6 +48,8 @@ RCRTCIWVideoConfig *toVideoConfig(NSDictionary *arguments);
 
 NSArray<RCRTCIWCustomLayout *> *toLiveMixCustomLayouts(NSArray<NSDictionary *> *arguments);
 
+CGPoint toCGPoint(NSDictionary *arguments);
+
 NSDictionary *fromNetworkStats(RCRTCIWNetworkStats *stats);
 
 NSDictionary *fromLocalAudioStats(RCRTCIWLocalAudioStats *stats);
@@ -57,6 +59,8 @@ NSDictionary *fromLocalVideoStats(RCRTCIWLocalVideoStats *stats);
 NSDictionary *fromRemoteAudioStats(RCRTCIWRemoteAudioStats *stats);
 
 NSDictionary *fromRemoteVideoStats(RCRTCIWRemoteVideoStats *stats);
+
+NSDictionary *fromNetworkProbeStats(RCRTCIWNetworkProbeStats *stats);
 
 #ifdef __cplusplus
 }
