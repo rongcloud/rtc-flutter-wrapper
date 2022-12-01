@@ -28,6 +28,7 @@ import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteAudioStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRemoteVideoStats;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWRole;
 import cn.rongcloud.rtc.wrapper.listener.IRCRTCIWAudioRouteingListener;
+import cn.rongcloud.rtc.wrapper.listener.IRCRTCIWLocalDeviceErrorListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWNetworkProbeListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnReadableAudioFrameListener;
@@ -154,6 +155,14 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         int code = -1;
         if (engine != null) {
             code = engine.stopAudioRouteing();
+        }
+        return code;
+    }
+
+    public int setLocalDeviceErrorListener(IRCRTCIWLocalDeviceErrorListener listener) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.setLocalDeviceErrorListener(listener);
         }
         return code;
     }
@@ -436,6 +445,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 break;
             case "sendSei":
                 sendSei(call, result);
+            case "preconnectToMediaServer":
+                preconnectToMediaServer(result);
+                break;
             case "enableLiveMixInnerCdnStream":
                 enableLiveMixInnerCdnStream(call, result);
                 break;
@@ -1154,7 +1166,9 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (playback != null);
             Integer loop = call.argument("loop");
             assert (loop != null);
-            code = engine.startAudioMixing(uri, ArgumentAdapter.toAudioMixingMode(mode), playback, loop);
+            Double position = call.argument("position");
+            assert (position != null);
+            code = engine.startAudioMixing(uri, ArgumentAdapter.toAudioMixingMode(mode), playback, loop, position);
         }
         MainThreadPoster.success(result, code);
     }
@@ -1678,6 +1692,15 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         }
         MainThreadPoster.success(result, code);
     }
+    
+    private void preconnectToMediaServer(Result result) {
+        int code = -1;
+        if (engine != null) {
+            code = engine.preconnectToMediaServer();
+        }
+        MainThreadPoster.success(result, code);
+    }
+
 
     private static class SingletonHolder {
         @SuppressLint("StaticFieldLeak")

@@ -1,3 +1,8 @@
+## 5.3.1
+
+* 更新 Android、iOS 原生 SDK
+* 新增混音进度设置功能
+
 ## 5.2.5+1
 
 * 更新 Android、iOS 原生 SDK

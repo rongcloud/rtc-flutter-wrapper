@@ -699,6 +699,12 @@ NS_ASSUME_NONNULL_BEGIN
                      playback:(BOOL)playback
                          loop:(NSUInteger)loop;
 
+- (NSInteger)startAudioMixing:(NSURL *)url
+                         mode:(RCRTCIWAudioMixingMode)mode
+                     playback:(BOOL)playback
+                         loop:(NSUInteger)loop
+                     position:(CGFloat)position;
+
 /*!
  暂停混音, 仅供会议用户或直播主播用户使用
  @discussion

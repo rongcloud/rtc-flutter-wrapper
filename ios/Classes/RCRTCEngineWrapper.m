@@ -872,10 +872,12 @@ SingleInstanceM(Instance);
         int mode = [arguments[@"mode"] intValue];
         bool playback = [arguments[@"playback"] boolValue];
         int loop = [arguments[@"loop"] intValue];
-        code = [engine startAudioMixing:[NSURL fileURLWithPath:file]
+        CGFloat position = [arguments[@"position"] floatValue];
+        code = [engine startAudioMixing:[NSURL URLWithString:file]
                                    mode:toAudioMixingMode(mode)
                                playback:playback
-                                   loop:loop];
+                                   loop:loop
+                               position:position];
     }
     dispatch_to_main_queue(^{
         result(@(code));
@@ -1463,6 +1465,15 @@ SingleInstanceM(Instance);
     });
 }
 
+- (void)preconnectToMediaServer:(FlutterResult)result {
+    NSInteger code = -1;
+    if (engine != nil) {
+        code = [engine preconnectToMediaServer];
+    }
+    dispatch_to_main_queue(^{
+        result(@(code));
+    });
+}
 
 #pragma mark *************** [C] ***************
 
@@ -2780,6 +2791,8 @@ SingleInstanceM(Instance);
         [self enableSei:call result:result];
     } else if ([method isEqualToString:@"sendSei"]) {
         [self sendSei:call result:result];
+    } else if ([method isEqualToString:@"preconnectToMediaServer"]) {
+        [self preconnectToMediaServer:result];
     } else if ([method isEqualToString:@"enableLiveMixInnerCdnStream"]) {
         [self enableLiveMixInnerCdnStream:call result:result];
     } else if ([method isEqualToString:@"subscribeLiveMixInnerCdnStream"]) {

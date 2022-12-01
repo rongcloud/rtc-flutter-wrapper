@@ -2069,7 +2069,12 @@ class MessagePanel extends StatefulWidget {
 
 class _MessagePanelState extends State<MessagePanel> {
   _MessagePanelState(this.widget) {
-    Utils.imEngine?.onMessageReceived = (RCIMIWMessage? message, int? left, bool? offline, bool? hasPackage,) {
+    Utils.imEngine?.onMessageReceived = (
+      RCIMIWMessage? message,
+      int? left,
+      bool? offline,
+      bool? hasPackage,
+    ) {
       _received(message);
     };
   }
@@ -2119,8 +2124,7 @@ class _MessagePanelState extends State<MessagePanel> {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(horizontal: 10.dp),
               itemBuilder: (context, index) {
-                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${(_messages[index] as RCIMIWTextMessage).text}'
-                    .toText();
+                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${(_messages[index] as RCIMIWTextMessage).text}'.toText();
               },
               separatorBuilder: (context, index) {
                 return Divider(
@@ -2452,6 +2456,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
               onChanged: (value) {
                 setState(() {
                   volume = value.toInt();
+                  widget.engine.adjustAudioMixingVolume(volume);
                 });
               },
             ),
@@ -2485,6 +2490,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
               onChanged: (value) {
                 setState(() {
                   playbackVolume = value.toInt();
+                  widget.engine.adjustAudioMixingPlaybackVolume(playbackVolume);
                 });
               },
             ),
@@ -2498,6 +2504,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
               onChanged: (value) {
                 setState(() {
                   publishVolume = value.toInt();
+                  widget.engine.adjustAudioMixingPublishVolume(publishVolume);
                 });
               },
             ),
@@ -2519,21 +2526,29 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
               height: 10.dp,
               color: Colors.transparent,
             ),
+            '混音进度'.toSliderWithStringOnLeft(
+              current: position,
+              max: 1,
+              onChanged: (value) {
+                setState(() {
+                  position = value;
+                });
+              },
+            ),
+            Divider(
+              height: 10.dp,
+              color: Colors.transparent,
+            ),
             Row(
               children: [
                 Spacer(),
                 '播放'.onClick(
-                      () {
-                    widget.engine.startAudioMixingFromAssets(
-                      path: 'assets/audio/music_$index.mp3',
-                      mode: mode,
-                      playback: playback,
-                      loop: count,
-                    );
+                  () {
+                    widget.engine.startAudioMixingFromAssets(path: 'assets/audio/music_$index.mp3', mode: mode, playback: playback, loop: count, position: position);
                     widget.engine.adjustAudioMixingVolume(volume);
-                    widget.engine.adjustAudioMixingPlaybackVolume(
-                        playbackVolume);
-                    widget.engine.adjustAudioMixingPublishVolume(publishVolume);
+                    // 点击播放以音量值播放  滑动单独修改
+                    //widget.engine.adjustAudioMixingPlaybackVolume(playbackVolume);
+                    //widget.engine.adjustAudioMixingPublishVolume(publishVolume);
                   },
                   color: Colors.black,
                 ),
@@ -2541,7 +2556,7 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
                   width: 20.dp,
                 ),
                 '停止'.onClick(
-                      () {
+                  () {
                     widget.engine.stopAudioMixing();
                   },
                   color: Colors.black,
@@ -2586,8 +2601,8 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
   int playbackVolume = 50;
   bool playback = true;
   int count = 1;
+  double position = 0;
 }
-
 
 class EchoTest extends StatefulWidget {
   const EchoTest();
@@ -2597,7 +2612,6 @@ class EchoTest extends StatefulWidget {
 }
 
 class _EchoTestState extends State<EchoTest> {
-
   @override
   void initState() {
     _createEngine();
@@ -2629,13 +2643,18 @@ class _EchoTestState extends State<EchoTest> {
         padding: EdgeInsets.all(20.dp),
         child: Column(
           children: [
-            SizedBox( height: 15.dp,),
+            SizedBox(
+              height: 15.dp,
+            ),
             Row(
               children: [
-                Text('时间',
+                Text(
+                  '时间',
                   style: TextStyle(fontSize: 18.sp),
                 ),
-                SizedBox(width: 15.dp,),
+                SizedBox(
+                  width: 15.dp,
+                ),
                 Expanded(
                   child: InputBox(
                     type: TextInputType.number,
@@ -2649,34 +2668,42 @@ class _EchoTestState extends State<EchoTest> {
                 ),
               ],
             ),
-            SizedBox( height: 15.dp,),
+            SizedBox(
+              height: 15.dp,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Button(_start ? '结束检测' :'开始检测', callback:_start ? _stopTest : _startTest,),
+                Button(
+                  _start ? '结束检测' : '开始检测',
+                  callback: _start ? _stopTest : _startTest,
+                ),
               ],
             ),
-            SizedBox(height: 15.dp,),
-
-            _start && _displayCountdown > 0 ? Column(
-              children: [
-                Text(
-                  '$_displayCountdown',
-                  style: TextStyle(
-                    fontSize: 40.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  '${_countdown > _timeInputController.text.toInt ? '现在应该能听到刚才的声音' : '请说一些话'}',
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ) : Container(),
+            SizedBox(
+              height: 15.dp,
+            ),
+            _start && _displayCountdown > 0
+                ? Column(
+                    children: [
+                      Text(
+                        '$_displayCountdown',
+                        style: TextStyle(
+                          fontSize: 40.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '${_countdown > _timeInputController.text.toInt ? '现在应该能听到刚才的声音' : '请说一些话'}',
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -2715,7 +2742,7 @@ class _EchoTestState extends State<EchoTest> {
       (timer) {
         setState(() {
           _countdown += 1;
-          if (_countdown > inputTime*2) {
+          if (_countdown > inputTime * 2) {
             _countdown = 0;
             _periodicTimer!.cancel();
             _periodicTimer = null;
@@ -2770,7 +2797,9 @@ class _WatermarkState extends State<Watermark> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('设置水印'),),
+      appBar: AppBar(
+        title: Text('设置水印'),
+      ),
       body: Padding(
         padding: EdgeInsets.all(15.dp),
         child: Column(
@@ -2808,14 +2837,22 @@ class _WatermarkState extends State<Watermark> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Button('设置水印', callback: _setWatermarkAction,),
+                Button(
+                  '设置水印',
+                  callback: _setWatermarkAction,
+                ),
               ],
             ),
-            SizedBox(height: 10.dp,),
+            SizedBox(
+              height: 10.dp,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Button('删除水印', callback: _removeWatermarkAction,),
+                Button(
+                  '删除水印',
+                  callback: _removeWatermarkAction,
+                ),
               ],
             ),
           ],
@@ -2910,7 +2947,6 @@ class NetworkProbe extends StatefulWidget {
 }
 
 class _NetworkProbeState extends State<NetworkProbe> implements RCRTCNetworkProbeListener {
-
   @override
   void initState() {
     _createEngine();
@@ -2931,114 +2967,125 @@ class _NetworkProbeState extends State<NetworkProbe> implements RCRTCNetworkProb
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('网络探测'),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(15.dp),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _started ? Button('主动结束', callback: _stop,) : Button('开启探测', callback: _start,)
-              ],
-            ),
-            SizedBox(height: 15.dp,),
-            _upLinkStats != null && _downLinkStats != null ? Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              border: TableBorder.all(
-                color: Colors.grey,
-                width: 1,
-                style: BorderStyle.solid,
-              ),
-              children: [
-                TableRow(
-                  children: [
-                    Text(
-                      '上行',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '质量:\n${_getQualityName(_upLinkStats!)}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '往返:\n${_upLinkStats?.rtt}ms',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '丢包率:\n${_upLinkStats?.packetLostRate}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    Text(
-                      '下行',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '质量:\n${_getQualityName(_downLinkStats!)}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '往返:\n${_downLinkStats?.rtt}ms',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                    Text(
-                      '丢包率:\n${_downLinkStats?.packetLostRate}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ) : Container(),
-          ],
+        appBar: AppBar(
+          title: Text('网络探测'),
         ),
-      )
-    );
+        body: Container(
+          padding: EdgeInsets.all(15.dp),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _started
+                      ? Button(
+                          '主动结束',
+                          callback: _stop,
+                        )
+                      : Button(
+                          '开启探测',
+                          callback: _start,
+                        )
+                ],
+              ),
+              SizedBox(
+                height: 15.dp,
+              ),
+              _upLinkStats != null && _downLinkStats != null
+                  ? Table(
+                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      border: TableBorder.all(
+                        color: Colors.grey,
+                        width: 1,
+                        style: BorderStyle.solid,
+                      ),
+                      children: [
+                        TableRow(
+                          children: [
+                            Text(
+                              '上行',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '质量:\n${_getQualityName(_upLinkStats!)}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '往返:\n${_upLinkStats?.rtt}ms',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '丢包率:\n${_upLinkStats?.packetLostRate}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            Text(
+                              '下行',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '质量:\n${_getQualityName(_downLinkStats!)}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '往返:\n${_downLinkStats?.rtt}ms',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            Text(
+                              '丢包率:\n${_downLinkStats?.packetLostRate}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Container(),
+            ],
+          ),
+        ));
   }
 
   void _createEngine() async {
@@ -3143,7 +3190,6 @@ class Sei extends StatefulWidget {
 }
 
 class _SeiState extends State<Sei> {
-
   @override
   void initState() {
     super.initState();
@@ -3157,12 +3203,13 @@ class _SeiState extends State<Sei> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('SEI 功能配置'),),
+      appBar: AppBar(
+        title: Text('SEI 功能配置'),
+      ),
       body: GestureDetector(
         onTap: () {
           FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus &&
-              currentFocus.focusedChild != null) {
+          if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
             FocusManager.instance.primaryFocus?.unfocus();
           }
         },
@@ -3172,20 +3219,28 @@ class _SeiState extends State<Sei> {
             children: [
               Row(
                 children: [
-                  Text('开启 SEI 功能',
+                  Text(
+                    '开启 SEI 功能',
                     style: TextStyle(fontSize: 18.sp),
                   ),
-                  SizedBox(width: 15.dp,),
+                  SizedBox(
+                    width: 15.dp,
+                  ),
                   Switch(value: widget.config.enable, onChanged: _enableSeiAction)
                 ],
               ),
-              SizedBox(height: 10.dp,),
+              SizedBox(
+                height: 10.dp,
+              ),
               Row(
                 children: [
-                  Text('发送的内容',
+                  Text(
+                    '发送的内容',
                     style: TextStyle(fontSize: 18.sp),
                   ),
-                  SizedBox(width: 15.dp,),
+                  SizedBox(
+                    width: 15.dp,
+                  ),
                   Expanded(
                     child: InputBox(
                       type: TextInputType.text,
@@ -3196,13 +3251,18 @@ class _SeiState extends State<Sei> {
                   ),
                 ],
               ),
-              SizedBox(height: 10.dp,),
+              SizedBox(
+                height: 10.dp,
+              ),
               Row(
                 children: [
-                  Text('发送的次数',
+                  Text(
+                    '发送的次数',
                     style: TextStyle(fontSize: 18.sp),
                   ),
-                  SizedBox(width: 15.dp,),
+                  SizedBox(
+                    width: 15.dp,
+                  ),
                   Expanded(
                     child: InputBox(
                       type: TextInputType.number,
@@ -3216,10 +3276,20 @@ class _SeiState extends State<Sei> {
                   ),
                 ],
               ),
-              SizedBox(height: 20.dp,),
-              Button(_sent ? '取消发送' : '发送', callback: _sent ? _cancelSend : _sendSei,),
-              SizedBox(height: 50.dp,),
-              Text('其他主播发送的 SEI 内容', style: TextStyle(fontSize: 19.sp, fontWeight: FontWeight.w500),),
+              SizedBox(
+                height: 20.dp,
+              ),
+              Button(
+                _sent ? '取消发送' : '发送',
+                callback: _sent ? _cancelSend : _sendSei,
+              ),
+              SizedBox(
+                height: 50.dp,
+              ),
+              Text(
+                '其他主播发送的 SEI 内容',
+                style: TextStyle(fontSize: 19.sp, fontWeight: FontWeight.w500),
+              ),
               SizedBox(
                 height: 20.dp,
               ),
@@ -3249,7 +3319,6 @@ class _SeiState extends State<Sei> {
         widget.config.enable = enable;
       });
     }
-
   }
 
   Future<int> _enableSei(bool enable) async {
@@ -3309,7 +3378,3 @@ class _SeiState extends State<Sei> {
   bool _sent = false;
   String _receivedSeiText = '';
 }
-
-
-
-

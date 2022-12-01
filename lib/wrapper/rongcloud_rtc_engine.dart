@@ -2,6 +2,7 @@
 /// @time 2021/6/8 15:51
 /// @version 1.0
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
@@ -502,12 +503,14 @@ class RCRTCEngine {
     required RCRTCAudioMixingMode mode,
     bool playback = true,
     int loop = 1,
+    double position = 0,
   }) async {
     Map<String, dynamic> arguments = {
       'assets': path,
       'mode': mode.index,
       'playback': playback,
       'loop': loop,
+      'position': position,
     };
     int code = await _channel.invokeMethod('startAudioMixing', arguments) ?? -1;
     return code;
@@ -518,12 +521,14 @@ class RCRTCEngine {
     required RCRTCAudioMixingMode mode,
     bool playback = true,
     int loop = 1,
+    double position = 0,
   }) async {
     Map<String, dynamic> arguments = {
       'path': path,
       'mode': mode.index,
       'playback': playback,
       'loop': loop,
+      'position': position,
     };
     int code = await _channel.invokeMethod('startAudioMixing', arguments) ?? -1;
     return code;
@@ -773,6 +778,11 @@ class RCRTCEngine {
 
   Future<int> sendSei(String sei) async {
     int code = await _channel.invokeMethod('sendSei', sei) ?? -1;
+    return code;
+  }
+
+  Future<int> preconnectToMediaServer() async {
+    int code = await _channel.invokeMethod('preconnectToMediaServer') ?? -1;
     return code;
   }
 
@@ -1105,12 +1115,12 @@ class RCRTCEngine {
         int argument = call.arguments;
         onRemoteLiveMixFirstFrame?.call(RCRTCMediaType.values[argument]);
         break;
-    // case 'engine:onMessageReceived':
-    //   Map<dynamic, dynamic> arguments = call.arguments;
-    //   String id = arguments['id'];
-    //   Message? message = MessageFactory.instance?.string2Message(arguments['message']);
-    //   if (message != null) onMessageReceived?.call(id, message);
-    //   break;
+      // case 'engine:onMessageReceived':
+      //   Map<dynamic, dynamic> arguments = call.arguments;
+      //   String id = arguments['id'];
+      //   Message? message = MessageFactory.instance?.string2Message(arguments['message']);
+      //   if (message != null) onMessageReceived?.call(id, message);
+      //   break;
       case 'engine:onCustomStreamPublished':
         Map<dynamic, dynamic> arguments = call.arguments;
         String tag = arguments['tag'];

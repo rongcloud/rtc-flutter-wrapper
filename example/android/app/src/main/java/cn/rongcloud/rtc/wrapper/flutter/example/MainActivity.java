@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,12 +13,15 @@ import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioDeviceErrorType;
+import cn.rongcloud.rtc.wrapper.constants.RCRTCIWVideoDeviceErrorType;
 import cn.rongcloud.rtc.wrapper.flutter.RCRTCEngineWrapper;
 import cn.rongcloud.rtc.wrapper.flutter.example.audio.AudioRouteingListener;
 import cn.rongcloud.rtc.wrapper.flutter.example.beauty.BeautyVideoOutputFrameListener;
 import cn.rongcloud.rtc.wrapper.flutter.example.utils.UIThreadHandler;
 import cn.rongcloud.rtc.wrapper.flutter.example.yuv.LocalYuvVideoFrameListener;
 import cn.rongcloud.rtc.wrapper.flutter.example.yuv.RemoteYuvVideoFrameListener;
+import cn.rongcloud.rtc.wrapper.listener.IRCRTCIWLocalDeviceErrorListener;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -123,6 +127,7 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
                 UIThreadHandler.success(result, null);
                 break;
             case "startAudioRouteing":
+                setLocalDeviceErrorListener();
                 startAudioRouteing();
                 UIThreadHandler.success(result, null);
                 break;
@@ -243,6 +248,52 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
     private void resetAudioRouteing() {
         Toast.makeText(getMainContext(),"重置成功",Toast.LENGTH_SHORT).show();
         RCRTCEngineWrapper.getInstance().resetAudioRouteingState();
+    }
+
+    private int setLocalDeviceErrorListener() {
+        return RCRTCEngineWrapper.getInstance().setLocalDeviceErrorListener(new IRCRTCIWLocalDeviceErrorListener(){
+            @Override
+            public void onAudioDeviceError(RCRTCIWAudioDeviceErrorType type) {
+                String tipString = "";
+                switch (type) {
+                    case IN_INTERRUPTION:
+                        tipString = "音频采集设备被其他应用抢占";
+                        break;
+                    case END_INTERRUPTION:
+                        tipString = "其他应用释放音频设备，尝试恢复音频设备";
+                        break;
+                    case AUDIO_RECORD_START_FAILED:
+                        tipString = "开启音频采集设备失败";
+                        break;
+                    default:
+                        tipString = "未知错误";
+                        break;
+                }
+                Log.e("Flutter_RTC_Demo", "音频设备错误状态：" + tipString);
+            }
+
+            @Override
+            public void onVideoDeviceError(RCRTCIWVideoDeviceErrorType type) {
+                String tipString = "";
+                switch (type) {
+                    case IN_INTERRUPTION:
+                        tipString = "摄像头资源被其他应用抢占";
+                        break;
+                    case END_INTERRUPTION:
+                        tipString = "摄像头资源恢复";
+                        break;
+                    case END_CAMERA_ERROR_UNKNOWN:
+                        // 对应Camera.ErrorCallback#CAMERA_ERROR_UNKNOWN
+                        // 目前应用退后台后，摄像头自动停止采集这种场景Camera会报CAMERA_ERROR_UNKNOWN，应通知开发者
+                        tipString = "应用退后台自动停止采集";
+                        break;
+                    default:
+                        tipString = "未知错误";
+                        break;
+                }
+                Log.e("Flutter_RTC_Demo", "摄像头错误状态：" + tipString);
+            }
+        });
     }
 
     private MethodChannel channel;
