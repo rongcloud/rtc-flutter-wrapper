@@ -69,7 +69,10 @@ class ConnectPageModel extends AbstractModel implements Model {
       _media = media;
     }
 
-    Utils.imEngine?.onConnected = (int? code, String? userId,) {
+    Utils.imEngine?.onConnected = (
+      int? code,
+      String? userId,
+    ) {
       if (code == 0) {
         User user = User.create(
           userId!,
@@ -124,12 +127,12 @@ class ConnectPageModel extends AbstractModel implements Model {
     await _enableCamera(false);
     // ------
 
-
     RCRTCRoomSetup setup = RCRTCRoomSetup.create(mediaType: type, role: role);
     Utils.engine?.onRoomJoined = (int code, String? message) {
       Utils.engine?.onRoomJoined = null;
       callback(code, code == 0 ? id : '$message');
     };
+    await Utils.engine?.preconnectToMediaServer();
     int ret = await Utils.engine?.joinRoom(id, setup) ?? -1;
     if (ret != 0) {
       Utils.engine?.onRoomJoined = null;
@@ -149,7 +152,6 @@ class ConnectPageModel extends AbstractModel implements Model {
     }
     return completer.future;
   }
-
 
   String? _media;
 }

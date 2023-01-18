@@ -4,18 +4,6 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Frameworks/RongIMLibCore.framework/Info.plist</key>
-		<data>
-		bUAQk8MaY+84YRP5ZNac4BqY3us=
-		</data>
-		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
-		<data>
-		vUQJP8BOwmbLn8o7OC1TspIps/U=
-		</data>
-		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
-		<data>
-		/viGhy8U2Upn0VrtLuKQn0R52qk=
-		</data>
 		<key>Headers/RCIWLog.h</key>
 		<data>
 		WguuPO1E7GKd5NblNJrbIGDDZMQ=
@@ -26,48 +14,19 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		UqOPB6KTUjIiZJofxt4UdU24GgQ=
+		+efkv+81TipfRMp3BmEWo3g5SXw=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		jh79gCJFbn+6NKyXZxT2Jr/Pbz0=
 		</data>
+		<key>RCConfig.plist</key>
+		<data>
+		tLLC4Uyo/ChnXw0e+qQoP2Aq2Rc=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Frameworks/RongIMLibCore.framework/Info.plist</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			bUAQk8MaY+84YRP5ZNac4BqY3us=
-			</data>
-			<key>hash2</key>
-			<data>
-			I4RCQKcywEJ7h8cuVkttH0cRf9rKnAf9cxggeoV/UbQ=
-			</data>
-		</dict>
-		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			vUQJP8BOwmbLn8o7OC1TspIps/U=
-			</data>
-			<key>hash2</key>
-			<data>
-			d3So47CVaiqaME7EPhY1ThDv2P4wEd7I5wRVem3DbJQ=
-			</data>
-		</dict>
-		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			/viGhy8U2Upn0VrtLuKQn0R52qk=
-			</data>
-			<key>hash2</key>
-			<data>
-			rNAfswTFQGMW5CTvo5TaiNPaDrZ5+hda8jhxqtYJe1Y=
-			</data>
-		</dict>
 		<key>Headers/RCIWLog.h</key>
 		<dict>
 			<key>hash</key>
@@ -99,6 +58,17 @@
 			<key>hash2</key>
 			<data>
 			sDqbOgSeNqoswuS+91pTVVosNSTyXVTQNxe42j5w4vs=
+			</data>
+		</dict>
+		<key>RCConfig.plist</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			tLLC4Uyo/ChnXw0e+qQoP2Aq2Rc=
+			</data>
+			<key>hash2</key>
+			<data>
+			vw5hCzMW6KYUbA7UDYMWR4yCSd/1uDX8ljdaiOveDLs=
 			</data>
 		</dict>
 	</dict>

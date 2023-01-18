@@ -82,3 +82,17 @@ const List<String> EffectNames = [
 const List<String> MusicNames = [
   '我和我的祖国',
 ];
+
+const List<String> AudioQualityNames = [
+  '游戏',
+  '语音',
+  '音乐',
+  '高质量音乐',
+];
+
+const List<String> AudioScenarioNames = [
+  '标准',
+  '音乐聊天室',
+  '音乐教室',
+  '游戏聊天室',
+];

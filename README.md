@@ -31,7 +31,7 @@
 dependencies:
   flutter:
     sdk: flutter
-  rongcloud_rtc_wrapper_plugin: 5.3.1
+  rongcloud_rtc_wrapper_plugin: 5.3.3
 ```
 
 iOS 需要在 Info.plist 中需要加入对相机和麦克风的权限申请

@@ -4,30 +4,6 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Frameworks/RongIMLibCore.framework/Info.plist</key>
-		<data>
-		Yfc8OpyJZ+xeJso6To4hpPyZnx8=
-		</data>
-		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
-		<data>
-		Zt3sOz6HbTqnMRp3Q/MtSC1iDCY=
-		</data>
-		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
-		<data>
-		IPWk6hxgwFTCYEd/nb6gnwqJ7v4=
-		</data>
-		<key>Frameworks/RongRTCLib.framework/Info.plist</key>
-		<data>
-		tzAj98R8bLsAuQ4Re8dn2k6R+bk=
-		</data>
-		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
-		<data>
-		ciTxFsBM4IugYkIW9F+KsrIKmgU=
-		</data>
-		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
-		<data>
-		R5uFPv7/QZuQ02jNzm26HmuybK4=
-		</data>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
 		<data>
 		196lUIX1wVPbM/RPCw7EaAIUhMs=
@@ -62,7 +38,7 @@
 		</data>
 		<key>Headers/RCRTCIWEngineDelegate.h</key>
 		<data>
-		+TnSpt6Xdbp8AY3aJj0ZtUQ3pHM=
+		Fl9Qn5qvDVU/sE8TTY21n/LeeQY=
 		</data>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
 		<data>
@@ -130,81 +106,27 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		4/QDoTEE5rsR9ZNXJcbf0XXb+TU=
+		qV163R5bspmk0w6fIML9TpSiUd0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		Na6PNmewPhAXlZeEfVd/7Qr8syQ=
 		</data>
+		<key>RCConfig.plist</key>
+		<data>
+		tLLC4Uyo/ChnXw0e+qQoP2Aq2Rc=
+		</data>
+		<key>RongRTCLib.bundle/HwAiVadModel.bin</key>
+		<data>
+		ATcRMel9IwX111oJWJbEEm8fxLw=
+		</data>
+		<key>RongRTCLib.bundle/HwAinrModel.bin</key>
+		<data>
+		B8kB+UwS+Djpk42nGs6PsuZb4i4=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Frameworks/RongIMLibCore.framework/Info.plist</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			Yfc8OpyJZ+xeJso6To4hpPyZnx8=
-			</data>
-			<key>hash2</key>
-			<data>
-			5gOICFg2+m+pZGex+V4F8XAEy9GDDDT/i331jHOHigU=
-			</data>
-		</dict>
-		<key>Frameworks/RongIMLibCore.framework/RongIMLibCore</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			Zt3sOz6HbTqnMRp3Q/MtSC1iDCY=
-			</data>
-			<key>hash2</key>
-			<data>
-			MoSSrHR3AXq2R3yZHoDzlFVUjH1ofz9aBYdw9TxumWk=
-			</data>
-		</dict>
-		<key>Frameworks/RongIMLibCore.framework/_CodeSignature/CodeResources</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			IPWk6hxgwFTCYEd/nb6gnwqJ7v4=
-			</data>
-			<key>hash2</key>
-			<data>
-			s1iKkLWy16wAIiC5/PKEDYKCCqRDfKz+V+Aen+ycheY=
-			</data>
-		</dict>
-		<key>Frameworks/RongRTCLib.framework/Info.plist</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			tzAj98R8bLsAuQ4Re8dn2k6R+bk=
-			</data>
-			<key>hash2</key>
-			<data>
-			tfAgMH2ZqA26trL13+UW58d41YtuUC9D/uTwvAAXLaE=
-			</data>
-		</dict>
-		<key>Frameworks/RongRTCLib.framework/RongRTCLib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			ciTxFsBM4IugYkIW9F+KsrIKmgU=
-			</data>
-			<key>hash2</key>
-			<data>
-			MYkgvbQQBhVDg58hNffaHMJHsXn3yKjqgBKL2iXd2Rs=
-			</data>
-		</dict>
-		<key>Frameworks/RongRTCLib.framework/_CodeSignature/CodeResources</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			R5uFPv7/QZuQ02jNzm26HmuybK4=
-			</data>
-			<key>hash2</key>
-			<data>
-			jhCfGozGKzjwKPYoqsNsU1waSFYSFTIOjFZDrWszfdc=
-			</data>
-		</dict>
 		<key>Headers/RCRTCIWAudioConfig.h</key>
 		<dict>
 			<key>hash</key>
@@ -297,11 +219,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			+TnSpt6Xdbp8AY3aJj0ZtUQ3pHM=
+			Fl9Qn5qvDVU/sE8TTY21n/LeeQY=
 			</data>
 			<key>hash2</key>
 			<data>
-			LZV0Kq1PkTiDlQRF+4muxaQdhPrQUkrKlx7oaO1GlzU=
+			arYifia20WyNuVypKCAZXqBm9B4nAH8qHeOmpVtcQ0U=
 			</data>
 		</dict>
 		<key>Headers/RCRTCIWEngineSetup.h</key>
@@ -489,6 +411,39 @@
 			<key>hash2</key>
 			<data>
 			dBLW4Fd3EmuJzdqI3KMWiGO0RQj2+QMdZqUOuZenR9I=
+			</data>
+		</dict>
+		<key>RCConfig.plist</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			tLLC4Uyo/ChnXw0e+qQoP2Aq2Rc=
+			</data>
+			<key>hash2</key>
+			<data>
+			vw5hCzMW6KYUbA7UDYMWR4yCSd/1uDX8ljdaiOveDLs=
+			</data>
+		</dict>
+		<key>RongRTCLib.bundle/HwAiVadModel.bin</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			ATcRMel9IwX111oJWJbEEm8fxLw=
+			</data>
+			<key>hash2</key>
+			<data>
+			rI/0N8nw9Ktvh3flHD50aM1unvKAoT4PXCZogPS4lzo=
+			</data>
+		</dict>
+		<key>RongRTCLib.bundle/HwAinrModel.bin</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			B8kB+UwS+Djpk42nGs6PsuZb4i4=
+			</data>
+			<key>hash2</key>
+			<data>
+			wWEpSmpBqk1A1pnvwExjRDLmRm4kLI6s07dug5+9ftg=
 			</data>
 		</dict>
 	</dict>

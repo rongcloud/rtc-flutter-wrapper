@@ -7,7 +7,6 @@
 
 #import "RCRTCEngineWrapper.h"
 
-#import <RongIMLibCore/RongIMLibCore.h>
 
 #import "RCRTCViewWrapper.h"
 #import "MainThreadPoster.h"
@@ -22,10 +21,6 @@
 - (NSInteger)setLocalCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view tag:(NSString *)tag;
 - (NSInteger)setRemoteCustomStreamViewWithViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view userId:(NSString *)userId tag:(NSString *)tag;
 - (NSInteger)setLiveMixInnerCdnStreamViewDelegate:(NSObject<RCRTCIWViewDelegate> *)view;
-@end
-
-@interface RCFlutterMessageFactory
-+ (NSString *)message2String:(RCMessage *)message;
 @end
 
 @interface RCRTCEngineWrapper() <RCRTCIWEngineDelegate, RCRTCIWStatsDelegate, RCRTCIWNetworkProbeDelegate> {
@@ -1937,17 +1932,17 @@ SingleInstanceM(Instance);
     });
 }
 
-- (void)onMessageReceived:(NSString *)roomId
-                  message:(RCMessage *)message {
-    // NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
-    // [arguments setObject:roomId forKey:@"id"];
-    // [arguments setObject:[RCFlutterMessageFactory message2String:message] forKey:@"message"];
-    // __weak typeof (channel) weak = channel;
-    // dispatch_to_main_queue(^{
-    //    typeof (weak) strong = weak;
-    //    [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:arguments];
-    // });
-}
+// - (void)onMessageReceived:(NSString *)roomId
+//                   message:(RCMessage *)message {
+//     // NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
+//     // [arguments setObject:roomId forKey:@"id"];
+//     // [arguments setObject:[RCFlutterMessageFactory message2String:message] forKey:@"message"];
+//     // __weak typeof (channel) weak = channel;
+//     // dispatch_to_main_queue(^{
+//     //    typeof (weak) strong = weak;
+//     //    [strong invokeMethod:@"engine:onRemoteLiveMixFirstFrame" arguments:arguments];
+//     // });
+// }
 
 - (void)onCustomStreamPublished:(NSString *)tag
                            code:(NSInteger)code

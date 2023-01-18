@@ -156,7 +156,8 @@ class SliderTrackShape extends RoundedRectSliderTrackShape {
   }) {
     final double trackHeight = sliderTheme.trackHeight ?? 5;
     final double trackLeft = offset.dx;
-    final double trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
     final double trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
@@ -273,7 +274,9 @@ class Radios<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            value == groupValue ? Icons.radio_button_on : Icons.radio_button_off,
+            value == groupValue
+                ? Icons.radio_button_on
+                : Icons.radio_button_off,
             color: color,
           ),
           Text(
@@ -1082,8 +1085,11 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                       DropdownButtonHideUnderline(
                         child: DropdownButton(
                           isDense: true,
-                          value: tiny ? widget.config.tinyVideoBitrate : widget.config.videoBitrate,
-                          items: tiny ? minVideoKbpsItems() : maxVideoKbpsItems(),
+                          value: tiny
+                              ? widget.config.tinyVideoBitrate
+                              : widget.config.videoBitrate,
+                          items:
+                              tiny ? minVideoKbpsItems() : maxVideoKbpsItems(),
                           onChanged: (dynamic bitrate) {
                             setter(() {
                               if (tiny)
@@ -1110,7 +1116,9 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                       DropdownButtonHideUnderline(
                         child: DropdownButton(
                           isDense: true,
-                          value: tiny ? widget.config.tinyVideoFps : widget.config.videoFps,
+                          value: tiny
+                              ? widget.config.tinyVideoFps
+                              : widget.config.videoFps,
                           items: videoFpsItems(),
                           onChanged: (dynamic fps) {
                             setter(() {
@@ -1138,7 +1146,9 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                       DropdownButtonHideUnderline(
                         child: DropdownButton(
                           isDense: true,
-                          value: tiny ? widget.config.tinyVideoResolution : widget.config.videoResolution,
+                          value: tiny
+                              ? widget.config.tinyVideoResolution
+                              : widget.config.videoResolution,
                           items: videoResolutionItems(),
                           onChanged: (dynamic resolution) {
                             setter(() {
@@ -1158,11 +1168,23 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                 TextButton(
                   child: Text('Ok'),
                   onPressed: () {
-                    widget.engine.setLiveMixVideoBitrate(tiny ? widget.config.tinyVideoBitrate : widget.config.videoBitrate, tiny);
-                    widget.engine.setLiveMixVideoFps(tiny ? widget.config.tinyVideoFps : widget.config.videoFps, tiny);
+                    widget.engine.setLiveMixVideoBitrate(
+                        tiny
+                            ? widget.config.tinyVideoBitrate
+                            : widget.config.videoBitrate,
+                        tiny);
+                    widget.engine.setLiveMixVideoFps(
+                        tiny
+                            ? widget.config.tinyVideoFps
+                            : widget.config.videoFps,
+                        tiny);
                     widget.engine.setLiveMixVideoResolution(
-                      tiny ? widget.config.tinyVideoResolution.width : widget.config.videoResolution.width,
-                      tiny ? widget.config.tinyVideoResolution.height : widget.config.videoResolution.height,
+                      tiny
+                          ? widget.config.tinyVideoResolution.width
+                          : widget.config.videoResolution.width,
+                      tiny
+                          ? widget.config.tinyVideoResolution.height
+                          : widget.config.videoResolution.height,
                       tiny,
                     );
                     Navigator.pop(context);
@@ -1199,7 +1221,10 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                     icon: Icon(
                       Icons.add,
                     ),
-                    onPressed: layouts.length < widget.items.length ? () => _showCustomLayoutConfig(context, setter, layouts) : null,
+                    onPressed: layouts.length < widget.items.length
+                        ? () =>
+                            _showCustomLayoutConfig(context, setter, layouts)
+                        : null,
                   ),
                 ],
               ),
@@ -1259,7 +1284,8 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                             widget.engine.setLiveMixCustomLayouts(layouts);
                             Navigator.pop(context);
                             setState(() {
-                              widget.config.mode = RCRTCLiveMixLayoutMode.custom;
+                              widget.config.mode =
+                                  RCRTCLiveMixLayoutMode.custom;
                             });
                           } else {
                             '至少需要一个自定义布局'.toast();
@@ -1291,7 +1317,8 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
     );
   }
 
-  List<DropdownMenuItem<LiveMixItem>> _buildUserItems(List<RCRTCCustomLayout> layouts) {
+  List<DropdownMenuItem<LiveMixItem>> _buildUserItems(
+      List<RCRTCCustomLayout> layouts) {
     List<DropdownMenuItem<LiveMixItem>> items = [];
     widget.items.forEach((item) {
       if (item.tag != null) {
@@ -1327,7 +1354,8 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
     return items;
   }
 
-  void _showCustomLayoutConfig(BuildContext context, StateSetter setter, List<RCRTCCustomLayout> layouts) {
+  void _showCustomLayoutConfig(BuildContext context, StateSetter setter,
+      List<RCRTCCustomLayout> layouts) {
     LiveMixItem? selected;
     TextEditingController videoXInputController = TextEditingController();
     TextEditingController videoYInputController = TextEditingController();
@@ -1465,11 +1493,13 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
                   String y = videoYInputController.text;
                   String width = videoWidthInputController.text;
                   String height = videoHeightInputController.text;
-                  if (selected == null) return 'Please select user or custom stream!'.toast();
+                  if (selected == null)
+                    return 'Please select user or custom stream!'.toast();
                   if (x.isEmpty) return 'X should not be null!'.toast();
                   if (y.isEmpty) return 'Y should not be null!'.toast();
                   if (width.isEmpty) return 'Width should not be null!'.toast();
-                  if (height.isEmpty) return 'Height should not be null!'.toast();
+                  if (height.isEmpty)
+                    return 'Height should not be null!'.toast();
                   RCRTCCustomLayout layout = selected!.tag != null
                       ? RCRTCCustomLayout.createCustomStreamLayout(
                           userId: selected!.id,
@@ -1542,7 +1572,8 @@ class _LiveMixPanelState extends State<LiveMixPanel> {
               TextButton(
                 child: Text('Ok'),
                 onPressed: () {
-                  widget.engine.setLiveMixAudioBitrate(widget.config.audioBitrate);
+                  widget.engine
+                      .setLiveMixAudioBitrate(widget.config.audioBitrate);
                   Navigator.pop(context);
                 },
               ),
@@ -1717,7 +1748,8 @@ class JoinSubRoomPanel extends StatelessWidget {
                         Text('${joinable[index]}'),
                         Button(
                           '加入',
-                          callback: () => Utils.joinSubRoom(context, joinable[index]),
+                          callback: () =>
+                              Utils.joinSubRoom(context, joinable[index]),
                         ),
                       ],
                     );
@@ -1836,7 +1868,8 @@ class _CDNConfigState extends State<CDNConfig> {
         itemCount: widget.cdnList.length,
         itemBuilder: (context, index) {
           CDNInfo cdn = widget.cdnList[index];
-          String text = 'RTMP地址：${cdn.rtmp} \nHLS地址：${cdn.hls} \nFLV地址：${cdn.flv}';
+          String text =
+              'RTMP地址：${cdn.rtmp} \nHLS地址：${cdn.hls} \nFLV地址：${cdn.flv}';
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -2124,7 +2157,8 @@ class _MessagePanelState extends State<MessagePanel> {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(horizontal: 10.dp),
               itemBuilder: (context, index) {
-                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${(_messages[index] as RCIMIWTextMessage).text}'.toText();
+                return '${_messages[index].senderUserId}${_messages[index].senderUserId == DefaultData.user?.id ? '(我)' : ''}:${(_messages[index] as RCIMIWTextMessage).text}'
+                    .toText();
               },
               separatorBuilder: (context, index) {
                 return Divider(
@@ -2185,7 +2219,8 @@ class _MessagePanelState extends State<MessagePanel> {
   void _send() async {
     if (!_joined) return '请先加入房间'.toast();
     String content = '我是${widget.host ? '主播' : '观众'}';
-    RCIMIWTextMessage? message = await Utils.imEngine?.createTextMessage(RCIMIWConversationType.chatroom, widget.id, '', content);
+    RCIMIWTextMessage? message = await Utils.imEngine?.createTextMessage(
+        RCIMIWConversationType.chatroom, widget.id, '', content);
     int result = await _sendMessage(message);
     if (result != 0) {
       '发消息接口调用失败'.toast();
@@ -2244,7 +2279,8 @@ class _AudioEffectPanelState extends State<AudioEffectPanel> {
       }
     };
     for (int i = 0; i < EffectNames.length; i++) {
-      widget.engine.createAudioEffectFromAssets('assets/audio/effect_$i.mp3', i);
+      widget.engine
+          .createAudioEffectFromAssets('assets/audio/effect_$i.mp3', i);
     }
   }
 
@@ -2319,7 +2355,8 @@ class _AudioEffectPanelState extends State<AudioEffectPanel> {
             ),
             '播放'.onClick(
               () {
-                widget.engine.playAudioEffect(effect.id, effect.volume, effect.count);
+                widget.engine
+                    .playAudioEffect(effect.id, effect.volume, effect.count);
               },
               color: Colors.blue,
             ),
@@ -2544,7 +2581,12 @@ class _AudioMixPanelState extends State<AudioMixPanel> {
                 Spacer(),
                 '播放'.onClick(
                   () {
-                    widget.engine.startAudioMixingFromAssets(path: 'assets/audio/music_$index.mp3', mode: mode, playback: playback, loop: count, position: position);
+                    widget.engine.startAudioMixingFromAssets(
+                        path: 'assets/audio/music_$index.mp3',
+                        mode: mode,
+                        playback: playback,
+                        loop: count,
+                        position: position);
                     widget.engine.adjustAudioMixingVolume(volume);
                     // 点击播放以音量值播放  滑动单独修改
                     //widget.engine.adjustAudioMixingPlaybackVolume(playbackVolume);
@@ -2830,7 +2872,8 @@ class _WatermarkState extends State<Watermark> {
                   width: 40.dp,
                   child: Text('zoom:'),
                 ),
-                Slider(value: _zoom, min: 0.0, max: 1.0, onChanged: _zoomChanged),
+                Slider(
+                    value: _zoom, min: 0.0, max: 1.0, onChanged: _zoomChanged),
                 Text('${_zoom.toStringAsFixed(1)}'),
               ],
             ),
@@ -2880,11 +2923,14 @@ class _WatermarkState extends State<Watermark> {
   }
 
   void _setWatermarkAction() async {
-    AssetPickerConfig config = const AssetPickerConfig(maxAssets: 1, requestType: RequestType.image);
-    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, pickerConfig: config);
+    AssetPickerConfig config =
+        const AssetPickerConfig(maxAssets: 1, requestType: RequestType.image);
+    final List<AssetEntity>? assets =
+        await AssetPicker.pickAssets(context, pickerConfig: config);
     File? file = await assets?.first.originFile;
     Loading.show(context);
-    int result = await _setWatermark(file?.absolute.path ?? '', Point(_x, _y), _zoom);
+    int result =
+        await _setWatermark(file?.absolute.path ?? '', Point(_x, _y), _zoom);
     Loading.dismiss(context);
     if (result == 0) {
       '设置水印成功'.toast();
@@ -2906,7 +2952,8 @@ class _WatermarkState extends State<Watermark> {
     Navigator.pop(context);
   }
 
-  Future<int> _setWatermark(String imagePath, Point<double> position, double zoom) async {
+  Future<int> _setWatermark(
+      String imagePath, Point<double> position, double zoom) async {
     Completer<int> completer = Completer();
     widget.engine.onWatermarkSet = (int code, String? message) async {
       widget.engine.onWatermarkSet = null;
@@ -2946,7 +2993,8 @@ class NetworkProbe extends StatefulWidget {
   State<NetworkProbe> createState() => _NetworkProbeState();
 }
 
-class _NetworkProbeState extends State<NetworkProbe> implements RCRTCNetworkProbeListener {
+class _NetworkProbeState extends State<NetworkProbe>
+    implements RCRTCNetworkProbeListener {
   @override
   void initState() {
     _createEngine();
@@ -2993,7 +3041,8 @@ class _NetworkProbeState extends State<NetworkProbe> implements RCRTCNetworkProb
               ),
               _upLinkStats != null && _downLinkStats != null
                   ? Table(
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
                       border: TableBorder.all(
                         color: Colors.grey,
                         width: 1,
@@ -3209,7 +3258,8 @@ class _SeiState extends State<Sei> {
       body: GestureDetector(
         onTap: () {
           FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+          if (!currentFocus.hasPrimaryFocus &&
+              currentFocus.focusedChild != null) {
             FocusManager.instance.primaryFocus?.unfocus();
           }
         },
@@ -3226,7 +3276,8 @@ class _SeiState extends State<Sei> {
                   SizedBox(
                     width: 15.dp,
                   ),
-                  Switch(value: widget.config.enable, onChanged: _enableSeiAction)
+                  Switch(
+                      value: widget.config.enable, onChanged: _enableSeiAction)
                 ],
               ),
               SizedBox(
@@ -3377,4 +3428,131 @@ class _SeiState extends State<Sei> {
   Timer? _sendSeiTimer;
   bool _sent = false;
   String _receivedSeiText = '';
+}
+
+class AudioConfigPanel extends StatefulWidget {
+  const AudioConfigPanel(this.engine);
+
+  @override
+  State<AudioConfigPanel> createState() => _AudioConfigPanelState();
+
+  final RCRTCEngine? engine;
+}
+
+class _AudioConfigPanelState extends State<AudioConfigPanel> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('音频配置'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(10.dp),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            '音频质量'.toText(),
+            Divider(
+              height: 5.dp,
+              color: Colors.transparent,
+            ),
+            Row(
+              children: _buildAudioQualityChooser(context),
+            ),
+            Divider(
+              height: 10.dp,
+              color: Colors.transparent,
+            ),
+            '音频场景'.toText(),
+            Divider(
+              height: 5.dp,
+              color: Colors.transparent,
+            ),
+            Row(
+              children: _buildAudioScenarioChooser(context),
+            ),
+            Divider(
+              height: 10.dp,
+              color: Colors.transparent,
+            ),
+            Row(
+              children: [
+                Spacer(),
+                '确定'.onClick(
+                  () {
+                    widget.engine?.setAudioConfig(RCRTCAudioConfig.create(
+                      quality: _quality,
+                      scenario: _scenario,
+                    ));
+                    Navigator.pop(context);
+                  },
+                  color: Colors.black,
+                ),
+                VerticalDivider(
+                  width: 20.dp,
+                ),
+                '取消'.onClick(
+                  () {
+                    Navigator.pop(context);
+                  },
+                  color: Colors.black,
+                ),
+                Spacer(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildAudioQualityChooser(BuildContext context) {
+    List<Widget> widgets = [];
+    widgets.add(Spacer());
+    for (int i = 0; i < AudioQualityNames.length; i++) {
+      widgets.add(
+        Radios(
+          AudioQualityNames[i],
+          value: RCRTCAudioQuality.values[i],
+          groupValue: _quality,
+          onChanged: (dynamic value) {
+            if (_quality != value) {
+              setState(() {
+                _quality = value;
+              });
+            }
+          },
+        ),
+      );
+      widgets.add(Spacer());
+    }
+    return widgets;
+  }
+
+  List<Widget> _buildAudioScenarioChooser(BuildContext context) {
+    List<Widget> widgets = [];
+    widgets.add(Spacer());
+    for (int i = 0; i < AudioScenarioNames.length; i++) {
+      widgets.add(
+        Radios(
+          AudioScenarioNames[i],
+          value: RCRTCAudioScenario.values[i],
+          groupValue: _scenario,
+          onChanged: (dynamic value) {
+            if (_scenario != value) {
+              setState(() {
+                _scenario = value;
+              });
+            }
+          },
+        ),
+      );
+      widgets.add(Spacer());
+    }
+    return widgets;
+  }
+
+  RCRTCAudioQuality _quality = RCRTCAudioQuality.speech;
+  RCRTCAudioScenario _scenario = RCRTCAudioScenario.normal;
 }

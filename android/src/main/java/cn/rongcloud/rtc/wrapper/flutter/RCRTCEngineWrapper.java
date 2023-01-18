@@ -37,14 +37,14 @@ import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableAudioFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWOnWritableVideoFrameListener;
 import cn.rongcloud.rtc.wrapper.listener.RCRTCIWStatusListener;
 import cn.rongcloud.rtc.wrapper.utils.RCWrapperLog;
+import cn.rongcloud.rtc.wrapper.utils.RCUtils;
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterAssets;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.rong.imlib.model.Message;
-import io.rong.message.utils.BitmapUtil;
+
 
 /**
  * @author panmingda
@@ -445,6 +445,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
                 break;
             case "sendSei":
                 sendSei(call, result);
+                break;
             case "preconnectToMediaServer":
                 preconnectToMediaServer(result);
                 break;
@@ -1655,7 +1656,7 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             if (!imagePath.startsWith("file://")) {
                 imagePath = "file://" + imagePath;
             }
-            Bitmap imageBitMap = BitmapUtil.getFactoryBitmap(context, Uri.parse(imagePath));
+            Bitmap imageBitMap = RCUtils.getFactoryBitmap(context, Uri.parse(imagePath));
             if (imageBitMap == null) {
                 RCWrapperLog.logE("setWatermark", "imageBitMap is null");
                 code = PARAM_ERROR.getCode();
@@ -2214,18 +2215,18 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             });
         }
 
-        @Override
-        public void onMessageReceived(String roomId, Message message) {
-//            final HashMap<String, Object> arguments = new HashMap<>();
-//            arguments.put("id", roomId);
-//            arguments.put("message", MessageFactory.getInstance().message2String(message));
-//            MainThreadPoster.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    channel.invokeMethod("engine:onMessageReceived", arguments);
-//                }
-//            });
-        }
+//         @Override
+//         public void onMessageReceived(String roomId, Message message) {
+// //            final HashMap<String, Object> arguments = new HashMap<>();
+// //            arguments.put("id", roomId);
+// //            arguments.put("message", MessageFactory.getInstance().message2String(message));
+// //            MainThreadPoster.post(new Runnable() {
+// //                @Override
+// //                public void run() {
+// //                    channel.invokeMethod("engine:onMessageReceived", arguments);
+// //                }
+// //            });
+//         }
 
         @Override
         public void onCustomStreamPublished(String tag, int code, String message) {

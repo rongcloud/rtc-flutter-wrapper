@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:handy_toast/handy_toast.dart';
@@ -154,6 +153,13 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
                 title: Text('聊天室'),
                 trailing: Icon(Icons.message),
                 onTap: () => _showMessagePanel(context),
+              ),
+              SizedBox(height: 10.dp,),
+              ListTile(
+                tileColor: Color(0xFFEEEEEE),
+                title: Text('切换音频模式'),
+                trailing: Icon(Icons.message),
+                onTap: () => _showAudioConfigPanel(context),
               ),
             ],
           ),
@@ -943,6 +949,16 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
       context: context,
       builder: (context) {
         return MessagePanel(_roomId, true);
+      },
+    );
+  }
+
+  void _showAudioConfigPanel(BuildContext context) {
+    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AudioConfigPanel(Utils.engine);
       },
     );
   }

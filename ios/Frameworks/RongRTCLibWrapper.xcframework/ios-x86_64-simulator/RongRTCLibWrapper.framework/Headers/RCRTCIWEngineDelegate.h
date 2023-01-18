@@ -324,6 +324,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onAudioMixingStarted;
 
 /*!
+ 混音进度回调, 仅供会议用户或直播主播用户使用
+ @param progress 混音进度
+ @discussion
+ 混音进度回调, 仅供会议用户或直播主播用户使用
+ */
+- (void)onAudioMixingProgressReported:(float)progress;
+
+/*!
  暂停本地音频数据合流操作回调, 仅供会议用户或直播主播用户使用
  @discussion
  暂停本地音频数据合流操作回调, 仅供会议用户或直播主播用户使用
@@ -351,15 +359,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onAudioMixingFinished;
 
 #pragma mark - 本地用户收到消息
-/*!
- 本地用户收到远端用记发送消息
- @param roomId 房间id
- @param message 消息
- @discussion
- 本地用户收到远端用记发送消息
- */
-- (void)onMessageReceived:(NSString *)roomId
-                  message:(RCMessage *)message;
+///*!
+// 本地用户收到远端用记发送消息
+// @param roomId 房间id
+// @param message 消息
+// @discussion
+// 本地用户收到远端用记发送消息
+// */
+//- (void)onMessageReceived:(NSString *)roomId
+//                  message:(RCMessage *)message;
 
 #pragma mark - 远端用户房间相关操作回调
 /*!
