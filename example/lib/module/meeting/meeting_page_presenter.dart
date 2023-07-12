@@ -8,7 +8,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'meeting_page_contract.dart';
 import 'meeting_page_model.dart';
 
-class MeetingPagePresenter extends AbstractPresenter<View, Model> implements Presenter {
+class MeetingPagePresenter extends AbstractPresenter<RCView, Model> implements Presenter {
   @override
   IModel createModel() {
     return MeetingPageModel();

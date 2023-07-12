@@ -23,7 +23,7 @@ class HostPage extends AbstractView {
   _HostPageState createState() => _HostPageState();
 }
 
-class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> implements View, RCRTCStatsListener {
+class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> implements RCView, RCRTCStatsListener {
   @override
   HostPagePresenter createPresenter() {
     return HostPagePresenter();

@@ -19,7 +19,7 @@ class ConnectPage extends AbstractView {
   _ConnectPageState createState() => _ConnectPageState();
 }
 
-class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectPage> implements View {
+class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectPage> implements RCView {
   @override
   ConnectPagePresenter createPresenter() {
     return ConnectPagePresenter();

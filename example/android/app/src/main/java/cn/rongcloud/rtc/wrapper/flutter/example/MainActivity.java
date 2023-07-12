@@ -70,7 +70,7 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
     @Override
     public void cleanUpFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.cleanUpFlutterEngine(flutterEngine);
-        release();
+        releaseChannel();
     }
 
     public static Context getMainContext() {
@@ -82,7 +82,7 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
         channel.setMethodCallHandler(this);
     }
 
-    private void release() {
+    private void releaseChannel() {
         channel.setMethodCallHandler(null);
         channel = null;
     }

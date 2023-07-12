@@ -10,7 +10,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'host_page_contract.dart';
 import 'host_page_model.dart';
 
-class HostPagePresenter extends AbstractPresenter<View, Model> implements Presenter {
+class HostPagePresenter extends AbstractPresenter<RCView, Model> implements Presenter {
   @override
   IModel createModel() {
     return HostPageModel();

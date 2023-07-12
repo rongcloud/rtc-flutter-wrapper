@@ -18,7 +18,7 @@ class AudiencePage extends AbstractView {
   _AudiencePageState createState() => _AudiencePageState();
 }
 
-class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, AudiencePage> implements View, RCRTCStatsListener {
+class _AudiencePageState extends AbstractViewState<AudiencePagePresenter, AudiencePage> implements RCView, RCRTCStatsListener {
   @override
   AudiencePagePresenter createPresenter() {
     return AudiencePagePresenter();

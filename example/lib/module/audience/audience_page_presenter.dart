@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'audience_page_contract.dart';
 import 'audience_page_model.dart';
 
-class AudiencePagePresenter extends AbstractPresenter<View, Model> implements Presenter {
+class AudiencePagePresenter extends AbstractPresenter<RCView, Model> implements Presenter {
   @override
   IModel createModel() {
     return AudiencePageModel();

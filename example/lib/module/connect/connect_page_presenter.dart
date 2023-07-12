@@ -7,7 +7,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presente
 import 'connect_page_contract.dart';
 import 'connect_page_model.dart';
 
-class ConnectPagePresenter extends AbstractPresenter<View, Model> implements Presenter {
+class ConnectPagePresenter extends AbstractPresenter<RCView, Model> implements Presenter {
   @override
   IModel createModel() {
     return ConnectPageModel();

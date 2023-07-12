@@ -22,7 +22,7 @@ class MeetingPage extends AbstractView {
   _MeetingPageState createState() => _MeetingPageState();
 }
 
-class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingPage> implements View, RCRTCStatsListener {
+class _MeetingPageState extends AbstractViewState<MeetingPagePresenter, MeetingPage> implements RCView, RCRTCStatsListener {
   @override
   MeetingPagePresenter createPresenter() {
     return MeetingPagePresenter();

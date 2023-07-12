@@ -5,7 +5,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/model.da
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/presenter.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/template/mvp/view.dart';
 
-abstract class View implements IView {
+abstract class RCView implements IView {
   void onConnected(String id);
 
   void onConnectError(int code, String? id);
