@@ -5,5 +5,5 @@ package cn.rongcloud.rtc.wrapper.flutter;
  * @date 2021/9/7
  */
 public class Version {
-    public static final String SDK_VERSION = "5.4.5";
+    public static final String SDK_VERSION = "5.6.2";
 }
