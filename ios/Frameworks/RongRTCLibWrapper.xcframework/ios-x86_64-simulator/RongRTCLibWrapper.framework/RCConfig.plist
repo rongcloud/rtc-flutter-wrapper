@@ -55,5 +55,7 @@
 		<key>SightCompressHeight</key>
 		<integer>960</integer>
 	</dict>
+	<key>HeartBeatInterval</key>
+	<integer>15</integer>
 </dict>
 </plist>

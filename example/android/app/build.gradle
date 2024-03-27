@@ -31,7 +31,7 @@ android {
         compileSdkVersion 33
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "cn.rongcloud.rtc.wrapper.flutter.example"
-        minSdkVersion 20
+        minSdkVersion 21
         targetSdkVersion 31
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()

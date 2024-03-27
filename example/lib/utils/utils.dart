@@ -147,9 +147,19 @@ class Utils {
         onUserCustomStateChanged?.call(userId, tag, state.audioPublished, state.videoPublished);
       };
       _rtcEngine?.onRemoteLiveRoleSwitched = (String roomId, String userId, RCRTCRole role) {
-        _users.removeWhere((user) => user.id == userId);
+
+        if(role == RCRTCRole.live_broadcaster) {
+          _users.removeWhere((user) => user.id == userId);
+        _users.add(UserState(roomId, userId));
+
         onUserListChanged?.call();
         onRemoveUserAudio?.call(userId);
+        } else {
+          _users.removeWhere((user) => user.id == userId);
+        onUserListChanged?.call();
+        onRemoveUserAudio?.call(userId);
+        }
+
       };
       _rtcEngine?.onRemoteLiveMixInnerCdnStreamPublished = () {
         print('utils - onRemoteLiveMixInnerCdnStreamPublished');

@@ -3,7 +3,7 @@
 #import "RCRTCViewWrapper.h"
 #import <RongIMLibCore/RongIMLibCore.h>
 
-static NSString * const VER = @"5.6.2";
+static NSString * const VER = @"5.6.11";
 
 @implementation RCRTCWrapperPlugin
 
