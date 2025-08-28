@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/data/data.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/local_storage.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'global_config.dart';
 import 'router/router.dart';
@@ -34,7 +34,7 @@ class RCRTCFlutter extends StatelessWidget {
     );
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
-    Wakelock.enable();
+    WakelockPlus.enable();
 
     return MaterialApp(
       navigatorKey: ContextHolder.key,

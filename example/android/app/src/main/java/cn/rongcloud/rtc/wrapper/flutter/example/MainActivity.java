@@ -13,6 +13,11 @@ import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 
+
+import cn.rongcloud.rtc.wrapper.flutter.RCRTCWrapperPlugin;
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWAudioDeviceErrorType;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWVideoDeviceErrorType;
 import cn.rongcloud.rtc.wrapper.flutter.RCRTCEngineWrapper;
@@ -145,13 +150,23 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
     private void openBeauty() {
         if (beautyVideoOutputFrameListener == null) {
             beautyVideoOutputFrameListener = new BeautyVideoOutputFrameListener();
-            RCRTCEngineWrapper.getInstance().setLocalVideoProcessedListener(beautyVideoOutputFrameListener);
+
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setLocalVideoProcessedListener(beautyVideoOutputFrameListener);
+            }
+
+            // RCRTCEngineWrapper.getInstance().setLocalVideoProcessedListener(beautyVideoOutputFrameListener);
         }
     }
 
     private void closeBeauty() {
         if (beautyVideoOutputFrameListener != null) {
-            RCRTCEngineWrapper.getInstance().setLocalVideoProcessedListener(null);
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setLocalVideoProcessedListener(null);
+            }
+            // RCRTCEngineWrapper.getInstance().setLocalVideoProcessedListener(null);
             beautyVideoOutputFrameListener.destroy();
             beautyVideoOutputFrameListener = null;
         }
@@ -164,13 +179,22 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
             String userId = call.argument("uid");
             String tag = call.argument("tag");
             localYuvVideoFrameListener = new LocalYuvVideoFrameListener(this, roomId, hostId, userId, tag);
-            RCRTCEngineWrapper.getInstance().setLocalCustomVideoProcessedListener(tag, localYuvVideoFrameListener);
+
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setLocalCustomVideoProcessedListener(tag, localYuvVideoFrameListener);
+            }
+            // RCRTCEngineWrapper.getInstance().setLocalCustomVideoProcessedListener(tag, localYuvVideoFrameListener);
         }
     }
 
     private void disableLocalCustomYuv() {
         if (localYuvVideoFrameListener != null) {
-            RCRTCEngineWrapper.getInstance().setLocalCustomVideoProcessedListener(localYuvVideoFrameListener.getTag(), null);
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setLocalCustomVideoProcessedListener(localYuvVideoFrameListener.getTag(), null);
+            }
+            // RCRTCEngineWrapper.getInstance().setLocalCustomVideoProcessedListener(localYuvVideoFrameListener.getTag(), null);
             localYuvVideoFrameListener.destroy();
             localYuvVideoFrameListener = null;
         }
@@ -186,7 +210,11 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
         if (listener == null) {
             listener = new RemoteYuvVideoFrameListener(this, roomId, hostId, userId, tag);
             remoteYuvVideoFrameListeners.put(key, listener);
-            RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(userId, tag, listener);
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setRemoteCustomVideoProcessedListener(userId, tag, listener);
+            }
+            // RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(userId, tag, listener);
         }
     }
 
@@ -196,14 +224,22 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
         String key = userId + "@" + tag;
         RemoteYuvVideoFrameListener listener = remoteYuvVideoFrameListeners.remove(key);
         if (listener != null) {
-            RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(userId, tag, null);
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setRemoteCustomVideoProcessedListener(userId, tag, null);
+            }
+            // RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(userId, tag, null);
             listener.destroy();
         }
     }
 
     private void disableAllRemoteCustomYuv() {
         for (RemoteYuvVideoFrameListener listener : remoteYuvVideoFrameListeners.values()) {
-            RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(listener.getUserId(), listener.getTag(), null);
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                rtcPlugin.engineWrapper.setRemoteCustomVideoProcessedListener(listener.getUserId(), listener.getTag(), null);
+            }
+            // RCRTCEngineWrapper.getInstance().setRemoteCustomVideoProcessedListener(listener.getUserId(), listener.getTag(), null);
             listener.destroy();
         }
         remoteYuvVideoFrameListeners.clear();
@@ -235,11 +271,19 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
         if (audioRouteingListener == null) {
             audioRouteingListener = new AudioRouteingListener();
         }
-        RCRTCEngineWrapper.getInstance().startAudioRouteing(audioRouteingListener);
+        RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+        if (rtcPlugin != null) {
+            rtcPlugin.engineWrapper.startAudioRouteing(audioRouteingListener);
+        }
+        // RCRTCEngineWrapper.getInstance().startAudioRouteing(audioRouteingListener);
     }
 
     private void stopAudioRouteing() {
-        RCRTCEngineWrapper.getInstance().stopAudioRouteing();
+        RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+        if (rtcPlugin != null) {
+            rtcPlugin.engineWrapper.stopAudioRouteing();
+        }
+        // RCRTCEngineWrapper.getInstance().stopAudioRouteing();
         if (audioRouteingListener != null) {
             audioRouteingListener = null;
         }
@@ -247,11 +291,17 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
 
     private void resetAudioRouteing() {
         Toast.makeText(getMainContext(),"重置成功",Toast.LENGTH_SHORT).show();
-        RCRTCEngineWrapper.getInstance().resetAudioRouteingState();
+        RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+        if (rtcPlugin != null) {
+            rtcPlugin.engineWrapper.resetAudioRouteingState();
+        }
+        // RCRTCEngineWrapper.getInstance().resetAudioRouteingState();
     }
 
     private int setLocalDeviceErrorListener() {
-        return RCRTCEngineWrapper.getInstance().setLocalDeviceErrorListener(new IRCRTCIWLocalDeviceErrorListener(){
+        RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+        if (rtcPlugin != null) {
+            return rtcPlugin.engineWrapper.setLocalDeviceErrorListener(new IRCRTCIWLocalDeviceErrorListener(){
             @Override
             public void onAudioDeviceError(RCRTCIWAudioDeviceErrorType type) {
                 String tipString = "";
@@ -293,7 +343,9 @@ public class MainActivity extends FlutterActivity implements MethodChannel.Metho
                 }
                 Log.e("Flutter_RTC_Demo", "摄像头错误状态：" + tipString);
             }
-        });
+            });
+        }
+        return -1;
     }
 
     private MethodChannel channel;

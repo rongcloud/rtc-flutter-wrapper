@@ -21,12 +21,8 @@ abstract class AbstractViewState<P extends IPresenter, V extends AbstractView> e
     Size size = designSize();
 
     ScreenUtil.init(
-      BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width,
-        maxHeight: MediaQuery.of(context).size.height,
-      ),
+      context,
       designSize: size,
-      orientation: Orientation.portrait,
     );
 
     _init(context);

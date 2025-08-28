@@ -3,12 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void init(BuildContext context) {
   ScreenUtil.init(
-    BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width,
-      maxHeight: MediaQuery.of(context).size.height,
-    ),
+    context,
     designSize: Size(375, 667),
-    orientation: Orientation.portrait,
   );
 }
 

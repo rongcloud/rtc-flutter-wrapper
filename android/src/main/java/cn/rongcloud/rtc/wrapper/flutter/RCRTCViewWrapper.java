@@ -23,11 +23,11 @@ import io.flutter.view.TextureRegistry;
  */
 class RCRTCViewWrapper implements MethodCallHandler {
 
-    static RCRTCViewWrapper getInstance() {
-        return RCRTCViewWrapper.SingletonHolder.instance;
-    }
+    // static RCRTCViewWrapper getInstance() {
+    //     return RCRTCViewWrapper.SingletonHolder.instance;
+    // }
 
-    private RCRTCViewWrapper() {
+    public RCRTCViewWrapper() {
     }
 
     void init(TextureRegistry registry, BinaryMessenger messenger) {
@@ -44,6 +44,16 @@ class RCRTCViewWrapper implements MethodCallHandler {
         }
         views.clear();
         channel.setMethodCallHandler(null);
+    }
+
+    // Activity 回到前台时重新创建 EGL Surface，避免纹理失效导致卡帧
+    void onActivityResumed() {
+        for(int i = 0, size = views.size(); i < size; i++) {
+            RCRTCView view = views.valueAt(i);
+            if (view != null) {
+                view.recreateSurfaceIfNeeded();
+            }
+        }
     }
 
     public RCRTCView getView(long id) {
@@ -138,6 +148,12 @@ class RCRTCViewWrapper implements MethodCallHandler {
             view.release();
             channel.setStreamHandler(null);
             entry.release();
+        }
+
+        private void recreateSurfaceIfNeeded() {
+            // Flutter Texture 在进后台一段时间后可能被回收，确保 Surface/EGL 恢复可用
+            view.destroySurface();
+            view.createSurface(entry.surfaceTexture());
         }
 
         private final TextureRegistry.SurfaceTextureEntry entry;

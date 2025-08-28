@@ -17,6 +17,10 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.rongcloud.rtc.wrapper.flutter.RCRTCViewWrapper;
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import cn.rongcloud.rtc.wrapper.RCRTCIWEngine;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWCamera;
 import cn.rongcloud.rtc.wrapper.constants.RCRTCIWLocalAudioStats;
@@ -52,16 +56,22 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 public final class RCRTCEngineWrapper implements MethodCallHandler {
 
-    public static RCRTCEngineWrapper getInstance() {
-        return SingletonHolder.instance;
+    // public static RCRTCEngineWrapper getInstance() {
+    //     return SingletonHolder.instance;
+    // }
+    private FlutterEngine flutterEngine;
+
+    public RCRTCEngineWrapper() {
     }
 
-    private RCRTCEngineWrapper() {
+    public FlutterEngine getFlutterEngine() {
+        return flutterEngine;
     }
 
-    void init(Context context, BinaryMessenger messenger, FlutterAssets assets) {
+    void init(Context context, BinaryMessenger messenger, FlutterAssets assets, FlutterEngine engine) {
         this.context = context;
         this.assets = assets;
+        this.flutterEngine = engine;
         channel = new MethodChannel(messenger, "cn.rongcloud.rtc.flutter/engine");
         channel.setMethodCallHandler(this);
     }
@@ -69,6 +79,19 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
     void unInit() {
         context = null;
         channel.setMethodCallHandler(null);
+    }
+
+    // Activity 回到前台尝试恢复相机采集（若之前开启过）
+    void onActivityResumed() {
+        if (engine != null) {
+            try {
+                RCRTCIWCamera camera = engine.whichCamera();
+                if (camera != null && camera != RCRTCIWCamera.NONE) {
+                    engine.enableCamera(true);
+                }
+            } catch (Throwable ignore) {
+            }
+        }
     }
 
     public int setLocalAudioCapturedListener(RCRTCIWOnWritableAudioFrameListener listener) {
@@ -774,14 +797,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         if (engine != null) {
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_LOCAL_VIEW_METHOD.invoke(engine, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_LOCAL_VIEW_METHOD.invoke(engine, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);
@@ -802,14 +828,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (id != null);
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_REMOTE_VIEW_METHOD.invoke(engine, id, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_REMOTE_VIEW_METHOD.invoke(engine, id, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);
@@ -829,14 +858,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         if (engine != null) {
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_LIVE_MIX_VIEW_METHOD.invoke(engine, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_LIVE_MIX_VIEW_METHOD.invoke(engine, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);
@@ -1330,14 +1362,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (tag != null);
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_LOCAL_CUSTOM_VIEW_METHOD.invoke(engine, tag, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_LOCAL_CUSTOM_VIEW_METHOD.invoke(engine, tag, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);
@@ -1395,14 +1430,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
             assert (tag != null);
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_REMOTE_CUSTOM_VIEW_METHOD.invoke(engine, id, tag, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_REMOTE_CUSTOM_VIEW_METHOD.invoke(engine, id, tag, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);
@@ -1585,14 +1623,17 @@ public final class RCRTCEngineWrapper implements MethodCallHandler {
         if (engine != null) {
             Integer view = call.argument("view");
             assert (view != null);
-            RCRTCViewWrapper.RCRTCView origin = RCRTCViewWrapper.getInstance().getView(view);
-            assert (origin != null);
-            try {
-                Integer ret = (Integer) SET_LIVE_MIX_INNER_CDN_VIEW_METHOD.invoke(engine, origin.view);
-                assert (ret != null);
-                code = ret;
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            RCRTCWrapperPlugin rtcPlugin = (RCRTCWrapperPlugin) getFlutterEngine().getPlugins().get(RCRTCWrapperPlugin.class);
+            if (rtcPlugin != null) {
+                RCRTCViewWrapper.RCRTCView origin = rtcPlugin.viewWrapper.getView(view);
+                assert (origin != null);
+                try {
+                    Integer ret = (Integer) SET_LIVE_MIX_INNER_CDN_VIEW_METHOD.invoke(engine, origin.view);
+                    assert (ret != null);
+                    code = ret;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                }
             }
         }
         MainThreadPoster.success(result, code);

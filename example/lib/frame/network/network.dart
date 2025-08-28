@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 enum HttpErrorCode {
   Ok,
@@ -24,23 +24,25 @@ class Http {
     bool enableCheckCert = false,
     String? proxy,
   ]) {
-    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-      // ssl
-      if (enableCheckCert)
-        client.badCertificateCallback = (
-          X509Certificate cert,
-          String host,
-          int port,
-        ) {
-          for (String _cert in _certs) if (cert.pem == _cert) return true;
-          return false;
-        };
-      // proxy
-      if (proxy?.isNotEmpty == true)
-        client.findProxy = (uri) {
-          return 'PROXY $proxy'; // localhost:8888
-        };
-    };
+    _dio.httpClientAdapter = IOHttpClientAdapter(
+      onHttpClientCreate: (client) {
+        // ssl
+        if (enableCheckCert)
+          client.badCertificateCallback = (
+            X509Certificate cert,
+            String host,
+            int port,
+          ) {
+            for (String _cert in _certs) if (cert.pem == _cert) return true;
+            return false;
+          };
+        // proxy
+        if (proxy?.isNotEmpty == true)
+          client.findProxy = (uri) {
+            return 'PROXY $proxy'; // localhost:8888
+          };
+      },
+    );
   }
 
   static Future<void> get(

@@ -13,7 +13,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/main.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/router/router.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/widgets/ui.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'host_page_contract.dart';
 import 'host_page_presenter.dart';
@@ -1064,11 +1064,31 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
   }
 
   void _selectMovie(BuildContext context) async {
-    AssetPickerConfig config = const AssetPickerConfig(maxAssets: 1, requestType: RequestType.video);
-    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context, pickerConfig: config);
-    File? file = await assets?.first.originFile;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [
+        'mp4',
+        'mov',
+        'mkv',
+        'avi',
+        'flv',
+        'wmv',
+        'webm',
+        'mpeg',
+        'mpg',
+        '3gp',
+        'ts',
+        'm4v',
+        'rmvb',
+        'rm',
+        'asf',
+        'vob',
+        'f4v'
+      ],
+      allowMultiple: false,
+    );
     setState(() {
-      _customPath = file?.absolute.path;
+      _customPath = result?.files.first.path;
     });
   }
 

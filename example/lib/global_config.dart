@@ -1,5 +1,5 @@
 class GlobalConfig {
-  static const String appKey = '';
+  static const String appKey = 'z3v5yqkbv8v30';
   static const String appVersion = '0.1';
 
   static const String appTitle = 'TEST DEMO';
@@ -11,5 +11,5 @@ class GlobalConfig {
 
   static const String mediaServer = '';
 
-  static const String host = '';
+  static const String host = 'http://47.93.191.216:8080/';
 }
