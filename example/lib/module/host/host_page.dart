@@ -1087,9 +1087,28 @@ class _HostPageState extends AbstractViewState<HostPagePresenter, HostPage> impl
       ],
       allowMultiple: false,
     );
+    String? pickedPath = result?.files.first.path;
+    if (pickedPath == null) {
+      return;
+    }
+    if (Platform.isIOS) {
+      pickedPath = await _copyPickedFileForIOS(pickedPath);
+    }
     setState(() {
-      _customPath = result?.files.first.path;
+      _customPath = pickedPath;
     });
+  }
+
+  Future<String> _copyPickedFileForIOS(String path) async {
+    File source = File(path);
+    if (!await source.exists()) {
+      return path;
+    }
+    String ext = Path.extension(path);
+    Directory dir = await Directory.systemTemp.createTemp('rtc_custom_');
+    String targetPath = Path.join(dir.path, 'custom_video${ext.isNotEmpty ? ext : ''}');
+    File copied = await source.copy(targetPath);
+    return copied.path;
   }
 
   void _customAction() {
