@@ -1,5 +1,7 @@
 # 融云 Flutter RTCLib
 
+融云 RTC Flutter 插件，基于 iOS/Android 原生 RTCLib SDK 封装，为 Flutter 应用提供跨平台音视频能力。
+
 [![GitHub stars](https://img.shields.io/github/stars/rongcloud/rtc-flutter-wrapper.svg)](https://github.com/rongcloud/rtc-flutter-wrapper) [![Pub version](https://img.shields.io/pub/v/rongcloud_rtc_wrapper_plugin.svg)](https://pub.dev/packages/rongcloud_rtc_wrapper_plugin)
 
 本文档主要讲解了如何使用融云  RTC Wrapper Plugin，基于 融云 iOS/Android 平台的  RTCLib  SDK。
