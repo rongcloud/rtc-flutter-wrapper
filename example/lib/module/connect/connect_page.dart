@@ -9,6 +9,7 @@ import 'package:rongcloud_rtc_wrapper_plugin_example/frame/ui/loading.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/frame/utils/extension.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/global_config.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/router/router.dart';
+import 'package:rongcloud_rtc_wrapper_plugin_example/utils/utils.dart';
 import 'package:rongcloud_rtc_wrapper_plugin_example/widgets/ui.dart';
 
 import 'connect_page_contract.dart';
@@ -47,6 +48,12 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.mic_none_outlined,
+            ),
+            onPressed: () => _showEchoTest(context),
+          ),
           IconButton(
             icon: Icon(
               Icons.info_outlined,
@@ -138,6 +145,14 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
                     controller: _tokenInputController,
                   ),
                 ),
+                VerticalDivider(
+                  width: 10.dp,
+                  color: Colors.transparent,
+                ),
+                Button(
+                  '生成',
+                  callback: () => _token(context),
+                ),
               ],
             ),
             Divider(
@@ -158,6 +173,15 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
                     padding: EdgeInsets.only(top: 20.dp),
                     child: Column(
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Button('网络检测',
+                              callback: () => _showNetworkProbe(context),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.dp,),
                         Row(
                           children: [
                             Radios(
@@ -318,6 +342,18 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     return items;
   }
 
+  void _token(BuildContext context) async {
+    Loading.show(context);
+    String key = _keyInputController.text;
+    Result result = await presenter.token(key);
+    if (result.code != 0) {
+      result.content!.toast();
+      print("[Flutter Test Demo] ${result.content}");
+    } else
+      _tokenInputController.text = result.content!;
+    Loading.dismiss(context);
+  }
+
   void _disconnect() {
     presenter.disconnect();
     setState(() {
@@ -333,9 +369,7 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
     String file = _fileInputController.text;
     String media = _mediaInputController.text;
     String token = _tokenInputController.text;
-
     if (token.isEmpty) return 'Token Should not be null!'.toast();
-
     Loading.show(context);
     presenter.connect(key, navigate, file, media, token);
   }
@@ -494,6 +528,25 @@ class _ConnectPageState extends AbstractViewState<ConnectPagePresenter, ConnectP
       context,
       RouterManager.AUDIENCE,
       arguments: id,
+    );
+  }
+
+
+  void _showEchoTest(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return EchoTest();
+      },
+    );
+  }
+
+  void _showNetworkProbe(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return NetworkProbe();
+      },
     );
   }
 

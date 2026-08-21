@@ -1,8 +1,8 @@
+// ignore_for_file: deprecated_member_use
 /// @author Pan ming da
 /// @time 2021/6/8 15:51
 /// @version 1.0
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
@@ -14,7 +14,6 @@ import 'rongcloud_rtc_custom_layout.dart';
 import 'rongcloud_rtc_listeners.dart';
 import 'rongcloud_rtc_setups.dart';
 import 'rongcloud_rtc_stats.dart';
-import 'rongcloud_rtc_rect.dart';
 
 part 'rongcloud_rtc_view.dart';
 

@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'RongCloudRTC/RongRTCLib', rtc_sdk_version
   s.dependency 'RongCloudRTC/RongRTCPlayer', rtc_sdk_version
-  s.dependency 'RongWrapperLog', '5.4.0'
+  s.dependency 'RongWrapperLog', '5.4.1'
   
   s.platform = :ios, '8.0'
 
